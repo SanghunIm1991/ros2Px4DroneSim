@@ -8,7 +8,7 @@
 - 各節は、コマンドで機械的に拾う「機械点検」と、読んで判断する「目視点検」に分けている。機械点検で何も出なくても、目視点検は省かない
 - 結果は、末尾の4節「実施記録」に1行ずつ追記する。指摘と対応の判断は [`docs/qa_log.md`](qa_log.md) にも記録する
 
-コマンドは、リポジトリの直下で実行する。どれもファイルを読むだけで、変更や外部への送信はしない（外部への通信を伴うのは3-2節の外部リンクの確認だけ）。
+コマンドは、リポジトリの直下で実行する。どれもファイルを読むだけで、変更や外部への送信はしない（外部への通信を伴うのは、3-2節で外部リンクを開いて確かめるときだけ）。
 
 ## 1. 機密情報の流出
 
@@ -42,18 +42,22 @@ git grep -nIE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' | grep -vE 'users
 git log --all -p | grep -oE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' | grep -vE 'users\.noreply\.github\.com|noreply@anthropic\.com|@example\.(com|org)|git@github\.com' | sort | uniq -c
 ```
 
-認証情報らしい語と、ユーザー名を含むパスを拾う（全履歴の版も同じ正規表現で `git log --all -p` に対して見る）。
+認証情報らしい語と、ユーザー名を含むパスを、今の版と全履歴（過去の版で足した行）から拾う。
 
 ```bash
 git grep -nIiE 'api[_-]?key|secret|token|passw(or)?d|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]|github_pat_|sk-[A-Za-z0-9]{10}'
 
-git grep -nIE '/home/[a-z][a-z0-9_-]*/|[A-Za-z]:\\+Users\\+|/mnt/c/Users/'
+git log --all -p | grep -E '^\+' | grep -iE 'api[_-]?key|secret|token|passw(or)?d|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]|github_pat_|sk-[A-Za-z0-9]{10}' | sort | uniq -c
+
+git grep -nIE '/home/[a-z][a-z0-9_-]*|[A-Za-z]:\\+Users\\+|/mnt/c/Users/'
+
+git log --all -p | grep -E '^\+' | grep -E '/home/[a-z][a-z0-9_-]*|[A-Za-z]:\\+Users\\+|/mnt/c/Users/' | sort | uniq -c
 ```
 
-追跡してはいけないものが入っていないかを見る。
+追跡してはいけないものが入っていないかを見る（`.gitignore` の項目とそろえている。`.gitignore` を変えたら、ここも変える）。
 
 ```bash
-git ls-files | grep -E '^(notes|ws|ros2_ws|PX4-Autopilot|Micro-XRCE-DDS-Agent)/|^\.claude/settings\.local\.json$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
+git ls-files | grep -E '^(notes|ws|ros2_ws|build|install|log|PX4-Autopilot|Micro-XRCE-DDS-Agent|\.vscode|\.idea)/|^\.claude/settings\.local\.json$|(^|/)(Thumbs\.db|Desktop\.ini|\.DS_Store)$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
 ```
 
 **見方**: メールアドレスの2つのコマンドと、追跡してはいけないもののコマンドは、何も表示されなければ問題ない。認証情報とパスのコマンドは、説明文の中の一般的な語（「パスワード」、`/home/<ユーザー名>` のような伏せ字、この文書のコマンドそのもの）にも当たるので、1件ずつ読んで、実際の値や実在のユーザー名が書かれていないかを判断する。GitHubのアカウント名は、上の正規表現では拾えないので、アカウント名そのもので `git grep -n` して、出てきた箇所を目視で判断する（著作権者の表示とリポジトリのURLは問題ない）。
@@ -160,3 +164,4 @@ grep -ohE '\]\(https?://[^/)]+' docs/*.md README.md | sort | uniq -c | sort -rn
 
 | 実施日 | 対象（範囲） | 結果の要約 | 対応 |
 |---|---|---|---|
+| 2026-10-31 | 最初のpushの前の点検（全ファイル・全履歴。点検した時点で1コミット） | 機械点検: 名義はすべてnoreply。実メール・認証情報・ユーザー名入りのパス・追跡してはいけないもの・模型のファイルは0件（当たったのは、この文書のコマンドと伏せ字だけ）。リンク切れ0件、改行はすべてLF。目視点検と独立したレビュー: 高なし、中2・低8 | 指摘を直した（[`docs/qa_log.md`](qa_log.md) の2026-10-31の行）。申し送りの作成環境の値と過去の経緯の記述を一般化した。一般化する前の記述が最初のコミットに残るが、機微性が低いため履歴に残すことにした（ユーザー判断）。直した後の版で機械点検をやり直し、0件だった |
