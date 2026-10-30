@@ -1,0 +1,36 @@
+# Claude Code のローカル設定（個人環境依存）
+.claude/settings.local.json
+
+# OS・エディタの一時ファイル
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/
+
+# ROS 2のビルド成果物（このリポジトリでは通常生成されないが念のため）
+build/
+install/
+log/
+
+# PX4・Agentのソースとビルドの生成物、飛行の記録（手順書ではホームの下に置くが、cloneした中に置いた場合に混ざらないように）
+PX4-Autopilot/
+Micro-XRCE-DDS-Agent/
+*.ulg
+rosbag2_*/
+
+# WSLのエクスポート・ディスクイメージ（巨大・個人環境の中身を含みうる）
+*.tar
+*.vhdx
+
+# 機微情報の混入防止
+.env
+*.pem
+*.key
+
+# 練習環境の個人メモ（手順書は他の人も使うため、個人への指摘は含めない）
+notes/
+
+# 練習用のワークスペース（手順書では ~/ros2_ws に作るが、cloneした中に作った場合に個人の練習コードが混ざらないように）
+ws/
+ros2_ws/
