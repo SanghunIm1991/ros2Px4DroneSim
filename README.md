@@ -12,7 +12,7 @@ PX4・Gazebo・ROS 2を使い、3Dの環境でドローンを飛ばし、障害�
 | 2 | [環境構築](docs/setup_px4_gazebo.md) | WSL2・Ubuntu 24.04・ROS 2 Jazzyの上に、Gazebo・PX4（v1.17）・QGroundControlを導入する | WindowsのPC。WSL2とROS 2の詳しい説明は、親プロジェクトの [環境構築の手順書](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/setup_wsl2_ros2.md) の1〜5節 |
 | 3 | [フェーズ1: PX4とGazeboで飛ばす](docs/phase1_first_flight.md) | PX4のシミュレーションとQGroundControlで、ドローンを離陸・移動・着陸させ、PX4のシェルでも離陸・帰還させて、飛行モードの移り変わりを見る（最初のゴール） | 1・2 |
 
-1と2は、どちらを先にしてもかまいません（環境構築の完了条件にPX4のシェルやQGroundControlが出てくるので、1を先に読むと分かりやすくなります）。続くフェーズ2〜6は、[学習計画](docs/learning_plan.md) に予定を書いています。
+1と2は、どちらを先にしてもかまいません（環境構築の完了条件にPX4のシェルやQGroundControlが出てくるので、1を先に読むと分かりやすくなります）。続くフェーズ2〜6と間章の手順書（下書き）は、[学習計画](docs/learning_plan.md) の5節に一覧があります。
 
 各手順書では、コマンドを実行する手順の直後に「期待する結果」として、表示の例と、その読み方を載せています。実行の環境を用意せずに、読み物として読むこともできます。表示の出どころ（実際に確かめた表示か、仕様から想定した表示か）は、各手順書の冒頭に書いています。時刻・版の数字・パスなど、環境や実行ごとに変わる部分は、その旨を書いています。
 
