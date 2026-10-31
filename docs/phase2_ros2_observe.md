@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の7節（uXRCE-DDS）と8節（座標系）を、実際に動かして確かめる。ROS 2のワークスペースとビルドの基本は、上の親プロジェクトの節で学ぶ。
 >
-> **期待する結果の出どころ**: （作成中）各節の表示は、PX4 v1.17のソースと設定のファイル、`px4_msgs`（`release/1.17`）の型の定義、PX4とeProsimaの公式の文書から想定したもの。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）2節（Agentと `px4_msgs` のビルド、型の表示）は、実際に動かした表示（ROS 2 Jazzy、Agent v2.4.3、`px4_msgs` の `release/1.17`）。3節以降の表示は、PX4 v1.17のソースと設定のファイル、`px4_msgs` の型の定義、PX4とeProsimaの公式の文書から想定したもの。実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -71,16 +71,33 @@ cd ~/px4_ws
 colcon build --packages-select microxrcedds_agent
 ```
 
-**期待する結果**（最後の部分の抜粋。想定。時間は実行ごとに変わる）:
+**期待する結果**（抜粋。`git clone` の進み具合の行と、ビルド中の `[Processing: ...]` の行は省いた。時間は実行ごとに変わる）:
 
 ```text
+Cloning into 'Micro-XRCE-DDS-Agent'...
+...
+Note: switching to '73622810d984349b80bbac0ef55fc0b694d62222'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+...
 Starting >>> microxrcedds_agent
+--- stderr: microxrcedds_agent
+Cloning into 'spdlog'...
+Cloning into 'microxrcedds_client'...
+HEAD is now at d44dc3f Release v2.4.3
+HEAD is now at eb322062 Bump version to 1.9.2
+Cloning into 'microcdr'...
+HEAD is now at 3d1b177 Release v2.0.1
+---
 Finished <<< microxrcedds_agent [<時間>]
 
 Summary: 1 package finished [<時間>]
+  1 package had stderr output: microxrcedds_agent
 ```
 
-`microxrcedds_agent` は、Agentのパッケージの名前である（取得したフォルダの名前とは違う）。Agentのビルドは、必要なライブラリ（Fast DDS・Fast CDR・spdlog等）のうち、決まった版が見つからないものを、ビルドの途中でGitHubから取得して一緒にビルドする。そのため、時間がかかる。取得したライブラリも、ワークスペースの `install/` の中に入り、PCのほかの場所には入らない。PX4の文書には、Agentを `sudo make install` で `/usr/local` に入れる方法もあるが、この教材では、ほかのソフトウェアに影響しないように、ワークスペースの中でビルドする方法を使う。
+最初の部分は `git clone` の表示である。`-b v2.4.3` は、ブランチではなく、版に付けた名前（タグ）なので、Gitは「detached HEAD」（どのブランチにもいない状態）の説明を出す。版を決めて取得したときの普通の表示で、誤りではない。
+
+`microxrcedds_agent` は、Agentのパッケージの名前である（取得したフォルダの名前とは違う）。Agentのビルドは、必要なライブラリのうち、決まった版が見つからないものを、ビルドの途中でGitHubから取得して一緒にビルドする。そのため、時間がかかる。`--- stderr:` と `---` の間の行が、その取得の表示である。ROS 2 Jazzyを入れたPCでは、DDSのライブラリ（Fast DDS・Fast CDR）はROS 2に入っているものが使われ、取得されるのは、ログの出力のライブラリ（spdlog）と、Micro XRCE-DDSのクライアントとデータの変換のライブラリ（`microxrcedds_client`・`microcdr`）である。これらの表示は、エラーの出力（stderr）に出るので、最後に `1 package had stderr output` と書かれるが、`Finished` と `1 package finished` が出ていれば、ビルドは成功している。取得したライブラリも、ワークスペースの `install/` の中に入り、PCのほかの場所には入らない。PX4の文書には、Agentを `sudo make install` で `/usr/local` に入れる方法もあるが、この教材では、ほかのソフトウェアに影響しないように、ワークスペースの中でビルドする方法を使う。
 
 ### 2-3. `px4_msgs` を取得してビルドする
 
@@ -96,16 +113,18 @@ cd ~/px4_ws
 colcon build --packages-select px4_msgs
 ```
 
-**期待する結果**（最後の部分の抜粋。想定。時間は実行ごとに変わる）:
+**期待する結果**（抜粋。`git clone` の進み具合の行と、ビルド中の `[Processing: ...]` の行は省いた。時間は実行ごとに変わる）:
 
 ```text
+Cloning into 'px4_msgs'...
+...
 Starting >>> px4_msgs
 Finished <<< px4_msgs [<時間>]
 
 Summary: 1 package finished [<時間>]
 ```
 
-`px4_msgs` には200を超える型があり、それぞれについてC++とPythonのコードを作るので、ビルドに時間がかかる。
+`px4_msgs` には200を超える型があり、それぞれについてC++とPythonのコードを作るので、ビルドに時間がかかる（2-2節のAgentより長くかかることが多い）。ビルドの間は `[Processing: px4_msgs]` の行が何度も出るが、止まっているわけではない。
 
 ### 2-4. 型を確かめる
 
@@ -117,7 +136,7 @@ source ~/px4_ws/install/setup.bash
 ros2 interface show px4_msgs/msg/VehicleOdometry
 ```
 
-**期待する結果**（抜粋。想定）:
+**期待する結果**（抜粋）:
 
 ```text
 # Vehicle odometry data
