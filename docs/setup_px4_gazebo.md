@@ -310,7 +310,7 @@ Successfully installed cerberus-1.3.8 ... numpy-2.5.4 ... pymavlink-2.4.50 ... p
 [ubuntu.sh] Gazebo (Harmonic) will be installed
 [ubuntu.sh] Earlier versions will be removed
 ...
-2026-10-31 10:47:17 (469 MB/s) - ‘/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg’ saved [1222/1222]
+<日時> (<速さ>) - ‘/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg’ saved [1222/1222]
 
 Get:1 http://packages.osrfoundation.org/gazebo/ubuntu-stable noble InRelease [4,273 B]
 ...
@@ -400,8 +400,8 @@ CMake Warning (dev) at CMakeLists.txt:176 (find_package):
 ...
 -- Looking for gz-sensors8-gpu_lidar -- found version 8.2.2
 ...
--- Configuring done (50.9s)
--- Generating done (0.8s)
+-- Configuring done (<秒数>s)
+-- Generating done (<秒数>s)
 -- Build files have been written to: /home/<ユーザー名>/PX4-Autopilot/build/px4_sitl_default
 [0/1141] git submodule src/modules/uxrce_dds_client/Micro-XRCE-DDS-Client
 ...
@@ -475,7 +475,7 @@ HTTP request sent, awaiting response... 200 OK
 Length: 195332600 (186M) [application/octet-stream]
 Saving to: ‘QGroundControl-x86_64.AppImage’
 ...
-2026-10-31 11:52:05 (19.7 MB/s) - ‘QGroundControl-x86_64.AppImage’ saved [195332600/195332600]
+<日時> (<速さ>) - ‘QGroundControl-x86_64.AppImage’ saved [195332600/195332600]
 
 $ sha256sum QGroundControl-x86_64.AppImage
 9a47e4cf269d9e4f897f582f6b19aa7ebf1e9e67c9d68a532a45b541354bc344  QGroundControl-x86_64.AppImage
@@ -524,13 +524,7 @@ cd ~/qgc
 
 ```text
 # T1（PX4のシミュレーション）
-______  __   __    ___
-| ___ \ \ \ / /   /   |
-| |_/ /  \ V /   / /| |
-|  __/   /   \  / /_| |
-| |     / /^\ \ \___  |
-\_|     \/   \/     |_/
-
+...
 px4 starting.
 
 INFO  [px4] startup script: /bin/sh etc/init.d-posix/rcS 0
