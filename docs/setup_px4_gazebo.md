@@ -326,7 +326,7 @@ Processing triggers for hicolor-icon-theme (0.17-2) ...
 表示は長く、3つの段階（`[ubuntu.sh] Installing ...` の行で区切られる）に分かれる。
 
 - **ビルドの道具（apt）**: 既に入っているものは `is already the newest version` と表示され、足りないもの（`ninja-build`・`ccache`・`gdb` 等）が入る。
-- **Pythonのパッケージ（pip）**: `Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment .../px4-venv` は、aptで入れたnumpy（ROS 2が使うもの）には手を付けず、仮想環境の中に新しい版を入れた、という意味である。仮想環境を使った狙いどおりの動きである。続く `ERROR: ... scipy ... requires numpy<1.28.0 ...` は、仮想環境の中で、aptで入れたscipyと、新しく入れたnumpyの版が合わないことを知らせる表示で、導入の失敗ではない（直後に `Successfully installed` が出る）。この食い違いは仮想環境の中だけのものなので、仮想環境を有効にしていないターミナル（ROS 2のノードを動かすターミナル）には影響しない。4-1の「`~/.bashrc` に有効にする行を書かない」は、このためでもある。
+- **Pythonのパッケージ（pip）**: `Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment .../px4-venv` は、aptで入れたnumpy（ROS 2が使うもの）には手を付けず、仮想環境の中に新しい版を入れた、という意味である。仮想環境を使った狙いどおりの動きである。続く `ERROR: ... scipy ... requires numpy<1.28.0 ...` は、仮想環境の中で、aptで入れたscipyと、新しく入れたnumpyの版が合わないことを知らせる表示で、導入の失敗ではない（直後に `Successfully installed` が出る）。この食い違いは仮想環境の中だけのものなので、仮想環境を有効にしていないターミナル（ROS 2のノードを動かすターミナル）には影響しない。4-1の「`~/.bashrc` に有効にする行を書かない」は、このためでもある。逆に、仮想環境を有効にしたターミナルでは、ROS 2のノードやツールを動かさない（新しいnumpyが読み込まれ、ROS 2のPythonのパッケージと合わないおそれがある）。
 - **シミュレーションの道具（apt）**: Gazebo公式の取得元の鍵（`/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg`）を保存し、取得元（`packages.osrfoundation.org`）を追加して、`gz-harmonic` と、その部品（`libgz-sim8` 等。200個ほど）を入れる。「Earlier versions will be removed」と表示されるが、aptの集計は `0 to remove` で、何も削除されない。
 
 最後の行は `Processing triggers ...` のようなaptの表示で、スクリプトは終わりの案内を出さずにプロンプトへ戻る。途中で止まらず、エラー（`E:` で始まるaptの行や、Pythonの `Traceback`）が出ずにプロンプトへ戻れば成功である。
@@ -368,7 +368,7 @@ Copyright (C) 2018 Open Source Robotics Foundation.
 Released under the Apache 2.0 License.
 ```
 
-`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。`gz sim --version` が3節と同じ版を表示すれば、4-3の導入で、ROS 2のパッケージのGazeboは置き換わっていない。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く見込みである（実際につながるかは、フェーズ4で確かめる）。
+`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。`which -a gz` の先頭にROS 2のパッケージの `gz` が残り、4-3のaptの集計が `0 to remove` だったので、4-3の導入で、ROS 2のパッケージのGazeboは削除も置き換えもされていない。`gz sim --version` は3節と同じ8.15.0で、Gazebo公式のパッケージの中身（`libgz-sim8`）も同じ8.15.0である。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く見込みである（実際につながるかは、フェーズ4で確かめる）。
 
 ### 4-5. PX4のビルド
 
@@ -466,7 +466,8 @@ sha256sum QGroundControl-x86_64.AppImage
 **期待する結果**（抜粋。時刻・速さ・接続先のアドレスは、実行ごとに変わる。`sha256sum` の値はv5.1.5のこのファイルに固有で、GitHubのリリースの情報と一致することを確かめたもの）:
 
 ```text
---2026-10-31 11:51:55--  https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
+$ wget https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
+--<日時>--  https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
 ...
 HTTP request sent, awaiting response... 302 Found
 Location: https://release-assets.githubusercontent.com/github-production-release-asset/... [following]
@@ -546,7 +547,7 @@ WARN  [health_and_arming_checks] Preflight Fail: No connection to the GCS
 INFO  [tone_alarm] home set
 INFO  [mavlink] mode: Normal, data rate: 4000000 B/s on udp port 18570 remote port 14550
 ...
-INFO  [logger] Opened full log file: ./log/2026-10-31/02_55_36.ulg
+INFO  [logger] Opened full log file: ./log/<日付>/<時刻>.ulg
 ...
 INFO  [px4] Startup script returned successfully
 pxh> INFO  [commander] Ready for takeoff!
@@ -564,13 +565,13 @@ libEGL warning: egl: failed to create dri2 screen
 T1は、次の順に進む。
 
 - **PX4の起動**: `SYS_AUTOSTART=4001` は、機体の種類（x500）の設定を読み込んだことを示す。初めての起動では、その後に `CAL_ACC0_ID: curr: 0 -> new: ...` のような、パラメータを初期値に書き換える行が続く。
-- **Gazeboの起動**: `Gazebo simulator 8.15.0` は、4-4で確かめたGazeboを使うことを示す。Gazeboのウィンドウが開くまで、`Waiting for Gazebo world...` が何度か続く。`Spawning Gazebo model` の後、Gazeboの画面の地面の上にドローン（`x500`）が現れる（ウィンドウが開いてから、ドローンが表示されるまで、数秒かかることがある）。`Warning [Utils.cc:132] ... gz_frame_id ... not defined in SDF` は、機体の模型のファイルに、Gazeboの模型の書式（SDF）の規格に無い項目があることを知らせる警告で、Gazeboはその項目をそのまま残して読み込む（機体は動く）。
+- **Gazeboの起動**: `Gazebo simulator 8.15.0` は、Gazebo Harmonic（8.15.0）で起動したことを示す（ROS 2のパッケージのものとGazebo公式のもののどちらかは、この表示からは区別できない。どちらも同じ版である）。Gazeboのウィンドウが開くまで、`Waiting for Gazebo world...` が何度か続く。`Spawning Gazebo model` の後、Gazeboの画面の地面の上にドローン（`x500`）が現れる（ウィンドウが開いてから、ドローンが表示されるまで、数秒かかることがある）。`Warning [Utils.cc:132] ... gz_frame_id ... not defined in SDF` は、機体の模型のファイルに、Gazeboの模型の書式（SDF）の規格に無い項目があることを知らせる警告で、Gazeboはその項目をそのまま残して読み込みを続け、機体は現れる。
 - **通信の準備**: `uxrce_dds_client` の行は、ROS 2とつなぐ部品が、UDPの8888番でAgentを待つことを示す（Agentはフェーズ2で使う。今は起動していないので、つながらなくてよい）。`mavlink` の行は、QGC（UDPの14550番）などと話す口を開いたことを示す。
 - **QGCとの接続**: `Preflight Fail: No connection to the GCS` は、地上局（GCS。ここではQGC）がつながっていないので、まだ飛べない、という意味である。T2でQGCを起動して機体につながると、`Ready for takeoff!` が表示される。この行は、`pxh>` のプロンプトの後ろに続けて表示されることがある（PX4の表示が、入力を待つプロンプトの後から割り込むため）。
 
 T1の `pxh>` は、PX4のシェルのプロンプトである。続けてコマンドを打つと、PX4に直接指示できる（フェーズ1で使う）。
 
-T2のQGCの表示は、警告が多いが、ウィンドウが開いて動いていれば問題ない。`libEGL warning` と `MESA: error: ZINK ...` は、WSLのグラフィックスの機能の一部が使えないことを知らせる表示で、QGCは使える方法で画面を描く。`speechd` と `QTextToSpeech` の行は、読み上げの機能が無いことを、`Positioning error` の行は、PCの位置を取得できないことを知らせる表示で、どちらもシミュレーションの機体とつなぐのには関係ない。
+T2のQGCの表示は、警告が多いが、ウィンドウが開いて動いていれば問題ない。`libEGL warning` と `MESA: error: ZINK ...` は、WSLのグラフィックスの機能の一部が使えないことを知らせる表示で、ウィンドウが表示されれば問題ない。`speechd` の行は、読み上げの機能が無いことを、`Positioning error` の行は、PCの位置を取得できないことを知らせる表示で、どちらもシミュレーションの機体とつなぐのには関係ない。
 
 QGCのウィンドウが開き、しばらくすると、自動でシミュレーションの機体につながり、地図の上に機体の印（オレンジ色の矢じりの形で、機体が向いている方向を指す）が表示される。この状態になれば、この手順書は完了である。止めるときは、T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutdown` と打ってもよい）。Ctrl+C で止めると、T1の最後に次の表示が出るが、止め方として正しいので問題ない。
 
@@ -599,4 +600,5 @@ make: *** [Makefile:227: px4_sitl] Interrupt
 - 4-2の `git clone`・`git checkout`・`make submodulesclean`、4-3の `ubuntu.sh` の実行とWSLの再起動、4-5と6節の `make` のコマンドは、PX4の公式の文書（PX4 User Guide v1.17: [Windows Development Environment (WSL2-Based)](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/dev_env_windows_wsl.md)、[Git Examples](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/contribute/git_examples.md)、[Building PX4 Software](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/building_px4.md)、[Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、Dronecode/PX4、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)）の手順に従ったもの。仮想環境の中で実行する形と、`--no-nuttx` の指定は、この教材で加えた（改変あり）。4-3のスクリプトの説明は、v1.17.0の [`Tools/setup/ubuntu.sh`](https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/Tools/setup/ubuntu.sh) を読んで、自分の言葉でまとめたもの。
 - 5節のライブラリの導入とAppImageの扱いは、QGroundControlの公式の文書（[Download and Install](https://docs.qgroundcontrol.com/master/en/qgc-user-guide/getting_started/download_and_install.html)）の手順を参考に書いた。AppImageの取得元は、QGroundControlのGitHubのリリース（[v5.1.5](https://github.com/mavlink/qgroundcontrol/releases/tag/v5.1.5)）。
 - 3節の `gz sim --version` の表示は、Gazebo（Open Source Robotics Foundation、Apache License 2.0）の表示。
+- 4〜6節の期待する結果は、PX4（PX4-Autopilot）・Gazebo・QGroundControlと、apt・pip・git・wget等のツールが出した表示を、筆者の環境で実行して抜粋したもの（説明に要る行に絞り、ユーザー名・ホスト名・日時・実測値の一部を伏せた）。
 - WSL2の導入: [Install WSL](https://learn.microsoft.com/windows/wsl/install)（Microsoft）
