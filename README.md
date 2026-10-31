@@ -12,6 +12,8 @@ PX4・Gazebo・ROS 2を使い、3Dの環境でドローンを飛ばし、障害�
 
 | 文書 | 内容 |
 |---|---|
+| [docs/idea_origin.md](docs/idea_origin.md) | 構想（目的・ゴール・6つの段階・技術を選んだ理由・先に確かめること） |
+| [docs/learning_plan.md](docs/learning_plan.md) | 学習計画（各フェーズの内容・前提・完了条件、作る予定の手順書） |
 | [docs/handoff_from_parent.md](docs/handoff_from_parent.md) | 立ち上げの経緯・親プロジェクトから引き継いだ知見・未決事項 |
 | [docs/qa_log.md](docs/qa_log.md) | 判断・承認の記録 |
 | [docs/public_release_review.md](docs/public_release_review.md) | 公開前と更新のたびの点検の観点と実施記録 |
