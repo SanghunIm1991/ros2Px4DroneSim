@@ -24,3 +24,7 @@
 | 6-5節 | `commander land` の後の動きと、T1の表示 | 飛行モードが **Land** になり、その場に着陸する。T1に `Landing detected` と `Disarmed by landing` | PX4のソース、5-3節の実際の表示 |
 | 6-3節 | `commander` とだけ打ったときの使い方の説明 | `mode` に渡せる名前（`auto:loiter`・`auto:land`・`auto:takeoff`・`auto:rtl`・`posctl`・`offboard` 等）が並ぶ | PX4のソース（`Commander.cpp` の使い方の一覧） |
 | 8節 | 課題2: QGCの飛行モードの一覧から **Land** を選べるか | 選べて、左のボタンと同じことが起きる | QGC v5.1.5の文書 |
+
+## フェーズ2（[`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md)）
+
+2026-10-31に下書き。すべての表示（Agentと `px4_msgs` のビルド、AgentとPX4がつながったときの表示、`ros2 topic list`・`info -v`・`echo`、QoSが合わないときの警告、機体を動かしたときの位置の値の変化）が想定で、まだ動かしていない。AgentがROS 2 Jazzyの環境でビルドでき、`~/.bashrc` の `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかも、確かめていない（学習計画のフェーズ2の予備の実験に当たる）。動かしたら、表示を差し替え、この節を、確かめた項目と残りの項目の表に直す。

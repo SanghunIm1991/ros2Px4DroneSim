@@ -102,7 +102,7 @@
 | 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。期待する結果は、実際に導入したときの表示に差し替えた |
 | 0 | [`docs/phase0_drone_px4.md`](phase0_drone_px4.md) | 作成済み（2026-10-31）。図の見た目もGitHubで確かめた |
 | 1 | [`docs/phase1_first_flight.md`](phase1_first_flight.md) | 作成済み（2026-10-31）。想定のままの表示は [`docs/pending_checks.md`](pending_checks.md) に一覧した（実際に使って違っていたら直す） |
-| 2 | `docs/phase2_ros2_observe.md` | 未作成 |
+| 2 | [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) | 下書き（2026-10-31）。表示はすべて想定で、実際に動かして確かめる |
 | 3 | `docs/phase3_offboard.md` | 未作成 |
 | 4 | `docs/phase4_lidar.md` | 未作成 |
 | 5 | `docs/phase5_collision_prevention.md` | 未作成 |
