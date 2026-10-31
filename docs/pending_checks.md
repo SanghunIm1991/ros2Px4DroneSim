@@ -86,11 +86,10 @@
 
 ## フェーズ6（[`docs/phase6_replan.md`](phase6_replan.md)）
 
-2026-10-31に下書き。Nav2を導入していない環境で書いた。サンプルのコードは、ROS 2のリンタ（`ament_flake8`）とPythonの文法の点検だけを通し、Nav2の設定の名前・既定値・アクションの型は `jazzy` のソースで確かめた。すべての表示と機体の動きが想定である（学習計画のフェーズ6の予備の実験を含む）。とくに、次を確かめる。
+2026-10-31に下書き。Nav2を導入していない環境で書いた。サンプルのコードは、ROS 2のリンタ（`ament_flake8`）とPythonの文法の点検だけを通し、Nav2の設定の名前・既定値・アクションの型は `jazzy` のソースで確かめた。同じ日に、3-1節のNav2の導入の表示（版1.3.13。使う部品がすべて入ること）を確かめて差し替えた。ほかのすべての表示と機体の動きが想定である（学習計画のフェーズ6の予備の実験を含む）。とくに、次を確かめる。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
-| 3-1節 | `ros-jazzy-navigation2` に、`planner_server`・コストマップ・NavFn・`nav2_msgs` が含まれるか | 含まれる |
 | 5-2節 | `planner_server` を `ros2 run` で起動したときの表示 | `planner_server lifecycle node launched.` と、外からの切り替えを待つ旨 |
 | 5-3節 | `ros2 lifecycle set` の表示と、有効化がTFを待って止まらないか | `Transitioning successful`。止まらない |
 | 5-3節 | 「設定」の後・「有効化」の前に、計画器がアクションの頼みを断るか（ノードが離陸しないか） | 断る。T6に「計画器が頼みを断った」が1回出て、離陸しない |
@@ -126,11 +125,10 @@
 
 ## 間章（[`docs/interlude_nav2.md`](interlude_nav2.md)）
 
-2026-10-31に下書き。部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチの最新のソースで確かめた。aptで入る版との違いと、4節・6節の動きは確かめていない。
+2026-10-31に下書き。部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチの最新のソースで確かめた。1-1節の表の部品が、aptで入る版（1.3.13）ですべて入ることは、同じ日に導入の表示で確かめた。設定の名前などの、aptの版と最新のソースとの違いと、4節・6節の動きは確かめていない。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
-| 1-1節 | aptの `ros-jazzy-navigation2` で入る部品の一覧（`ros2 pkg list \| grep -E 'nav2\|opennav'`） | 表の部品がすべて入る |
 | 4節 | `ros2 param get`・`ros2 param set` で、実行中に `inflation_layer.inflation_radius` を変えられるか。表示の文言 | `Double value is: 1.2`・`Set parameter successful`。RViz2の地図の膨らませた範囲が狭くなる |
 | 6節 | 課題1・2: `SmacPlanner2D`・`ThetaStarPlanner` に替えて、「設定」と計画ができるか | できる |
 | 4節 | 実行中に効かない設定（`width` 等）を `ros2 param set` したときの表示 | `Set parameter successful` と出るが、効かない |

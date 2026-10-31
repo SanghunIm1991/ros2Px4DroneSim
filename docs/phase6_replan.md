@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: フェーズ3（オフボード制御）、フェーズ4（LiDARの値をROS 2へ中継する）、フェーズ5（組み込みの衝突防止にできないこと）を組み合わせる。Nav2は、本来は地面を走るロボットのためのパッケージ群で、この手順書では、その中の地図（コストマップ）と経路の計画器だけを使う。Nav2全体の使い方（自己位置の推定・走行の制御・行動の木など）は扱わない。
 >
-> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。Nav2を導入していない環境で書いたので、ビルド・起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2を導入していない環境で書いたので、ほかのビルド・起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -102,7 +102,36 @@ sudo apt update
 sudo apt install ros-jazzy-navigation2
 ```
 
-**期待する結果**（想定）: 導入する部品の一覧と、使う容量が表示され、`Do you want to continue? [Y/n]` と聞かれる。Enterを押すと導入が進み、プロンプトに戻る。`ros-jazzy-navigation2` は、Nav2の部品をまとめたパッケージで、この手順書で使う `planner_server`（`nav2_planner`）・コストマップ（`nav2_costmap_2d`）・NavFn（`nav2_navfn_planner`）・アクションの型（`nav2_msgs`）を含む。
+**期待する結果**（抜粋。`<username>` は、各自のユーザー名。パッケージの数・容量・版は、既に入っているものと、導入する時期によって変わる）:
+
+```text
+[sudo] password for <username>:
+...
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+All packages are up to date.
+...
+The following NEW packages will be installed:
+  ...
+  ros-jazzy-nav2-costmap-2d ros-jazzy-nav2-map-server
+  ros-jazzy-nav2-mppi-controller ros-jazzy-nav2-msgs ros-jazzy-nav2-navfn-planner ros-jazzy-nav2-planner ros-jazzy-nav2-regulated-pure-pursuit-controller
+  ...
+  ros-jazzy-nav2-waypoint-follower ros-jazzy-navigation2 ros-jazzy-ompl ros-jazzy-opennav-docking ros-jazzy-opennav-docking-bt ros-jazzy-opennav-docking-core
+  ros-jazzy-robot-localization ros-jazzy-smclib xfonts-encodings xfonts-utils xtl-dev
+0 upgraded, 106 newly installed, 0 to remove and 0 not upgraded.
+Need to get 76.5 MB of archives.
+After this operation, 472 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+...
+Setting up ros-jazzy-navigation2 (1.3.13-1noble.20260921.033624) ...
+Processing triggers for man-db (2.12.0-4build2) ...
+...
+```
+
+最初の `[sudo] password` は、管理者の権限で実行するためのパスワードの入力で、打った文字は表示されない。`sudo apt update` は、パッケージの一覧を新しくする（`All packages are up to date.` は、更新の要るパッケージが無いことを示す）。`sudo apt install` は、入れるパッケージの一覧（`The following NEW packages will be installed:`）と、取得する量と使う容量を表示し、`Do you want to continue? [Y/n]` と聞く。`Y` を打ってEnterを押す（大文字の `Y` が既定なので、Enterだけでもよい）と、取得（`Get:`）・展開（`Unpacking`）・設定（`Setting up`）が進み、プロンプトに戻る。エラー（`E:` で始まる行）が出なければ成功である。
+
+`ros-jazzy-navigation2` は、Nav2の部品をまとめたパッケージで、この手順書で使う `planner_server`（`ros-jazzy-nav2-planner`）・コストマップ（`ros-jazzy-nav2-costmap-2d`）・NavFn（`ros-jazzy-nav2-navfn-planner`）・アクションの型（`ros-jazzy-nav2-msgs`）が、一覧に含まれる。ほかにも、この手順書では使わない部品（制御器・自己位置の推定・行動の木など。[Nav2の全体像の間章](interlude_nav2.md) の1-1節）と、それらが使うライブラリが、まとめて入る。最後の `Setting up ros-jazzy-navigation2 (1.3.13-...)` の数が、入ったNav2の版である。
 
 ### 3-2. 計画器の設定ファイルを書く
 

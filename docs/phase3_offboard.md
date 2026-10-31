@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: PX4の公式のサンプル（[`px4_ros_com`](https://github.com/PX4/px4_ros_com) のオフボード制御の例）と同じ流れ（合図を送り続け、1秒たったらOffboardに切り替えてアームする）を、この教材で一から書いた。公式のPythonの例は、`px4_ros_com` の `main` のブランチにだけあり、v1.17では名前に `_v1` が付く位置と状態のトピック（フェーズ0の7節）を、印の無い名前で購読しているので、v1.17ではそのまま使えない。
 >
-> **期待する結果の出どころ**: サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。型の項目と定数は、`px4_msgs`（`release/1.17`）とPX4 v1.17のソースで確かめた。4-1節のパッケージの作成、5節のビルドとノードのログ、6節の `ros2 topic hz` と `ros2 topic echo` の表示は、筆者の環境で動かして確かめたもの。5節の、QGCとGazeboの画面の様子とT1の表示、QGCのLandやCtrl+Cで途中で止めたときの動きは、PX4 v1.17のソースと公式の文書から想定したもの。時刻は実行ごとに変わる。ビルドの時間はPCによって変わるので `<time>` と書いた。
+> **期待する結果の出どころ**: サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。型の項目と定数は、`px4_msgs`（`release/1.17`）とPX4 v1.17のソースで確かめた。4-2節のクラス図（SVG）は、生成スクリプトの機械点検（はみ出し・重なり・線の交差）を通したもので、見た目は未確認。4-1節のパッケージの作成、5節のビルドとノードのログ、6節の `ros2 topic hz` と `ros2 topic echo` の表示は、筆者の環境で動かして確かめたもの。5節の、QGCとGazeboの画面の様子とT1の表示、QGCのLandやCtrl+Cで途中で止めたときの動きは、PX4 v1.17のソースと公式の文書から想定したもの。時刻は実行ごとに変わる。ビルドの時間はPCによって変わるので `<time>` と書いた。
 
 ## 0. 学習目標と完了条件
 
@@ -132,6 +132,68 @@ creating ./drone_offboard/drone_offboard/waypoint_flight.py
 フェーズ3-0の2節と同じ形で、パッケージの名前とノードの名前だけが違う。最後の行の `waypoint_flight.py` が、次の4-2節で書き換える雛形である。
 
 ### 4-2. ノードを書く
+
+コードは長いので、先に、ノードのクラス `WaypointFlight` の作りを図で見ておく。
+
+![フェーズ3のノード WaypointFlight のクラス図。WaypointFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読し、右の3つの型（合図の OffboardControlMode、目標の TrajectorySetpoint、指令の VehicleCommand）を、既定のQoSで送る。同じファイルの定数（経由点・機首の向き・着いたとみなす距離・周期・指示し直す間隔）を読み、座標の変換の関数を使う。下の補足は、0.1秒ごとに呼ばれる on_timer が、どの順に段階を進めるかを示す](img/phase3_class.svg)
+
+<details>
+<summary>同じ図（mermaid版）</summary>
+
+```mermaid
+classDiagram
+    class Node {
+        ROS 2のノードの元になるクラス
+    }
+    class WaypointFlight {
+        mode_pub・setpoint_pub・command_pub 送り手
+        position 最後に届いた位置
+        status 最後に届いた状態
+        cycles on_timerが呼ばれた回数
+        index 今目指している経由点の番号
+        started 一度Offboardでアームしたか
+        landing 着陸を指示したか
+        timer 0.1秒ごとのタイマー
+        __init__() 送り手・受け手・タイマーを作る
+        on_position(msg) 最後の位置を覚える
+        on_status(msg) 最後の状態を覚える
+        on_timer() 0.1秒ごとに段階を進める
+        send_setpoint() 合図と目標を送る
+        send_command(command, param1, param2) 指令を送る
+        engaged() Offboardでアームしているか
+        distance_to_target() 経由点までの距離
+        keep_landing() Landまで送り直し終える
+        now_us() ノードの時計の値
+    }
+    class VehicleLocalPosition {
+        /fmu/out/vehicle_local_position_v1
+    }
+    class VehicleStatus {
+        /fmu/out/vehicle_status_v1
+    }
+    class OffboardControlMode {
+        /fmu/in/offboard_control_mode
+    }
+    class TrajectorySetpoint {
+        /fmu/in/trajectory_setpoint
+    }
+    class VehicleCommand {
+        /fmu/in/vehicle_command
+    }
+    Node <|-- WaypointFlight : 受け継ぐ
+    VehicleLocalPosition --> WaypointFlight : 購読（センサ向けのQoS）
+    VehicleStatus --> WaypointFlight : 購読（センサ向けのQoS）
+    WaypointFlight --> OffboardControlMode : 送る（既定のQoS）
+    WaypointFlight --> TrajectorySetpoint : 送る（既定のQoS）
+    WaypointFlight --> VehicleCommand : 送る（既定のQoS）
+    note for WaypointFlight "on_timerの流れ（0.1秒ごと）<br>【1】位置と状態が届くまでは何もしない<br>【2】着陸を指示した後はkeep_landingだけ<br>【3】合図と目標を送る<br>【4】Offboardでアームするまで1秒ごとに指示し直す<br>【5】一度Offboardになった後に抜けたら終える<br>【6】経由点まで0.5m以内なら次へ<br>【7】最後の経由点で着陸を指示する"
+```
+
+mermaid版には、定数と、座標の変換の関数を載せていない（SVGの図の左下と右下）。
+
+</details>
+
+図の中央がクラスで、上の区画が、ノードが覚えておく値（属性）、下の区画が、メソッドである。左の2つの型を購読し（受け手の作り方はフェーズ3-0と同じ）、右の3つの型をPX4へ送る。動きの中心は `on_timer` で、下の補足の順に、毎回（0.1秒ごとに）上から判断していく。1節の4つの段階は、この中の3〜7に当たる。ほかのメソッドは、`on_timer` から呼ばれる部品である。
 
 雛形の `waypoint_flight.py` の中身を、次のように書き換える。
 
@@ -477,3 +539,4 @@ T6の `ros2 topic echo` を Ctrl+C で止める。ノードは、着陸してデ
 - 型の項目と定数: [PX4/px4_msgs](https://github.com/PX4/px4_msgs)（`release/1.17`、BSD 3-Clause License、PX4 Development Team）の定義。Offboardのモードの番号: PX4 v1.17のソース [`src/modules/commander/px4_custom_mode.h`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/px4_custom_mode.h)。PX4が受け取るトピックの一覧と名前: [`src/modules/uxrce_dds_client/dds_topics.yaml`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/dds_topics.yaml)。
 - 流れの参考にしたサンプル: [`px4_ros_com`](https://github.com/PX4/px4_ros_com) の `main` のブランチの `src/examples/offboard_py/offboard_control.py`（BSD 3-Clause License、PX4 Development Team）。コードは写しておらず、同じ流れを、この教材で一から書いた。
 - サンプルのコードは、この教材で書いたもの（Apache License 2.0）。
+- 図（`img/phase3_class.svg`）は、この教材で作ったもの。

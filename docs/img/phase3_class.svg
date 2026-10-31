@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1290 874" width="1290" height="874" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="フェーズ3のノード WaypointFlight のクラス図。WaypointFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読し、右の3つの型（合図の OffboardControlMode、目標の TrajectorySetpoint、指令の VehicleCommand）を、既定のQoSで送る。同じファイルの定数（経由点・機首の向き・着いたとみなす距離・周期・指示し直す間隔）を読み、座標の変換の関数を使う。下の補足は、0.1秒ごとに呼ばれる on_timer が、どの順に段階を進めるかを示す">
+<title>フェーズ3のノード WaypointFlight のクラス図。WaypointFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読し、右の3つの型（合図の OffboardControlMode、目標の TrajectorySetpoint、指令の VehicleCommand）を、既定のQoSで送る。同じファイルの定数（経由点・機首の向き・着いたとみなす距離・周期・指示し直す間隔）を読み、座標の変換の関数を使う。下の補足は、0.1秒ごとに呼ばれる on_timer が、どの順に段階を進めるかを示す</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker><marker id="t" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#ffffff" stroke="#333333" stroke-width="1.2"/></marker></defs>
+<rect x="0" y="0" width="1290" height="874" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M660,134 L660,100" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#t)"/>
+<path d="M350,194 L420,194" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M350,304 L420,304" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M420,434 L350,434" fill="none" stroke="#333333" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M900,194 L970,194" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M900,298 L970,298" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M900,402 L970,402" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M900,516 L970,516" fill="none" stroke="#333333" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#a)"/>
+<path d="M660,554 L660,594" fill="none" stroke="#333333" stroke-width="1.6" stroke-dasharray="6,4"/>
+<rect x="510" y="20" width="300" height="80" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="660" y="44" text-anchor="middle" font-weight="bold">Node（rclpy）</text>
+<line x1="510" y1="60" x2="810" y2="60" stroke="#7a5aa6" stroke-width="1.2"/>
+<text x="660" y="84" text-anchor="middle">ROS 2のノードの元になるクラス</text>
+<rect x="420" y="134" width="480" height="420" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="430" y="158" font-weight="bold">WaypointFlight</text>
+<line x1="420" y1="174" x2="900" y2="174" stroke="#7a5aa6" stroke-width="1.2"/>
+<text x="430" y="198">mode_pub・setpoint_pub・command_pub: 送り手（右の3つ）</text>
+<text x="430" y="218">position: 最後に届いた位置（左の上）</text>
+<text x="430" y="238">status: 最後に届いた状態（左の下）</text>
+<text x="430" y="258">cycles: on_timer が呼ばれた回数</text>
+<text x="430" y="278">index: 今目指している経由点の番号</text>
+<text x="430" y="298">started: 一度Offboardでアームしたか</text>
+<text x="430" y="318">landing: 着陸を指示したか</text>
+<text x="430" y="338">timer: 0.1秒（PERIOD）ごとのタイマー</text>
+<line x1="420" y1="354" x2="900" y2="354" stroke="#7a5aa6" stroke-width="1.2"/>
+<text x="430" y="378">__init__(): 送り手3つ・受け手2つ・タイマーを作る</text>
+<text x="430" y="398">on_position(msg)・on_status(msg): 最後の値を覚える</text>
+<text x="430" y="418">on_timer(): 0.1秒ごとに段階を進める（下の補足）</text>
+<text x="430" y="438">send_setpoint(): 合図と、今の経由点の目標を送る</text>
+<text x="430" y="458">send_command(command, param1, param2): 指令を送る</text>
+<text x="430" y="478">engaged(): Offboardで、アームしているか</text>
+<text x="430" y="498">distance_to_target(): 今の経由点までの距離</text>
+<text x="430" y="518">keep_landing(): Landまで指令を送り直し、終える</text>
+<text x="430" y="538">now_us(): ノードの時計の値（マイクロ秒）</text>
+<rect x="20" y="154" width="330" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="185" y="178" text-anchor="middle" font-weight="bold">VehicleLocalPosition</text>
+<text x="185" y="198" text-anchor="middle" font-size="13">/fmu/out/vehicle_local_position_v1</text>
+<text x="185" y="218" text-anchor="middle" font-size="13">QoS: センサ向け（BEST_EFFORT）</text>
+<rect x="20" y="264" width="330" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="185" y="288" text-anchor="middle" font-weight="bold">VehicleStatus</text>
+<text x="185" y="308" text-anchor="middle" font-size="13">/fmu/out/vehicle_status_v1</text>
+<text x="185" y="328" text-anchor="middle" font-size="13">QoS: センサ向け（BEST_EFFORT）</text>
+<rect x="20" y="374" width="330" height="160" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="30" y="398" font-weight="bold">定数（ファイルの先頭）</text>
+<line x1="20" y1="414" x2="350" y2="414" stroke="#c77d1a" stroke-width="1.2"/>
+<text x="30" y="438">WAYPOINTS_ENU: 回る経由点（ENU）</text>
+<text x="30" y="458">YAW_ENU: 機首の向き（ENU）</text>
+<text x="30" y="478">REACHED_DIST: 着いたとみなす距離</text>
+<text x="30" y="498">PERIOD: 周期（0.1秒）</text>
+<text x="30" y="518">RETRY_CYCLES: 指示し直す間隔（10回）</text>
+<rect x="970" y="154" width="300" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="1120" y="178" text-anchor="middle" font-weight="bold">OffboardControlMode</text>
+<text x="1120" y="198" text-anchor="middle" font-size="13">/fmu/in/offboard_control_mode</text>
+<text x="1120" y="218" text-anchor="middle" font-size="13">QoS: 既定（10）。合図</text>
+<rect x="970" y="258" width="300" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="1120" y="282" text-anchor="middle" font-weight="bold">TrajectorySetpoint</text>
+<text x="1120" y="302" text-anchor="middle" font-size="13">/fmu/in/trajectory_setpoint</text>
+<text x="1120" y="322" text-anchor="middle" font-size="13">QoS: 既定（10）。目標の位置</text>
+<rect x="970" y="362" width="300" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="1120" y="386" text-anchor="middle" font-weight="bold">VehicleCommand</text>
+<text x="1120" y="406" text-anchor="middle" font-size="13">/fmu/in/vehicle_command</text>
+<text x="1120" y="426" text-anchor="middle" font-size="13">QoS: 既定（10）。切り替え・アーム等</text>
+<rect x="970" y="466" width="300" height="100" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="980" y="490" font-weight="bold">関数（クラスの外）</text>
+<line x1="970" y1="506" x2="1270" y2="506" stroke="#c77d1a" stroke-width="1.2"/>
+<text x="980" y="530">enu_to_ned(): 位置をNEDに直す</text>
+<text x="980" y="550">enu_yaw_to_ned(): 向きをNEDに直す</text>
+<rect x="420" y="594" width="480" height="200" rx="8" fill="#fffbe6" stroke="#b59f3b" stroke-width="1.5"/>
+<text x="430" y="618" font-weight="bold">補足: on_timer の流れ（0.1秒ごと）</text>
+<line x1="420" y1="634" x2="900" y2="634" stroke="#b59f3b" stroke-width="1.2"/>
+<text x="430" y="658">1. 位置と状態が届くまでは、何もしない</text>
+<text x="430" y="678">2. 着陸を指示した後は、keep_landing だけを行う</text>
+<text x="430" y="698">3. 合図と目標を送る（send_setpoint）</text>
+<text x="430" y="718">4. Offboardでアームするまで、1秒ごとに指示し直す</text>
+<text x="430" y="738">5. 一度Offboardになった後に抜けたら、終える</text>
+<text x="430" y="758">6. 経由点まで0.5m以内なら、次の経由点へ進む</text>
+<text x="430" y="778">7. 最後の経由点に着いたら、着陸を指示する</text>
+<text x="668" y="122" text-anchor="start" font-size="13">受け継ぐ</text>
+<text x="385" y="186" text-anchor="middle" font-size="13">購読</text>
+<text x="385" y="296" text-anchor="middle" font-size="13">購読</text>
+<text x="385" y="426" text-anchor="middle" font-size="13">読む</text>
+<text x="935" y="186" text-anchor="middle" font-size="13">送る</text>
+<text x="935" y="290" text-anchor="middle" font-size="13">送る</text>
+<text x="935" y="394" text-anchor="middle" font-size="13">送る</text>
+<text x="935" y="508" text-anchor="middle" font-size="13">使う</text>
+<text x="20" y="856" text-anchor="start" font-size="13">実線の矢印: 購読する・送る　点線の矢印: 読む・使う　白い三角の矢印: 受け継ぐ　点線（矢印なし）: 補足</text>
+<rect x="20" y="815" width="20" height="14" rx="3" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="48" y="828">ROS 2のクラス</text>
+<rect x="200" y="815" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="228" y="828">px4_msgs の型とトピック</text>
+<rect x="470" y="815" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="498" y="828">同じファイルの定数・関数</text>
+<rect x="740" y="815" width="20" height="14" rx="3" fill="#fffbe6" stroke="#b59f3b" stroke-width="1.5"/>
+<text x="768" y="828">補足</text>
+</g></svg>
