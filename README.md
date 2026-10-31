@@ -2,7 +2,7 @@
 
 PX4・Gazebo・ROS 2を使い、3Dの環境でドローンを飛ばし、障害物をセンサで検知したら経路計画を更新するシミュレーションを、WSL2 + Ubuntu 24.04 + ROS 2 Jazzyで段階的に組み立てる学習教材です。
 
-> **作成中です。** 下の「読む順番」の手順書は、主な表示を実際に動かして確かめたものです（一部の表示は想定のままで、[一覧](docs/pending_checks.md) にあります）。フェーズ4〜6と間章の手順書は下書きで、表示の多くが想定のままです（[学習計画](docs/learning_plan.md) の5節に一覧があります）。確かめ終えたものから、「読む順番」に加えます。
+> **作成中です。** 下の「読む順番」の手順書は、主な表示を実際に動かして確かめたものです（一部の表示は想定のままで、[一覧](dev/pending_checks.md) にあります）。フェーズ4〜6と間章の手順書は下書きで、表示の多くが想定のままです（[学習計画](docs/learning_plan.md) の5節に一覧があります）。確かめ終えたものから、「読む順番」に加えます。
 
 ## 読む順番
 
@@ -37,14 +37,16 @@ PX4・Gazebo・ROS 2を使い、3Dの環境でドローンを飛ばし、障害�
 
 ## 計画と記録の文書
 
+読者向けの文書（手順書・学習計画・図）は `docs/` に、教材を作る側の文書（構想・判断の記録・点検の記録など）は `dev/` に置いています。教材を進めるのに `dev/` は必須ではありません（学習計画などから、一部をリンクしています）。
+
 | 文書 | 内容 |
 |---|---|
-| [docs/idea_origin.md](docs/idea_origin.md) | 構想（目的・ゴール・6つの段階・技術を選んだ理由・先に確かめること） |
 | [docs/learning_plan.md](docs/learning_plan.md) | 学習計画（各フェーズの内容・前提・完了条件、作る予定の手順書） |
-| [docs/handoff_from_parent.md](docs/handoff_from_parent.md) | 立ち上げの経緯・親プロジェクトから引き継いだ知見・未決事項 |
-| [docs/qa_log.md](docs/qa_log.md) | 判断・承認の記録 |
-| [docs/pending_checks.md](docs/pending_checks.md) | 手順書の期待する結果のうち、想定のままで、実際の表示で確かめる項目の一覧 |
-| [docs/public_release_review.md](docs/public_release_review.md) | 公開前と更新のたびの点検の観点と実施記録 |
+| [dev/idea_origin.md](dev/idea_origin.md) | 構想（目的・ゴール・6つの段階・技術を選んだ理由・先に確かめること） |
+| [dev/handoff_from_parent.md](dev/handoff_from_parent.md) | 立ち上げの経緯・親プロジェクトから引き継いだ知見・未決事項 |
+| [dev/qa_log.md](dev/qa_log.md) | 判断・承認の記録 |
+| [dev/pending_checks.md](dev/pending_checks.md) | 手順書の期待する結果のうち、想定のままで、実際の表示で確かめる項目の一覧 |
+| [dev/public_release_review.md](dev/public_release_review.md) | 公開前と更新のたびの点検の観点と実施記録 |
 
 ## ライセンス
 

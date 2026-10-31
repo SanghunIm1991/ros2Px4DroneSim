@@ -1,10 +1,10 @@
 # 実際の表示で確かめる項目の一覧
 
-手順書の「期待する結果」のうち、PX4のソースや公式の文書から想定して書き、まだ実際に動かして確かめていない表示の一覧。手順書を使って練習するときに確かめ、違っていたら手順書を直して、この一覧から消す（直した経緯は [`docs/qa_log.md`](qa_log.md) に残す）。どの表示が想定かは、各手順書の冒頭の注記「期待する結果の出どころ」にも書いてある。
+手順書の「期待する結果」のうち、PX4のソースや公式の文書から想定して書き、まだ実際に動かして確かめていない表示の一覧。手順書を使って練習するときに確かめ、違っていたら手順書を直して、この一覧から消す（直した経緯は [`dev/qa_log.md`](qa_log.md) に残す）。どの表示が想定かは、各手順書の冒頭の注記「期待する結果の出どころ」にも書いてある。
 
 確かめた表示は、ユーザー名・ホスト名・PCの実測値（処理時間・速さ等）を伏せてから手順書に載せる。伏せる部分は、`<username>`・`<hostname>`・`<time>` のように英字の置き換えにする。日時は伏せず、実際の値のまま載せる（2026-10-31、ユーザー判断）。
 
-## フェーズ1（[`docs/phase1_first_flight.md`](phase1_first_flight.md)）
+## フェーズ1（[`docs/phase1_first_flight.md`](../docs/phase1_first_flight.md)）
 
 2026-10-31に作成。起動・QGCでの離陸と着陸のT1の表示、QGCの起動した直後の表示、Gazeboの右クリックのメニューは確かめた。同じ日に、5節・6節のT1の表示（`commander status`・`commander takeoff`・`listener vehicle_local_position`・`commander mode auto:rtl`・`commander land`）と、7節の止めたときの表示も確かめた。
 
@@ -20,7 +20,7 @@
 | 6-3節 | `commander` とだけ打ったときの使い方の説明 | `mode` に渡せる名前（`auto:loiter`・`auto:land`・`auto:takeoff`・`auto:rtl`・`posctl`・`offboard` 等）が並ぶ | PX4のソース（`Commander.cpp` の使い方の一覧） |
 | 8節 | 課題2: QGCの飛行モードの一覧から **Land** を選べるか | 選べて、左のボタンと同じことが起きる | QGC v5.1.5の文書 |
 
-## フェーズ2（[`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md)）
+## フェーズ2（[`docs/phase2_ros2_observe.md`](../docs/phase2_ros2_observe.md)）
 
 2026-10-31に下書き。2節（AgentがROS 2 Jazzyの環境でビルドできること、`px4_msgs` のビルド、`ros2 interface show` の表示）は、同じ日に確かめて差し替えた。同じ日に、3節のT3（Agent）とT5（`ros2 topic list`）、4節の `ros2 topic info -v`・`echo`、5節のQoSが合わないときの警告、6節の地面にいるときの表示も確かめて差し替えた。残りは、3節のT1（PX4の側の `uxrce_dds_client` の表示）と、6節の、機体を飛ばしたときの位置の値の変化で、まだ確かめていない。親プロジェクトのフェーズ1の1-3節で設定する `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかは、この設定のある環境で、フェーズ2〜3のトピックが見え、指令も届いたので、見えると確かめた（2026-10-31）。残りの項目は、次のとおりである。
 
@@ -30,7 +30,7 @@
 | 4-3節 | QGCが機体につながっているときの `gcs_connection_lost` と `pre_flight_checks_pass` の値（確かめた表示では `true`・`false` だったので、そのときQGCがつながっていたかを確かめる。本文には載せていない） | つながっていれば `false`・`true` |
 | 6節 | 機体を飛ばしたときの、`--field position` の値の変化 | 離陸で3つ目が約−3、Go to locationで北・東の値が変わり、着陸で0に近づく |
 
-## フェーズ3-0（[`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md)）とフェーズ3（[`docs/phase3_offboard.md`](phase3_offboard.md)）
+## フェーズ3-0（[`docs/phase3_0_node_qos.md`](../docs/phase3_0_node_qos.md)）とフェーズ3（[`docs/phase3_offboard.md`](../docs/phase3_offboard.md)）
 
 2026-10-31に下書き。サンプルのコードは、ROS 2のリンタ（`ament_flake8`）とPythonの文法の点検だけを通した。フェーズ3-0は、同じ日に動かして、2節・4節・5節の表示（`ros2 pkg create`・`colcon build`・ノードのログ・`ros2 node info`・`ros2 topic info -v`・QoSが合わないときの警告）を確かめて差し替えた。フェーズ3-0で残るのは、4節の、離陸させたときの高さの変わり方だけである。フェーズ3も、同じ日に動かして、4-1節・5節・6節のT5とT6の表示（パッケージの作成・ビルド・ノードのログ・`ros2 topic hz`・`ros2 topic echo`）を確かめて差し替えた（最初の指示で切り替えとアームが通ること、0.5mで経由点をすべて回れること、着陸の後に `SystemExit` で終わること、PX4を起動し直さずに続けて飛ばせることも確かめた）。フェーズ3で残るのは、QGCとGazeboの画面の様子・T1（PX4）の表示と、途中で止めたときの動きである。とくに、次を確かめる。
 
@@ -41,7 +41,7 @@
 | フェーズ3の5節 | 飛行中にQGCのLandで止めたときの、ノードの動き | 「Offboardから別のモードに移った。終わる」と出して終わる |
 | フェーズ3の5節 | 飛行中にノードを Ctrl+C で止めたときのPX4の動き | 少しHoldした後、Returnで離陸した地点へ戻って着陸する（既定の設定と、送信機が無いこと。ソースの読み取りによる） |
 
-## フェーズ4（[`docs/phase4_lidar.md`](phase4_lidar.md)）
+## フェーズ4（[`docs/phase4_lidar.md`](../docs/phase4_lidar.md)）
 
 2026-10-31に下書き。機体・センサ・ワールドの中身とGazeboのトピックの名前はPX4 v1.17のソースで、`parameter_bridge` の引数の書き方は使い方の表示で確かめたが、起動はしていない。すべての表示（T1の起動の表示、`gz topic -l`、`parameter_bridge` の表示、`ros2 topic list`・`hz`・`echo`、RViz2の表示、機体を動かしたときの変化）が想定である。とくに、次を確かめる（学習計画のフェーズ4の予備の実験を含む）。
 
@@ -63,7 +63,7 @@
 | 6-2節 | **Axes** の表示が、TFなしで固定フレームの原点に出るか | 出る |
 | 6-2節 | 壁3の西の端が、右前の約11m先に数点出るか | 出ることがある |
 
-## フェーズ5（[`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md)）
+## フェーズ5（[`docs/phase5_collision_prevention.md`](../docs/phase5_collision_prevention.md)）
 
 2026-10-31に下書き。パラメータの名前・既定値・働きはPX4 v1.17のソースと文書で、仮想ジョイスティックの設定はQGC v5.1.5の文書と設定の定義で確かめたが、起動はしていない。すべての表示と機体の動きが想定である。とくに、次を確かめる。
 
@@ -84,7 +84,7 @@
 | 9節 | 課題3: `CP_GUIDE_ANG` を0にしたときの、壁に沿う動き | 沿って動くが、速さが落ちる |
 | 9節 | 課題2: 衝突防止が有効でも、Go to locationでは壁にぶつかるか | ぶつかる |
 
-## フェーズ6（[`docs/phase6_replan.md`](phase6_replan.md)）
+## フェーズ6（[`docs/phase6_replan.md`](../docs/phase6_replan.md)）
 
 2026-10-31に下書き。Nav2を導入していない環境で書いた。サンプルのコードは、ROS 2のリンタ（`ament_flake8`）とPythonの文法の点検だけを通し、Nav2の設定の名前・既定値・アクションの型は `jazzy` のソースで確かめた。同じ日に、3-1節のNav2の導入の表示（版1.3.13。使う部品がすべて入ること）を確かめて差し替えた。ほかのすべての表示と機体の動きが想定である（学習計画のフェーズ6の予備の実験を含む）。とくに、次を確かめる。
 
@@ -107,7 +107,7 @@
 | 出どころの注記 | 確かめたNav2の設定の名前（層の全体の `min_obstacle_height`、`Result.NONE`・`error_msg`）が、導入される版でも同じか | 同じ |
 | つまずきやすい点 | 時刻が合わないときのT5の警告の文言 | 未確認 |
 
-## 間章（[`docs/interlude_custom_sensor.md`](interlude_custom_sensor.md)）
+## 間章（[`docs/interlude_custom_sensor.md`](../docs/interlude_custom_sensor.md)）
 
 2026-10-31に下書き。1〜3節の模型・ワールド・起動のスクリプトの中身はPX4 v1.17のソースで確かめ、4節の模型のファイルは `gz sdf -k`（形式の点検）を通したが、Gazeboで読み込んではいない。5節の表示と機体の動きは想定である。とくに、次を確かめる。
 
@@ -123,7 +123,7 @@
 | 5-3節 | 360°にしたLiDARの光が、機体自身の部品に当たらないか（真後ろに近い向きの `ranges` に0.1〜0.4mの値が出ないか） | 当たらない |
 | 4-2節 | PX4のフォルダの `git status` の表示 | `Tools/simulation/gz (untracked content)` |
 
-## 間章（[`docs/interlude_nav2.md`](interlude_nav2.md)）
+## 間章（[`docs/interlude_nav2.md`](../docs/interlude_nav2.md)）
 
 2026-10-31に下書き。部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチの最新のソースで確かめた。1-1節の表の部品が、aptで入る版（1.3.13）ですべて入ることは、同じ日に導入の表示で確かめた。設定の名前などの、aptの版と最新のソースとの違いと、4節・6節の動きは確かめていない。
 

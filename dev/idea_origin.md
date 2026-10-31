@@ -1,6 +1,6 @@
 # PX4・Gazebo・ROS 2で、障害物を避けて飛ぶドローンのシミュレーションを組み立てる
 
-この教材の構想（なぜ作るか・何を目指すか・どんな技術を選び、なぜそれを選んだか）をまとめた文書。学習の順番と各段階の完了条件は [`docs/learning_plan.md`](learning_plan.md) にある。決めた経緯は [`docs/qa_log.md`](qa_log.md)、立ち上げのときの申し送りは [`docs/handoff_from_parent.md`](handoff_from_parent.md) にある。
+この教材の構想（なぜ作るか・何を目指すか・どんな技術を選び、なぜそれを選んだか）をまとめた文書。学習の順番と各段階の完了条件は [`docs/learning_plan.md`](../docs/learning_plan.md) にある。決めた経緯は [`dev/qa_log.md`](qa_log.md)、立ち上げのときの申し送りは [`dev/handoff_from_parent.md`](handoff_from_parent.md) にある。
 
 この文書に出てくるドローンとPX4の用語は、学習計画のフェーズ0（ドローンとPX4の用語と仕組みの読み物）で詳しく説明する。ここでは、読み進めるのに要る語だけを、4節の表の前に短く説明する。
 
@@ -27,7 +27,7 @@
 
 ## 4. 段階のロードマップ
 
-6つの段階で進める。①が最初のゴール、⑥が最終ゴールに当たる。各段階の内容・完了条件・必須の範囲は [`docs/learning_plan.md`](learning_plan.md) にある。
+6つの段階で進める。①が最初のゴール、⑥が最終ゴールに当たる。各段階の内容・完了条件・必須の範囲は [`docs/learning_plan.md`](../docs/learning_plan.md) にある。
 
 表に出てくる語の短い説明:
 
@@ -77,7 +77,7 @@
 
 ## 7. 出典
 
-この文書と [`docs/learning_plan.md`](learning_plan.md) の技術的な記述は、次の公式の文書とファイル（PX4 v1.17の版）を読んで、自分の言葉でまとめたもの（逐語の転載ではない）。PX4の文書のライセンスは、手順書で引用するときに確かめる。
+この文書と [`docs/learning_plan.md`](../docs/learning_plan.md) の技術的な記述は、次の公式の文書とファイル（PX4 v1.17の版）を読んで、自分の言葉でまとめたもの（逐語の転載ではない）。PX4の文書のライセンスは、手順書で引用するときに確かめる。
 
 - PX4 User Guide（v1.17）: [Ubuntu Development Environment](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/dev_env_linux_ubuntu.md)、[Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、[Gazebo Vehicles](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/vehicles.md)、[Gazebo Worlds](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/worlds.md)、[ROS 2 User Guide](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/user_guide.md)、[ROS 2 Offboard Control Example](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/offboard_control.md)、[Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)
 - PX4の導入のスクリプト: [Tools/setup/ubuntu.sh](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/Tools/setup/ubuntu.sh)（v1.17）

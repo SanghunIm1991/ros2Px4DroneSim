@@ -6,7 +6,7 @@
 - 実施の目安: **pushの前に毎回**。手順書をいくつか更新したときにも行う
 - 観点は3つ: 1節「機密情報の流出」、2節「権利侵害」、3節「リンク先が意図どおりか」
 - 各節は、コマンドで機械的に拾う「機械点検」と、読んで判断する「目視点検」に分けている。機械点検で何も出なくても、目視点検は省かない
-- 結果は、末尾の4節「実施記録」に1行ずつ追記する。指摘と対応の判断は [`docs/qa_log.md`](qa_log.md) にも記録する
+- 結果は、末尾の4節「実施記録」に1行ずつ追記する。指摘と対応の判断は [`dev/qa_log.md`](qa_log.md) にも記録する
 
 コマンドは、リポジトリの直下で実行する。どれもファイルを読むだけで、変更や外部への送信はしない（外部への通信を伴うのは、3-2節で外部リンクを開いて確かめるときだけ）。
 
@@ -18,9 +18,9 @@
 |---|---|---|
 | 認証情報 | APIキー、トークン、パスワード、秘密鍵 | 全ファイル・全履歴 |
 | コミットの名義 | author・committerの名前とメールアドレスが、GitHubのnoreplyアドレス（`<数字>+<ユーザー名>@users.noreply.github.com`）になっているか | `git log` のメタデータ |
-| 本文の個人情報 | 実名、実メールアドレス、GitHubのアカウント名（手順書では `<username>` に伏せる。`LICENSE`・`README.md`・`CLAUDE.md` の著作権者の表示と、リポジトリのURLにあるアカウント名は意図して載せているので、対象外） | [`docs/qa_log.md`](qa_log.md)、手順書 |
-| PC固有の情報 | ユーザー名を含むパス（`/home/<名前>`、`C:\Users\<名前>`）、ドライブ構成、RAM・ディスク容量・ビルドの時間などの実測値（READMEの「確認した環境」を作る場合は、そこだけ対象外。ただし項目が増えていないかは見る） | `docs/` 全体、特に環境構築 |
-| PCの利用状況 | PCの具体的な用途など、個人の生活を推測させる記述、スペックの制約、PCの扱いへの注意の言及 | [`CLAUDE.md`](../CLAUDE.md)、[`docs/handoff_from_parent.md`](handoff_from_parent.md)、構想の文書 |
+| 本文の個人情報 | 実名、実メールアドレス、GitHubのアカウント名（手順書では `<username>` に伏せる。`LICENSE`・`README.md`・`CLAUDE.md` の著作権者の表示と、リポジトリのURLにあるアカウント名は意図して載せているので、対象外） | [`dev/qa_log.md`](qa_log.md)、手順書 |
+| PC固有の情報 | ユーザー名を含むパス（`/home/<名前>`、`C:\Users\<名前>`）、ドライブ構成、RAM・ディスク容量・ビルドの時間などの実測値（READMEの「確認した環境」を作る場合は、そこだけ対象外。ただし項目が増えていないかは見る） | `docs/`・`dev/` 全体、特に環境構築と申し送り |
+| PCの利用状況 | PCの具体的な用途など、個人の生活を推測させる記述、スペックの制約、PCの扱いへの注意の言及 | [`CLAUDE.md`](../CLAUDE.md)、[`dev/handoff_from_parent.md`](handoff_from_parent.md)、構想の文書 |
 | 追跡してはいけないもの | 個人メモ（`notes/`）、練習用のワークスペース（`px4_ws/`・`ros2_ws/`・`ws/`）、PX4・Agentのソースとビルドの生成物、飛行の記録（`.ulg`・`rosbag2_*`）、`.env`・鍵ファイル、WSLのエクスポート | `.gitignore` と `git ls-files` |
 | 画像の写り込み | スクリーンショット（Gazebo・QGroundControlの画面等）に、画面上の個人情報・ほかのウィンドウ・書類が写っていないか。メタデータ | `docs/img/`（作ったとき） |
 
@@ -64,9 +64,9 @@ git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilo
 
 ### 1-3. 目視点検
 
-- [`CLAUDE.md`](../CLAUDE.md)・[`docs/handoff_from_parent.md`](handoff_from_parent.md) に、PCの利用状況やスペックの制約、PCの扱いへの注意の言及が、公開してよい書き方で残っているか。
-- `docs/` の実測のPCの値（RAM・ディスク容量・PX4のビルドの時間など）が、公開してよい範囲か。
-- [`docs/qa_log.md`](qa_log.md) に新しく足した行に、アカウント名・実メール・PC固有の情報・個人の練習環境の状態（`notes/` に書くべき内容）が入っていないか。
+- [`CLAUDE.md`](../CLAUDE.md)・[`dev/handoff_from_parent.md`](handoff_from_parent.md) に、PCの利用状況やスペックの制約、PCの扱いへの注意の言及が、公開してよい書き方で残っているか。
+- `docs/`・`dev/` の実測のPCの値（RAM・ディスク容量・PX4のビルドの時間など）が、公開してよい範囲か。
+- [`dev/qa_log.md`](qa_log.md) に新しく足した行に、アカウント名・実メール・PC固有の情報・個人の練習環境の状態（`notes/` に書くべき内容）が入っていないか。
 - 前回の実施以降に足した画像があれば、1枚ずつ開いて写り込みを確かめる。
 
 ## 2. 権利侵害
@@ -75,7 +75,7 @@ git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilo
 
 | 観点 | 具体例 | 主な置き場所 |
 |---|---|---|
-| 公式ドキュメントの抜粋 | 抜粋した箇所に、帰属表示（出典・ライセンス・改変の有無）が残っているか。抜粋が必要な範囲に留まっているか。PX4のユーザーガイド・PX4のソースと付属のサンプル（`px4_ros_com` 等）・Micro XRCE-DDS Agentの文書は、使う前にライセンスを確かめ、結果を [`docs/qa_log.md`](qa_log.md) に残す | 環境構築の手順書、各手順書 |
+| 公式ドキュメントの抜粋 | 抜粋した箇所に、帰属表示（出典・ライセンス・改変の有無）が残っているか。抜粋が必要な範囲に留まっているか。PX4のユーザーガイド・PX4のソースと付属のサンプル（`px4_ros_com` 等）・Micro XRCE-DDS Agentの文書は、使う前にライセンスを確かめ、結果を [`dev/qa_log.md`](qa_log.md) に残す | 環境構築の手順書、各手順書 |
 | 各ページの出典注記 | 公式の文書と同等のコマンド・APIの使い方を含むページに、出典（元にしたものとそのライセンス）と「逐語の転載でない」旨の注記があるか | `docs/` の手順書 |
 | 模型のファイル | PX4に付属するGazeboの機体・ワールドの模型（SDF・メッシュ等）を、リポジトリに含めていないか（読者が各自の導入済みのファイルを使う・写す形にする） | `git ls-files` |
 | 引用の範囲 | ツールの出力（型の定義の表示、`pxh>` の表示、警告の文面など）が、説明に必要な範囲に留まり、出典があるか | 各手順書の「期待する結果」 |
@@ -127,13 +127,13 @@ git grep -nE '<image|href="https?:' -- 'docs/img/*.svg'
 
 ### 3-2. 機械点検
 
-文書間のリンクの先が実在するかを確かめる（`README.md` と `docs/` の文書の、リンクの `(...)` の中の、`http` で始まらないものを対象にする。`CLAUDE.md` は読者向けの文書ではないので対象にしない）。
+文書間のリンクの先が実在するかを確かめる（`README.md`・`CLAUDE.md` と `docs/`・`dev/` の文書の、リンクの `(...)` の中の、`http` で始まらないものを対象にする。読者向けでない文書も、GitHubで開いたときにリンクが切れないように対象にする）。
 
 ```bash
 python3 - <<'PY'
 import pathlib, re
 bad = 0
-for md in [pathlib.Path('README.md'), *sorted(pathlib.Path('docs').glob('*.md'))]:
+for md in [pathlib.Path('README.md'), pathlib.Path('CLAUDE.md'), *sorted(pathlib.Path('docs').glob('*.md')), *sorted(pathlib.Path('dev').glob('*.md'))]:
     for n, line in enumerate(md.read_text(encoding='utf-8').splitlines(), 1):
         for target in re.findall(r'\]\(([^)\s]+)\)', line):
             if re.match(r'[a-z]+:', target):
@@ -149,7 +149,7 @@ PY
 外部リンクの実在は、この環境から外部へアクセスして確かめる必要がある。アクセスする前に、対象のドメインの一覧（下のコマンド）を見て、見慣れないドメインが無いかを確かめる。
 
 ```bash
-grep -ohE '\]\(https?://[^/)]+' docs/*.md README.md | sort | uniq -c | sort -rn
+grep -ohE '\]\(https?://[^/)]+' docs/*.md dev/*.md README.md | sort | uniq -c | sort -rn
 ```
 
 **見方**: 1つ目は `リンク切れ: 0件` だけが表示されれば問題ない。2つ目は、件数の多い順にドメインが並ぶ。docs.ros.orgはボット対策でコマンドやツールからの取得に失敗するため、Web検索か、文書の原稿のリポジトリで実在を確かめる。GitHubの `blob` のリンクは、同じパスを `raw.githubusercontent.com` で開いて200が返るかで確かめる。
