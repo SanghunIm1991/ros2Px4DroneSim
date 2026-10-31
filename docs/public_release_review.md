@@ -21,7 +21,7 @@
 | 本文の個人情報 | 実名、実メールアドレス、GitHubのアカウント名（手順書では `<ユーザー名>` に伏せる。`LICENSE`・`README.md`・`CLAUDE.md` の著作権者の表示と、リポジトリのURLにあるアカウント名は意図して載せているので、対象外） | [`docs/qa_log.md`](qa_log.md)、手順書 |
 | PC固有の情報 | ユーザー名を含むパス（`/home/<名前>`、`C:\Users\<名前>`）、ドライブ構成、RAM・ディスク容量・ビルドの時間などの実測値（READMEの「確認した環境」を作る場合は、そこだけ対象外。ただし項目が増えていないかは見る） | `docs/` 全体、特に環境構築 |
 | PCの利用状況 | PCの具体的な用途など、個人の生活を推測させる記述、スペックの制約、PCの扱いへの注意の言及 | [`CLAUDE.md`](../CLAUDE.md)、[`docs/handoff_from_parent.md`](handoff_from_parent.md)、構想の文書 |
-| 追跡してはいけないもの | 個人メモ（`notes/`）、練習用のワークスペース（`ros2_ws/`・`ws/`）、PX4・Agentのソースとビルドの生成物、飛行の記録（`.ulg`・`rosbag2_*`）、`.env`・鍵ファイル、WSLのエクスポート | `.gitignore` と `git ls-files` |
+| 追跡してはいけないもの | 個人メモ（`notes/`）、練習用のワークスペース（`px4_ws/`・`ros2_ws/`・`ws/`）、PX4・Agentのソースとビルドの生成物、飛行の記録（`.ulg`・`rosbag2_*`）、`.env`・鍵ファイル、WSLのエクスポート | `.gitignore` と `git ls-files` |
 | 画像の写り込み | スクリーンショット（Gazebo・QGroundControlの画面等）に、画面上の個人情報・ほかのウィンドウ・書類が写っていないか。メタデータ | `docs/img/`（作ったとき） |
 
 ### 1-2. 機械点検
@@ -57,7 +57,7 @@ git log --all -p | grep -E '^\+' | grep -E '/home/[a-z][a-z0-9_-]*|[A-Za-z]:\\+U
 追跡してはいけないものが入っていないかを見る（`.gitignore` の項目とそろえている。`.gitignore` を変えたら、ここも変える）。
 
 ```bash
-git ls-files | grep -E '^(notes|ws|ros2_ws|build|install|log|PX4-Autopilot|Micro-XRCE-DDS-Agent|\.vscode|\.idea)/|^\.claude/settings\.local\.json$|(^|/)(Thumbs\.db|Desktop\.ini|\.DS_Store)$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
+git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilot|Micro-XRCE-DDS-Agent|\.vscode|\.idea)/|^\.claude/settings\.local\.json$|(^|/)(Thumbs\.db|Desktop\.ini|\.DS_Store)$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
 ```
 
 **見方**: メールアドレスの2つのコマンドと、追跡してはいけないもののコマンドは、何も表示されなければ問題ない。認証情報とパスのコマンドは、説明文の中の一般的な語（「パスワード」、`/home/<ユーザー名>` のような伏せ字、この文書のコマンドそのもの）にも当たるので、1件ずつ読んで、実際の値や実在のユーザー名が書かれていないかを判断する。GitHubのアカウント名は、上の正規表現では拾えないので、アカウント名そのもので `git grep -n` して、出てきた箇所を目視で判断する（著作権者の表示とリポジトリのURLは問題ない）。

@@ -58,10 +58,17 @@ the author (SanghunIm1991) and the license are credited.
    - 「期待する結果」等に載せたコマンドの出力: 各ツールの表示
      （例: docs/setup_px4_gazebo.md の3節の `gz sim --version` の表示は、
      Gazebo（Open Source Robotics Foundation）, Apache License 2.0）
+   - docs/phase2_ros2_observe.md の2-4節で抜粋した型の定義:
+     px4_msgs, Copyright (c) 2019, PX4 Development Team, BSD 3-Clause License
+     （全文: https://github.com/PX4/px4_msgs/blob/release/1.17/LICENSE）
+   - docs/phase2_ros2_observe.md の2節・3節で、公式の手順に従って載せた
+     Agentと px4_msgs の取得・ビルド・起動のコマンド:
+     PX4 User Guide（Dronecode/PX4）, CC BY 4.0
    - docs/img/phase1_gazebo.png（docs/phase1_first_flight.md の3節）の
      Gazeboの画面の撮影画像: 画面は Gazebo（Open Source Robotics Foundation）,
      Apache License 2.0。写っている機体の模型 x500 は PX4-gazebo-models
      （Copyright (c) 2022, Rudis Laboratories）, BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/models/x500_base/LICENSE）
 
    このリポジトリは、PX4・Gazebo・ROS 2・Micro XRCE-DDS Agent等のソフトウェアと、
    PX4に付属するGazeboの機体・ワールドの模型を同梱していない。読者は、各自で
