@@ -125,3 +125,16 @@
 | 5-3節 | 離陸してもLiDARの部品が離れないか（`<joint>` の効き） | 離れない |
 | 5-3節 | 360°にしたLiDARの光が、機体自身の部品に当たらないか（真後ろに近い向きの `ranges` に0.1〜0.4mの値が出ないか） | 当たらない |
 | 4-2節 | PX4のフォルダの `git status` の表示 | `Tools/simulation/gz (untracked content)` |
+
+## 間章（[`docs/interlude_nav2.md`](interlude_nav2.md)）
+
+2026-10-31に下書き。部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチの最新のソースで確かめた。aptで入る版との違いと、4節・6節の動きは確かめていない。
+
+| 節 | 確かめること | 今の記述（想定） |
+|---|---|---|
+| 1-1節 | aptの `ros-jazzy-navigation2` で入る部品の一覧（`ros2 pkg list \| grep -E 'nav2\|opennav'`） | 表の部品がすべて入る |
+| 4節 | `ros2 param get`・`ros2 param set` で、実行中に `inflation_layer.inflation_radius` を変えられるか。表示の文言 | `Double value is: 1.2`・`Set parameter successful`。RViz2の地図の膨らませた範囲が狭くなる |
+| 6節 | 課題1・2: `SmacPlanner2D`・`ThetaStarPlanner` に替えて、「設定」と計画ができるか | できる |
+| 4節 | 実行中に効かない設定（`width` 等）を `ros2 param set` したときの表示 | `Set parameter successful` と出るが、効かない |
+| 3-1節 | `ros-jazzy-nav2-bringup` を入れたときの、既定の設定ファイルの場所 | `/opt/ros/jazzy/share/nav2_bringup/params/nav2_params.yaml` |
+| 3-1節 | 飛行中に計画器だけを起動し直したときの、自作のノードの動き | 前の経路をたどり続ける（だから、やり直しは5-1節から） |
