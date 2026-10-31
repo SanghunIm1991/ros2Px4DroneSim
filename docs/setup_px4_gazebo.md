@@ -205,11 +205,11 @@ source ~/px4-venv/bin/activate
 command -v python3
 ```
 
-**期待する結果**（`<ユーザー名>` は各自のもの）:
+**期待する結果**（`<username>` は、各自のユーザー名）:
 
 ```text
 (px4-venv) $ command -v python3
-/home/<ユーザー名>/px4-venv/bin/python3
+/home/<username>/px4-venv/bin/python3
 ```
 
 プロンプトの先頭に `(px4-venv)` が付き、`python3` が仮想環境の中のものになっていれば、仮想環境が有効になっている。`python3 -m venv` が `ensurepip is not available` のエラーで止まる場合は、`sudo apt install python3-venv` を実行してからやり直す。
@@ -282,14 +282,14 @@ bash ./Tools/setup/ubuntu.sh --no-nuttx
 - Gazebo公式のaptの取得元（`packages.osrfoundation.org`）を追加し、Gazebo Harmonic（`gz-harmonic`）を入れる。このとき「Earlier versions will be removed」（古い版は削除される）と表示するが、削除する処理は無い。3節で入れたROS 2のパッケージのGazeboは、そのまま残る。
 - `pip` で、PX4のビルドに要るPythonのパッケージ（約30個）を入れる。仮想環境が有効なので、`~/px4-venv` の中に入る。
 
-**期待する結果**（抜粋。時刻と、パッケージの数・版・容量は、取得する時期と、既に入っているものによって変わる。`<ユーザー名>` は各自のもの）:
+**期待する結果**（抜粋。時刻と、パッケージの数・版・容量は、取得する時期と、既に入っているものによって変わる。`<username>` は、各自のユーザー名）:
 
 ```text
 [ubuntu.sh] Starting...
 [ubuntu.sh] arch: x86_64
 [ubuntu.sh] Ubuntu 24.04
 [ubuntu.sh] Installing PX4 general dependencies
-[sudo] password for <ユーザー名>:
+[sudo] password for <username>:
 ...
 cmake is already the newest version (3.28.3-1build7).
 ...
@@ -300,7 +300,7 @@ cmake is already the newest version (3.28.3-1build7).
 ...
   Attempting uninstall: numpy
     Found existing installation: numpy 1.26.4
-    Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment /home/<ユーザー名>/px4-venv
+    Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment /home/<username>/px4-venv
     Can't uninstall 'numpy'. No files were found to uninstall.
 ...
 ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
@@ -312,7 +312,7 @@ Successfully installed cerberus-1.3.8 ... numpy-2.5.4 ... pymavlink-2.4.50 ... p
 [ubuntu.sh] Gazebo (Harmonic) will be installed
 [ubuntu.sh] Earlier versions will be removed
 ...
-<日時> (<速さ>) - ‘/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg’ saved [1222/1222]
+<datetime> (<speed>) - ‘/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg’ saved [1222/1222]
 
 Get:1 http://packages.osrfoundation.org/gazebo/ubuntu-stable noble InRelease [4,273 B]
 ...
@@ -384,14 +384,14 @@ cd ~/PX4-Autopilot
 make px4_sitl
 ```
 
-**期待する結果**（抜粋。時間・件数・版の数字は、環境と取得する時期によって変わる。`<ユーザー名>` と `<ホスト名>` は各自のもの）:
+**期待する結果**（抜粋。時間・件数・版の数字は、環境と取得する時期によって変わる。`<username>` と `<hostname>` は、各自のユーザー名とホスト名（PCの名前））:
 
 ```text
 -- PX4_GIT_TAG: v1.17.0
 CMake Warning (dev) at CMakeLists.txt:176 (find_package):
   Policy CMP0148 is not set: The FindPythonInterp and FindPythonLibs modules
   are removed.  ...
--- Found PythonInterp: /home/<ユーザー名>/px4-venv/bin/python3 (found suitable version "3.12.3", minimum required is "3")
+-- Found PythonInterp: /home/<username>/px4-venv/bin/python3 (found suitable version "3.12.3", minimum required is "3")
 -- PX4 config: px4_sitl_default
 -- PX4 platform: posix
 -- PX4 lockstep: enabled
@@ -402,15 +402,15 @@ CMake Warning (dev) at CMakeLists.txt:176 (find_package):
 ...
 -- Looking for gz-sensors8-gpu_lidar -- found version 8.2.2
 ...
--- Configuring done (<秒数>s)
--- Generating done (<秒数>s)
--- Build files have been written to: /home/<ユーザー名>/PX4-Autopilot/build/px4_sitl_default
+-- Configuring done (<seconds>s)
+-- Generating done (<seconds>s)
+-- Build files have been written to: /home/<username>/PX4-Autopilot/build/px4_sitl_default
 [0/1141] git submodule src/modules/uxrce_dds_client/Micro-XRCE-DDS-Client
 ...
 [13/1141] Performing download step (git clone) for 'OpticalFlow'
 ...
 [1141/1141] Linking CXX shared library src/examples/dyn_hello/examples__dyn_hello.px4mod
-(px4-venv) <ユーザー名>@<ホスト名>:~/PX4-Autopilot$
+(px4-venv) <username>@<hostname>:~/PX4-Autopilot$
 ```
 
 ビルドは2段階で進む。
@@ -430,10 +430,10 @@ QGCの公式の導入の手順に従って、QGCの実行に要るライブラ�
 sudo apt install -y libfuse2 libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor0
 ```
 
-**期待する結果**（抜粋。既に入っているものと、パッケージの数・版は、環境と取得する時期によって変わる。`<ユーザー名>` は各自のもの）:
+**期待する結果**（抜粋。既に入っているものと、パッケージの数・版は、環境と取得する時期によって変わる。`<username>` は、各自のユーザー名）:
 
 ```text
-[sudo] password for <ユーザー名>:
+[sudo] password for <username>:
 ...
 Note, selecting 'libfuse2t64' instead of 'libfuse2'
 libxcb-xinerama0 is already the newest version (1.15-1ubuntu2).
@@ -451,7 +451,7 @@ Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
 
 `Note, selecting 'libfuse2t64' instead of 'libfuse2'` は、Ubuntu 24.04では `libfuse2` の代わりに `libfuse2t64` を入れる、という意味である（AppImageの実行に要るもの）。`is already the newest version` は、ROS 2やGazeboと一緒に既に入っていたもので、`set to manually installed` は、今後は自分で入れたものとして扱う、という意味である（どちらも問題ない）。エラー（`E:` で始まる行）が出ずにプロンプトへ戻れば成功。
 
-QGCの公式の手順には、ほかに、シリアルポート（実機をUSBでつなぐときの口）を使うための設定（`dialout` のグループへの追加と、ModemManagerの停止）がある。WSLの中のQGCは、シミュレーションにつなぐだけで、シリアルポートを使わないので、この教材では行わない。
+QGCの公式の手順には、ほかに、シリアルポート（実機をUSBでつなぐときの口）を使うための設定（`dialout` のグループへの追加と、ModemManagerの停止）がある。WSLの中のQGCは、シミュレーションにつなぐだけで、シリアルポートを使わないので、この教材では行わない。この設定をしていないので、QGCを起動するたびに、`The current user does not have the correct permissions to access serial devices.` で始まるメッセージが出て、`dialout` への追加とModemManagerの削除のコマンドを勧められる。このメッセージは閉じてよく、書かれているコマンドも実行しなくてよい（シミュレーションとはUDPでつなぐので、影響しない）。
 
 AppImageを取得する（約200MB）。AppImageは、取得したファイルをそのまま実行する形なので、取得元は、QGroundControlのGitHubの公式のリリースのページ（[v5.1.5](https://github.com/mavlink/qgroundcontrol/releases/tag/v5.1.5)）に限り、検索で見つけた別の配布元は使わない。取得したら、実行する前に、ファイルのSHA-256のハッシュ（ファイルの中身から計算する指紋。1文字でも違うと値が変わる）を計算し、リリースのページの添付ファイルの一覧で `QGroundControl-x86_64.AppImage` の横に表示される `sha256:` の値と同じかを確かめる。
 
@@ -469,7 +469,7 @@ sha256sum QGroundControl-x86_64.AppImage
 
 ```text
 $ wget https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
---<日時>--  https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
+--<datetime>--  https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
 ...
 HTTP request sent, awaiting response... 302 Found
 Location: https://release-assets.githubusercontent.com/github-production-release-asset/... [following]
@@ -478,7 +478,7 @@ HTTP request sent, awaiting response... 200 OK
 Length: 195332600 (186M) [application/octet-stream]
 Saving to: ‘QGroundControl-x86_64.AppImage’
 ...
-<日時> (<速さ>) - ‘QGroundControl-x86_64.AppImage’ saved [195332600/195332600]
+<datetime> (<speed>) - ‘QGroundControl-x86_64.AppImage’ saved [195332600/195332600]
 
 $ sha256sum QGroundControl-x86_64.AppImage
 9a47e4cf269d9e4f897f582f6b19aa7ebf1e9e67c9d68a532a45b541354bc344  QGroundControl-x86_64.AppImage
@@ -496,18 +496,18 @@ chmod +x QGroundControl-x86_64.AppImage
 ls -l
 ```
 
-**期待する結果**（`<ユーザー名>` は各自のもの。`total` の値と日時は、環境によって変わる）:
+**期待する結果**（`<username>` は、各自のユーザー名。`total` の値と日時は、環境によって変わる）:
 
 ```text
 total 190756
--rwxr-xr-x 1 <ユーザー名> <ユーザー名> 195332600 Oct  2 01:34 QGroundControl-x86_64.AppImage
+-rwxr-xr-x 1 <username> <username> 195332600 Oct  2 01:34 QGroundControl-x86_64.AppImage
 ```
 
 左端に `x`（実行の許可）が付いていればよい。サイズ（`195332600`）は、`wget` の `saved [195332600/195332600]` と同じである。日時は、取得した日時ではなく、配布元に置かれたファイルの日時になる（`wget` は、配布元が知らせるファイルの更新の日時を、取得したファイルに付けるため）。起動は6節で、PX4のシミュレーションと一緒に行う。
 
 ## 6. 確かめる（完了条件）
 
-PX4のシミュレーションとQGCを、別々のターミナルで起動する。
+PX4のシミュレーションとQGCを、別々のターミナルで起動する。T1でPX4のシミュレーションを、T2でQGCを起動する（この番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、ほかの手順書でも同じプログラムに使う）。
 
 ```bash
 # T1
@@ -523,7 +523,7 @@ cd ~/qgc
 ./QGroundControl-x86_64.AppImage
 ```
 
-**期待する結果**（抜粋。時刻・待つ回数・ID・ログのファイル名は、実行ごとに変わる。`<ユーザー名>` は各自のもの。T2の行の先頭の数字は、起動からの秒数）:
+**期待する結果**（抜粋。時刻・待つ回数・ID・ログのファイル名は、実行ごとに変わる。`<username>` は、各自のユーザー名。T2の行の先頭の数字は、起動からの秒数）:
 
 ```text
 # T1（PX4のシミュレーション）
@@ -534,7 +534,7 @@ INFO  [px4] startup script: /bin/sh etc/init.d-posix/rcS 0
 INFO  [init] found model autostart file as SYS_AUTOSTART=4001
 ...
 INFO  [init] Gazebo simulator 8.15.0
-INFO  [init] Starting gazebo with world: /home/<ユーザー名>/PX4-Autopilot/Tools/simulation/gz/worlds/default.sdf
+INFO  [init] Starting gazebo with world: /home/<username>/PX4-Autopilot/Tools/simulation/gz/worlds/default.sdf
 INFO  [init] Starting gz gui
 INFO  [init] Waiting for Gazebo world...
 ...
@@ -549,7 +549,7 @@ WARN  [health_and_arming_checks] Preflight Fail: No connection to the GCS
 INFO  [tone_alarm] home set
 INFO  [mavlink] mode: Normal, data rate: 4000000 B/s on udp port 18570 remote port 14550
 ...
-INFO  [logger] Opened full log file: ./log/<日付>/<時刻>.ulg
+INFO  [logger] Opened full log file: ./log/2026-10-31/12_48_10.ulg
 ...
 INFO  [px4] Startup script returned successfully
 pxh> INFO  [commander] Ready for takeoff!
@@ -566,7 +566,7 @@ libEGL warning: egl: failed to create dri2 screen
 
 T1は、次の順に進む。
 
-- **PX4の起動**: `SYS_AUTOSTART=4001` は、機体の種類（x500）の設定を読み込んだことを示す。初めての起動では、その後に `CAL_ACC0_ID: curr: 0 -> new: ...` のような、パラメータを初期値に書き換える行が続く。
+- **PX4の起動**: `SYS_AUTOSTART=4001` は、機体の種類（x500）の設定を読み込んだことを示す。初めての起動では、その後に `CAL_ACC0_ID: curr: 0 -> new: ...` のような、パラメータを初期値に書き換える行が続く。機体が現れた後に出る `LED: open /dev/led0 failed` は、シミュレーションには機体のLEDが無いことを、`Preflight Fail: ekf2 missing data` は、起動の直後で、推定（EKF2）がまだセンサの値を受け取っていないことを知らせる表示で、どちらも問題ない（`ekf2 missing data` は、推定が動き始めると出なくなる）。
 - **Gazeboの起動**: `Gazebo simulator 8.15.0` は、Gazebo Harmonic（8.15.0）で起動したことを示す（ROS 2のパッケージのものとGazebo公式のもののどちらかは、この表示からは区別できない。どちらも同じ版である）。Gazeboのウィンドウが開くまで、`Waiting for Gazebo world...` が何度か続く。`Spawning Gazebo model` の後、Gazeboの画面の地面の上にドローン（`x500`）が現れる（ウィンドウが開いてから、ドローンが表示されるまで、数秒かかることがある）。`Warning [Utils.cc:132] ... gz_frame_id ... not defined in SDF` は、機体の模型のファイルに、Gazeboの模型の書式（SDF）の規格に無い項目があることを知らせる警告で、Gazeboはその項目をそのまま残して読み込みを続け、機体は現れる。
 - **通信の準備**: `uxrce_dds_client` の行は、ROS 2とつなぐ部品が、UDPの8888番でAgentを待つことを示す（Agentはフェーズ2で使う。今は起動していないので、つながらなくてよい）。`mavlink` の行は、QGC（UDPの14550番）などと話す口を開いたことを示す。
 - **QGCとの接続**: `Preflight Fail: No connection to the GCS` は、地上局（GCS。ここではQGC）がつながっていないので、まだ飛べない、という意味である。T2でQGCを起動して機体につながると、`Ready for takeoff!` が表示される。この行は、`pxh>` のプロンプトの後ろに続けて表示されることがある（PX4の表示が、入力を待つプロンプトの後から割り込むため）。
@@ -575,7 +575,9 @@ T1の `pxh>` は、PX4のシェルのプロンプトである。続けてコマ�
 
 T2のQGCの表示は、警告が多いが、ウィンドウが開いて動いていれば問題ない。`libEGL warning` と `MESA: error: ZINK ...` は、WSLのグラフィックスの機能の一部が使えないことを知らせる表示で、ウィンドウが表示されれば問題ない。`speechd` の行は、読み上げの機能が無いことを、`Positioning error` の行は、PCの位置を取得できないことを知らせる表示で、どちらもシミュレーションの機体とつなぐのには関係ない。
 
-QGCのウィンドウが開き、しばらくすると、自動でシミュレーションの機体につながり、地図の上に機体の印（オレンジ色の矢じりの形で、機体が向いている方向を指す）が表示される。この状態になれば、この手順書は完了である。止めるときは、T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutdown` と打ってもよい）。Ctrl+C で止めると、T1の最後に次の表示が出るが、止め方として正しいので問題ない。
+QGCを起動すると、シリアルポートの権限についてのメッセージ（`The current user does not have the correct permissions to access serial devices.`）が表示される。5節のとおり、この教材ではシリアルポートを使わないので、メッセージを閉じて先へ進む。
+
+QGCのウィンドウが開き、しばらくすると、自動でシミュレーションの機体につながり、地図の上に機体の印（オレンジ色の矢じりの形で、機体が向いている方向を指す）が表示される。この状態になれば、この手順書は完了である。止めるときは、T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutdown` と打っても、T1はUbuntuのプロンプトに戻らないので、続けて Ctrl+C を押す。フェーズ1の7節）。Ctrl+C で止めると、T1の最後に次の表示が出るが、止め方として正しいので問題ない。
 
 ```text
 PX4 Exiting...

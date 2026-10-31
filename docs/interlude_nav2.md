@@ -95,6 +95,56 @@ Nav2は、地面の上を平面に動くロボットを前提にしている。�
 - **一度に1つだけ変える**: 変えたら、フェーズ6の6節と7節で動きを確かめ、結果を見てから次を変える。複数を同時に変えると、どれが効いたか分からなくなる。
 - **変えた後のやり直し方**: 機体を着陸させてノードを止め、フェーズ6の5-1節（PX4のシミュレーションの起動し直し）からやり直す。飛行中に計画器だけを止めて起動し直すと、自作のノードは前の経路をたどり続け、その後に見えた壁を避けない（計画器の答えを待ったまま、次の計画を頼まなくなることがある）。設定ファイルは、計画器（T5）が `src` の下のファイルを直接読むので、ビルドし直さなくてよい。自作のノードのコードを変えたときは、フェーズ6の4-3節でビルドし直す。
 
+やり直すときのコマンドは、次のとおりである（フェーズ6の5-1〜5-3節と同じ。ターミナルの番号もフェーズ6の5-1節の表と同じで、T1がPX4のシミュレーション、T2がQGC、T3がAgent、T4が中継、T5が計画器、T6がビルドと自作のノード、T7がRViz2、T8が `ros2 lifecycle` のコマンドである。それぞれの表示と、RViz2の設定は、フェーズ6のその節にある）。前の回のターミナルを、すべて止めてから始める（T2のQGCはウィンドウを閉じ、ほかはCtrl+Cで止める。前の回のAgentや中継を残したまま、もう一度起動すると、同じポートやトピックを2つが使って、ぶつかるおそれがある）。T1〜T4を起動し、QGCが機体につながってT1に `Ready for takeoff!` が出たら、T5〜T7を起動し、最後にT8で計画器を有効にする。T6は、毎回ビルドしてから起動する（コードを変えていなくても、ビルドし直して問題ない）。
+
+```bash
+# T1
+source ~/px4-venv/bin/activate
+
+cd ~/PX4-Autopilot
+
+make px4_sitl gz_x500_lidar_2d_walls
+
+# T2
+cd ~/qgc
+
+./QGroundControl-x86_64.AppImage
+
+# T3
+source ~/px4_ws/install/setup.bash
+
+MicroXRCEAgent udp4 -p 8888
+
+# T4
+export GZ_IP=127.0.0.1
+
+ros2 run ros_gz_bridge parameter_bridge \
+  /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
+  --ros-args -p override_timestamps_with_wall_time:=true \
+  -r /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan:=/scan
+
+# T5
+ros2 run nav2_planner planner_server --ros-args \
+  --params-file ~/px4_ws/src/drone_offboard/config/planner.yaml
+
+# T6
+cd ~/px4_ws
+
+colcon build --packages-select drone_offboard
+
+source ~/px4_ws/install/setup.bash
+
+ros2 run drone_offboard replan_flight
+
+# T7
+rviz2
+
+# T8
+ros2 lifecycle set /planner_server configure
+
+ros2 lifecycle set /planner_server activate
+```
+
 ### 3-2. 計画器とコストマップの設定（`planner.yaml`）
 
 | 区分 | 設定 | 変えると何が変わるか |

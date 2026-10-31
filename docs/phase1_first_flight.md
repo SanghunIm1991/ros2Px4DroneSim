@@ -8,7 +8,7 @@
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の、5節（アームと飛行モード）・6節（地上局とMAVLink）・8節（座標系）を、実際に動かして確かめる。用語の意味は、フェーズ0で確かめる。
 >
-> **期待する結果の出どころ**: 2節・5節・6-1節のT1（PX4のシミュレーション）の表示、2節のQGCの警告、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。5節の、飛んでいる間のQGCとGazeboの様子と `commander status` の表示、6-2〜6-5節の表示は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。
+> **期待する結果の出どころ**: 2節・5節・6節のT1（PX4のシミュレーション）の表示（`commander status` と `listener` の表示を含む）、7節の止めたときの表示、2節のQGCの警告とメッセージ、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。5節・6節の、飛んでいる間のQGCとGazeboの様子は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。時刻・位置の値・ログのファイル名とバイト数は、実行ごとに変わる。
 
 ## 0. 学習目標と完了条件
 
@@ -29,7 +29,7 @@
 
 ## 1. 全体像
 
-この手順書では、2つのターミナルを使う。T1でPX4のシミュレーション（PX4のSITLとGazebo）を起動し、T2でQGCを起動する。T1の最後の行に出る `pxh>` は、PX4のシェルのプロンプトで、5節と6節ではここにコマンドを打つ。この手順書では、打つコマンドの前に `pxh> ` を付けて書くが、`pxh>` はプロンプトなので打たない（`pxh> commander status` とまるごと打つと、`Invalid command: pxh>` と表示される）。
+この手順書では、2つのターミナルを使う。T1でPX4のシミュレーション（PX4のSITLとGazebo）を起動し、T2でQGCを起動する。ターミナルの番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T1〜T4がどの手順書でも同じプログラムで、T5以降がそのページの作業用である。この手順書では、T1とT2だけを使う。T1の最後の行に出る `pxh>` は、PX4のシェルのプロンプトで、5節と6節ではここにコマンドを打つ。この手順書では、打つコマンドの前に `pxh> ` を付けて書くが、`pxh>` はプロンプトなので打たない（`pxh> commander status` とまるごと打つと、`Invalid command: pxh>` と表示される）。
 
 1回の飛行で、飛行モードとアームは、次のように移り変わる。
 
@@ -93,6 +93,8 @@ INFO  [commander] Ready for takeoff!
 Gazeboのウィンドウが開き、地面の上に機体（`x500`）が現れる。QGCのウィンドウが開き、機体につながると、T1に `partner IP: 127.0.0.1`（MAVLinkの相手が、同じPCの中に見つかった）と `Ready for takeoff!` が表示される。T1で Enter を押すと、`pxh>` のプロンプトが改めて表示され、コマンドを打てる状態になる。
 
 T2のQGCの表示には、環境構築の6節で見た警告のほかに、`"Bing Tile Above Zoom Level"`（地図の画像が、その拡大の倍率では用意されていない）や、`QGCPressure`（PCの気圧のセンサが無い）の警告が出ることがある。どれも、シミュレーションの機体を飛ばすのには関係ない。
+
+QGCの起動の直後には、毎回、シリアルポートの権限についてのメッセージ（`The current user does not have the correct permissions to access serial devices.`）が表示される。環境構築の5節のとおり、シミュレーションとはUDPでつなぐのでシリアルポートは使わない。メッセージを閉じてよく、勧められるコマンド（`dialout` への追加とModemManagerの削除）も実行しない。
 
 ## 3. Gazeboの画面の見方
 
@@ -184,13 +186,13 @@ INFO  [commander] in failsafe: no
 1. 左の **Land** のボタンを押す。
 2. 確定のボタンを、押したまま離さずにいて、受け付けられるまで待つ。
 
-**期待する結果**（T1。抜粋。`<バイト数>` は実行ごとに変わる）:
+**期待する結果**（T1。抜粋。バイト数は実行ごとに変わる）:
 
 ```text
 INFO  [commander] Landing detected
 INFO  [commander] Disarmed by landing
 INFO  [tone_alarm] notify neutral
-INFO  [logger] closed logfile, bytes written: <バイト数>
+INFO  [logger] closed logfile, bytes written: 108551532
 ```
 
 飛行モードが **Land** に変わり、機体がその場で真下に降りて着地する。`Landing detected` は、PX4が着地を検知したことを、`Disarmed by landing` は、着地の後に自動でディスアームしたことを示す（フェーズ0の5-1節。着陸から約2秒）。`notify neutral` は、終わったことを知らせる音を、`closed logfile` は、飛行の記録（ログ）のファイルを閉じたことを示す。QGCのFlight Statusは、**Landing** を経て、**Ready** に戻る。
@@ -216,7 +218,7 @@ commander: cycle: ...
 commander: preflight check: ...
 ```
 
-1行目がアームの状態、2行目が今の飛行モードである。3行目は、人や地上局が選んだ飛行モードで、ふだんは2行目と同じになる。フェイルセーフ（フェーズ0の9-2節）が働くと、2行目だけがフェイルセーフの動作のモードに変わり、4行目が `yes` になる。5節で着陸した後は、飛行モードがHoldに戻っている（PX4は、Landで着地してディスアームすると、Landの前に選んでいたモード（ここではHold）に戻す）。最後の2行（`cycle`・`preflight check`）は、`commander` の処理の回数と時間の計測で、この手順書では読まなくてよい。
+1行目がアームの状態、2行目が今の飛行モードである。3行目は、人や地上局が選んだ飛行モードで、ふだんは2行目と同じになる。フェイルセーフ（フェーズ0の9-2節）が働くと、2行目だけがフェイルセーフの動作のモードに変わり、4行目が `yes` になる。5節で着陸した後は、飛行モードがHoldに戻っている（PX4は、ディスアームすると、最後に選ばれた飛行モードのうち、アームを妨げないもので、離陸のモード（Takeoff）でもないもの（ここではHold）に戻す。LandとReturnは、アームを妨げるモードとして扱われるので、戻り先にならない）。最後の2行（`cycle`・`preflight check`）は、`commander` の処理の回数と時間の計測で、この手順書では読まなくてよい。
 
 ### 6-2. 離陸して、高さを見る
 
@@ -224,7 +226,21 @@ commander: preflight check: ...
 pxh> commander takeoff
 ```
 
-**期待する結果**: 5-1節と同じように、機体がアームして離陸し、2.5mの高さで止まる。`commander takeoff` は、Takeoffのモードに切り替えてから、アームする。
+**期待する結果**（T1。ログのファイル名の日付と時刻は、実行ごとに変わる。`arming warning` と `Using default takeoff altitude` の行は、順番が入れ替わることがある）:
+
+```text
+pxh> INFO  [commander] Armed by internal command
+INFO  [tone_alarm] arming warning
+INFO  [navigator] Using default takeoff altitude: 2.5 m
+INFO  [logger] Start file log (type: full)
+INFO  [logger] [logger] ./log/2026-10-31/12_55_59.ulg
+INFO  [logger] Opened full log file: ./log/2026-10-31/12_55_59.ulg
+INFO  [commander] Takeoff detected
+```
+
+5-1節と同じように、機体がアームして離陸し、2.5mの高さで止まる。`commander takeoff` は、Takeoffのモードに切り替えてから、アームする。1行目の先頭の `pxh> ` は、コマンドを打った後に出たプロンプトで、その後ろにPX4の表示が続いている（環境構築の6節の `Ready for takeoff!` と同じ）。
+
+`Armed by internal command` は、PX4の中（ここではシェル）からの指示でアームしたことを示す。5-1節のQGCからの指示では `external command`（外からの指示）だった。`Using default takeoff altitude: 2.5 m` は、離陸の高さを指定しなかったので、既定の `MIS_TAKEOFF_ALT`（5-1節）の2.5mを使う、という意味である。`logger` の3行は、アームしたので、新しい飛行の記録（ログ）のファイルを開いたことを示す。このファイルは、着陸してディスアームすると閉じられる（5-3節の `closed logfile`）。
 
 高さに着いたら、PX4の中の、機体の位置のトピック（フェーズ0の3-2節のuORBのトピック）を1回表示する。
 
@@ -232,18 +248,29 @@ pxh> commander takeoff
 pxh> listener vehicle_local_position
 ```
 
-**期待する結果**（抜粋。想定）:
+**期待する結果**（抜粋。全部で約60行。値は実行ごとに変わり、`x`・`y` は5-2節で移動した先によって変わる）:
 
 ```text
 TOPIC: vehicle_local_position
  vehicle_local_position
-    timestamp: <起動からの時間>
-    x: <北への位置>
-    y: <東への位置>
-    z: -2.5...
+    timestamp: 434684000 (0.008000 seconds ago)
+    ...
+    ref_lat: 47.397971
+    ref_lon: 8.546164
+    x: -12.11189
+    y: 41.94363
+    z: -2.50223
+    ...
+    ref_alt: 0.21130
+    ...
+    xy_valid: True
+    z_valid: True
+    ...
 ```
 
-`x`・`y`・`z` は、NEDの座標（フェーズ0の8節）の位置で、単位はmである。原点は、PX4の推定（EKF2）が動き始めたときの機体の位置で、この手順書では、Gazeboで機体が現れた地点である。5-2節で移動した先で着陸し、そこから離陸したので、`x`・`y` は、5-2節で移動した分だけ0から離れている。地面の高さは同じなので、2.5mの高さにいると、`z` は約−2.5になる。NEDのzは下が正だからである。
+`x`・`y`・`z` は、NEDの座標（フェーズ0の8節）の位置で、単位はmである。原点は、PX4の推定（EKF2）が動き始めたときの機体の位置で、この手順書では、Gazeboで機体が現れた地点である。5-2節で移動した先で着陸し、そこから離陸したので、`x`・`y` は、5-2節で移動した分だけ0から離れている（この例では、`x` が約−12なので北へ−12m、つまり南へ約12m、`y` が約42なので東へ約42m）。地面の高さは同じなので、2.5mの高さにいると、`z` は約−2.5になる。NEDのzは下が正だからである。
+
+`timestamp` は、PX4が起動してからの時間（マイクロ秒）である。`ref_lat`・`ref_lon`・`ref_alt` は、原点の緯度・経度・海抜（m）で、緯度・経度は、Gazeboのワールドのファイル（`Tools/simulation/gz/worlds/default.sdf`）に書かれた場所（スイスのチューリッヒの付近）と同じである。このワールドの地面は、海抜がほぼ0mである。`xy_valid`・`z_valid` が `True` なのは、水平と高さの位置の推定が使える状態であることを示す。
 
 ### 6-3. 地点へ移動させてから、帰還させる
 
@@ -255,7 +282,18 @@ pxh> commander mode auto:rtl
 
 Go to locationで指す地点は、離陸した地点から10m以内にする。それより離れていると、帰還のときに、まず帰還先より60m上（パラメータ `RTL_RETURN_ALT` の既定）まで上昇してから戻り、30m（`RTL_DESCEND_ALT`）を経て降りるので、着陸までに時間がかかる（PX4 v1.17のソースの `rtl.cpp` で確かめた。10m以内なら、上がるのは距離と同じくらいの高さまでである）。
 
-**期待する結果**: 飛行モードが **Return** に変わり、機体が、ホームの位置（離陸した地点）の上へ戻って、着陸する（10m以内の地点からなら、少し上がってから戻る）。着陸すると、5-3節と同じように、`Landing detected` と `Disarmed by landing` が表示される。
+**期待する結果**（T1。10m以内の地点から帰還させた場合。バイト数は実行ごとに変わる）:
+
+```text
+pxh> INFO  [navigator] RTL: start return at 3 m (3 m above destination)
+INFO  [navigator] RTL: land at destination
+INFO  [commander] Landing detected
+INFO  [commander] Disarmed by landing
+INFO  [tone_alarm] notify neutral
+INFO  [logger] closed logfile, bytes written: 14137281
+```
+
+飛行モードが **Return** に変わり、機体が、ホームの位置（離陸した地点）の上へ戻って、着陸する（10m以内の地点からなら、少し上がってから戻る）。`RTL: start return at 3 m (3 m above destination)` は、帰還先より3m上の高さで戻る、という意味である。前の数は海抜の高さで、6-2節のとおり、このワールドの地面は海抜がほぼ0mなので、括弧の中の数と同じくらいになる。どちらも、整数に切り上げて表示される（PX4 v1.17のソースの `rtl_direct.cpp`）。帰還を始めた位置が離陸した地点から遠いほど、この数は大きくなる。`RTL: land at destination` は、帰還先の上に着いたので、着陸を始めたことを示す。着陸すると、5-3節と同じように、`Landing detected` と `Disarmed by landing` が表示される。
 
 `auto:rtl` の `rtl` は、Return To Launch（離陸した所へ戻る）の頭文字である。`commander mode` に渡せる飛行モードの名前は、`commander` とだけ打つと表示される使い方の説明にある（例: Holdは `auto:loiter`、Landは `auto:land`、Takeoffは `auto:takeoff`、Positionは `posctl`、Offboardは `offboard`）。
 
@@ -265,7 +303,7 @@ Go to locationで指す地点は、離陸した地点から10m以内にする。
 pxh> commander status
 ```
 
-**期待する結果**: 1行目が `Disarmed` に戻る。2行目は、Returnの前に選んでいたモード（Hold）に戻る。
+**期待する結果**: 1行目が `Disarmed` に戻る。2行目は、Holdに戻る（6-1節のとおり、Returnは戻り先にならないので、その前に選ばれていたHoldに戻る）。
 
 ### 6-5. その場に着陸させる
 
@@ -281,11 +319,44 @@ pxh> commander takeoff
 pxh> commander land
 ```
 
-**期待する結果**: 飛行モードが **Land** に変わり、機体がその場で真下に降りて着地する。5-3節と同じように、`Landing detected` と `Disarmed by landing` が表示される。帰還（Return）と違い、離陸した地点へは戻らない。着地した後に `commander status` を打つと、1行目が `Disarmed` になっている。
+**期待する結果**（T1。`commander takeoff` の表示は6-2節と同じなので省いた。バイト数は実行ごとに変わる）:
+
+```text
+pxh> INFO  [commander] Landing at current position
+INFO  [commander] Landing detected
+INFO  [commander] Disarmed by landing
+INFO  [tone_alarm] notify neutral
+INFO  [logger] closed logfile, bytes written: 7408103
+```
+
+飛行モードが **Land** に変わり、機体がその場で真下に降りて着地する。`Landing at current position` は、今いる位置に着陸する、という意味である。5-3節と同じように、`Landing detected` と `Disarmed by landing` が表示される。帰還（Return）と違い、離陸した地点へは戻らない。着地した後に `commander status` を打つと、1行目が `Disarmed` になっている。
 
 ## 7. 止める
 
-T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutdown` と打ってもよい）。止めたときの表示は、環境構築の6節と同じである。
+T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す。
+
+**期待する結果**（T1の最後の部分）:
+
+```text
+PX4 Exiting...
+pxh> Exiting NOW.
+ninja: build stopped: interrupted by user.
+make: *** [Makefile:227: px4_sitl] Interrupt
+```
+
+環境構築の6節と同じ表示である。`interrupted by user` と `Interrupt` は、Ctrl+Cで止めたことを示す表示で、止め方として正しいので問題ない。
+
+`pxh>` で `shutdown` と打っても、PX4は `Exiting NOW.` と表示して止まるが、T1はコマンドを打てる状態（Ubuntuのプロンプト）に戻らない。そのときは、続けて Ctrl+C を押す。
+
+```text
+pxh> shutdown
+Exiting NOW.
+
+^Cninja: build stopped: interrupted by user.
+make: *** [Makefile:227: px4_sitl] Interrupt
+```
+
+`^C` は、Ctrl+Cを押したことを示す。
 
 ## 8. 課題（任意）
 
@@ -298,6 +369,7 @@ T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutd
 - **`commander takeoff` で離陸しない**: QGCがつながっているかを確かめる（つながっていないと、アームできない）。
 - **機体が画面から外れて見えなくなった**: シーンの機体を右クリックし、**Follow Options** から **Follow** を選ぶ（3節）。
 - **確定のボタンを押しても何も起きない**: 押してすぐ離すと、確定しない。受け付けられるまで、押したままにする。
+- **`pxh>` でコマンドを打っている途中に、PX4の表示が割り込む**: 打ちかけの文字は、消えずに入力に残っている（`pxh> shINFO  [logger] ...` のように、PX4の表示の前に見える）。この状態で Enter を押すと、打ちかけの文字がそのままコマンドとして扱われ、`Invalid command: sh` のように表示される。そのときは、コマンドを改めて打ち直す。
 
 ## 次へ
 

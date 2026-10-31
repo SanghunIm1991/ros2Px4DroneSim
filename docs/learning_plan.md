@@ -2,7 +2,7 @@
 
 [`docs/idea_origin.md`](idea_origin.md) の6つの段階（①〜⑥）を、学習の順番に並べ、各フェーズの内容・前提・完了条件をまとめたもの。ゴールと技術を選んだ理由は構想の文書に、決めた経緯は [`docs/qa_log.md`](qa_log.md) にある。この文書に出てくるドローンとPX4の用語（SITL・アーム・オフボード制御・Position mode・uXRCE-DDS等）は、構想の文書の4節に短い説明があり、フェーズ0で詳しく学ぶ。技術的な記述の出典は、構想の文書の7節にまとめている。
 
-> **作成中である。** 手順書は、環境構築とフェーズ0・1が作成済み（フェーズ1の一部の表示は想定のまま）で、フェーズ2〜6と間章2つは下書きである（5節の一覧）。フェーズの番号と必須・任意の範囲は決めたもので、状況に応じて柔軟に直す。各フェーズの前提と完了条件は案で、手順書を作るときに確かめて直す。
+> **作成中である。** 手順書は、環境構築とフェーズ0〜3（3-0を含む）が作成済み（一部の表示は想定のまま）で、フェーズ4〜6と間章2つは下書きである（5節の一覧）。フェーズの番号と必須・任意の範囲は決めたもので、状況に応じて柔軟に直す。各フェーズの前提と完了条件は案で、手順書を作るときに確かめて直す。
 
 ## 1. 目的とゴール
 
@@ -116,9 +116,9 @@
 | 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。期待する結果は、実際に導入したときの表示に差し替えた |
 | 0 | [`docs/phase0_drone_px4.md`](phase0_drone_px4.md) | 作成済み（2026-10-31）。図の見た目もGitHubで確かめた |
 | 1 | [`docs/phase1_first_flight.md`](phase1_first_flight.md) | 作成済み（2026-10-31）。想定のままの表示は [`docs/pending_checks.md`](pending_checks.md) に一覧した（実際に使って違っていたら直す） |
-| 2 | [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) | 下書き（2026-10-31）。2節（Agentと `px4_msgs` のビルド、型の表示）は実際の表示に差し替えた。3節以降の表示は想定で、実際に動かして確かめる |
-| 3-0 | [`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md) | 下書き（2026-10-31）。表示はすべて想定 |
-| 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 下書き（2026-10-31）。表示はすべて想定 |
+| 2 | [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) | 作成済み（2026-10-31）。2〜6節の表示は実際の表示に差し替えた。3節のT1（PX4）の表示と、6節の飛ばしたときの値の変化は想定のまま（[`docs/pending_checks.md`](pending_checks.md)） |
+| 3-0 | [`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md) | 作成済み（2026-10-31）。離陸させたときの高さの変わり方だけが想定のまま（[`docs/pending_checks.md`](pending_checks.md)） |
+| 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 作成済み（2026-10-31）。T5とT6の表示は確かめた。QGCとGazeboの画面の様子・T1（PX4）の表示・途中で止めたときの動きは想定のまま（[`docs/pending_checks.md`](pending_checks.md)） |
 | 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 6 | [`docs/phase6_replan.md`](phase6_replan.md) | 下書き（2026-10-31）。表示はすべて想定 |
@@ -128,5 +128,5 @@
 
 ## 6. 未決事項
 
-- 下書きのフェーズ2〜6と間章を、実際に動かして確かめ、READMEの「読む順番」に加える（各ページの前提の節は、そのとき「前提」の列に写す）。確かめる項目は [`docs/pending_checks.md`](pending_checks.md) にある。
+- 下書きのフェーズ4〜6と間章を、実際に動かして確かめ、READMEの「読む順番」に加える（各ページの前提の節は、そのとき「前提」の列に写す）。確かめる項目は [`docs/pending_checks.md`](pending_checks.md) にある。
 - （決定済み）ROS 2のコマンドでの観察とQoSの復習は、フェーズ3-0の1ページにした（2026-10-31）。

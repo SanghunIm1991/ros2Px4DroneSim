@@ -39,12 +39,16 @@
 
 3の衝突防止は、2のPosition modeのように、操縦桿の入力を加速度の目標にする手動のモードの中でだけ働く。オフボード制御（フェーズ3）や、Hold・Return・Takeoff・Landなどの自動のモードでは働かない（7節。厳密には、Landの最中に操縦桿で位置を少し直す処理でも使われる）。
 
-この手順書では、2つのターミナルを使う（フェーズ4の6節のRViz2を並べて見る場合は、フェーズ4のT3とT5も使う）。
+この手順書では、2つのターミナルを使う（9節の課題4で、RViz2を並べて見る場合は、T4とT5も使う）。
 
 | ターミナル | 動かすもの | 仮想環境 `~/px4-venv` |
 |---|---|---|
 | T1 | PX4のシミュレーション（`make px4_sitl gz_x500_lidar_2d_walls`）とPX4のシェル | 使う |
 | T2 | QGroundControl | 使わない |
+| T4 | `ros_gz_bridge`（中継。9節の課題4だけ） | 使わない |
+| T5 | RViz2（9節の課題4だけ） | 使わない |
+
+ターミナルの番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T1〜T4がどの手順書でも同じプログラムで、T5以降がそのページの作業用である。この手順書では、Agent（T3）を使わないので、T3は開かない。
 
 ## 2. Position modeと操縦の入力
 
@@ -199,7 +203,19 @@ QGCの **Application Settings** の **Virtual Joystick** のチェックを外�
 1. `CP_DIST` を−1のまま、6-2節と同じ操作をして、機体が壁にぶつかることを確かめる（ぶつかった後は、PX4のシミュレーションを止めて起動し直す）。衝突防止が何をしていたかを、6-2節の結果と比べて説明する。
 2. 衝突防止を有効にしたまま、QGCの **Go to location** で、壁1の向こう側（東へ8m）を指す。機体がHoldのモードで壁にぶつかることを確かめ、7節の表の「手動のモード以外では働かない」を確かめる。移動の間は操縦桿に触れない（触れるとPositionに切り替わり、衝突防止が働く。2-2節）。ぶつかった後は、PX4のシミュレーションを起動し直す。
 3. `CP_GUIDE_ANG` を0にして（`pxh> param set CP_GUIDE_ANG 0`）、6-3節と同じ操作をする。入力の向きが曲げられなくなり、壁に沿って動く速さが落ちることを確かめたら、30に戻す。
-4. フェーズ4の5節と6節の手順で、`parameter_bridge` とRViz2を並べて起動し、6-2節で止まったときの壁の点の直線が、2mより遠い位置にあることを確かめる。
+4. フェーズ4の5節と6節の手順で、`parameter_bridge` とRViz2を並べて起動し、6-2節で止まったときの壁の点の直線が、2mより遠い位置にあることを確かめる。コマンドは次のとおりである。RViz2では、フェーズ4の6-2節のとおり、**Fixed Frame** を `link` にし、**Add** の **By topic** で `/scan` の **LaserScan** を足して、**Size (m)** を `0.05` にする。
+
+```bash
+# T4
+export GZ_IP=127.0.0.1
+
+ros2 run ros_gz_bridge parameter_bridge \
+  /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
+  --ros-args -r /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan:=/scan
+
+# T5
+rviz2
+```
 
 ## つまずきやすい点
 

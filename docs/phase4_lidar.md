@@ -42,9 +42,11 @@
 |---|---|---|
 | T1 | PX4のシミュレーション（`make px4_sitl gz_x500_lidar_2d_walls`） | 使う |
 | T2 | QGroundControl | 使わない |
-| T3 | `ros_gz_bridge`（中継） | 使わない |
-| T4 | `gz` と `ros2` のコマンド | 使わない |
-| T5 | RViz2 | 使わない |
+| T4 | `ros_gz_bridge`（中継） | 使わない |
+| T5 | `gz` と `ros2` のコマンド | 使わない |
+| T6 | RViz2 | 使わない |
+
+ターミナルの番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T1〜T4がどの手順書でも同じプログラムで、T5以降がそのページの作業用である。この手順書では、Agent（T3）を使わないので、T3は開かない。
 
 LiDARの値を見るだけなら、Agentは要らない（フェーズ6で、PX4の値と合わせて使うときに、再び起動する）。
 
@@ -134,7 +136,7 @@ INFO  [commander] Ready for takeoff!
 ROS 2へ中継する前に、Gazeboの側で、LiDARのトピックが出ていることを確かめる。Gazeboのトピックは、Gazebo自身の通信の仕組み（Gazebo Transport）で流れていて、`ros2 topic` では見えない。見るには、Gazeboのコマンド `gz topic` を使う。
 
 ```bash
-# T4
+# T5
 export GZ_IP=127.0.0.1
 
 gz topic -l | grep lidar
@@ -158,7 +160,7 @@ gz topic -l | grep lidar
 `ros_gz_bridge` は、GazeboのトピックとROS 2のトピックを中継するパッケージで、環境構築で入れた `ros-jazzy-ros-gz` に含まれる。その中の `parameter_bridge` は、引数で指定したトピックを中継するノードである。
 
 ```bash
-# T3
+# T4
 export GZ_IP=127.0.0.1
 
 ros2 run ros_gz_bridge parameter_bridge \
@@ -180,10 +182,10 @@ ROS 2のトピックの名前は、何もしなければGazeboのトピックと
 
 ### 5-2. ROS 2のトピックを見る
 
-T4で、ROS 2のトピックとして見えることを確かめる。
+T5で、ROS 2のトピックとして見えることを確かめる。
 
 ```bash
-# T4
+# T5
 ros2 topic list
 
 ros2 topic hz /scan
@@ -238,7 +240,7 @@ RViz2は、表示するすべてのデータを、1つの基準の座標系（�
 ### 6-2. 表示する
 
 ```bash
-# T5
+# T6
 rviz2
 ```
 
@@ -269,7 +271,7 @@ PX4の既定の設定では、自動のモードで目標の地点が少し離�
 
 ## 8. 止める
 
-T5のRViz2のウィンドウを閉じ、T3の `parameter_bridge` を Ctrl+C で止める。T2のQGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
+T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で止める。T2のQGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
 
 ## 9. 課題（任意）
 
@@ -279,7 +281,7 @@ T5のRViz2のウィンドウを閉じ、T3の `parameter_bridge` を Ctrl+C で�
 ## つまずきやすい点
 
 - **`gz topic -l` に何も出ない・LiDARのトピックが無い**: `export GZ_IP=127.0.0.1` を忘れていないかを確かめる。T1を、`gz_x500` ではなく `gz_x500_lidar_2d_walls` で起動したかを確かめる（T1に `walls.sdf` の行が出ているか）。
-- **`/scan` は見えるが、`ros2 topic hz` に何も出ない**: T3で `export GZ_IP=127.0.0.1` をしていないと、中継がGazeboのトピックを受け取れない。T3の引数のトピックの名前が、4節の `gz topic -l` の表示と一字一句同じかを確かめる。
+- **`/scan` は見えるが、`ros2 topic hz` に何も出ない**: T4で `export GZ_IP=127.0.0.1` をしていないと、中継がGazeboのトピックを受け取れない。T4の引数のトピックの名前が、4節の `gz topic -l` の表示と一字一句同じかを確かめる。
 - **RViz2に点が出ない**: **Fixed Frame** が `link` になっているか、**LaserScan** の **Topic** が `/scan` になっているかを確かめる。点が小さすぎることもあるので、**Size (m)** を大きくしてみる。
 - **LiDARの値がまったく出ない（専用のGPUが無いPC）**: GazeboのLiDARは、画面の描画の仕組み（GPU）を使って距離を計算する。GPUの描画が使えない環境では、値が出ないことがある。
 
