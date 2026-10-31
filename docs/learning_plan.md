@@ -46,7 +46,7 @@
 
 ### フェーズ1: PX4とGazeboで飛ばす（段階①・最初のゴール）
 
-- **内容**: PX4のシミュレーションを起動し、Gazeboの画面の見方（視点の動かし方・機体とワールドの見え方など）を確かめる。QGroundControlで離陸・地図の上の地点への移動・着陸を指示する。離陸と着陸、飛行モードの切り替えは、PX4のシェルのコマンドでも行い、モードが切り替わる様子を見る（シェルで地点への移動まで指示できるかは、手順書を作るときに確かめる）。
+- **内容**: PX4のシミュレーションを起動し、Gazeboの画面の見方（視点の動かし方・機体とワールドの見え方など）を確かめる。QGroundControlで離陸・地図の上の地点への移動・着陸を指示する。離陸と着陸、飛行モードの切り替えは、PX4のシェルのコマンドでも行い、モードが切り替わる様子を見る（シェルの `commander` のコマンドには地点を指す指示が無いので、移動はQGCの Go to location で行い、シェルでは離陸・帰還・着陸を指示する）。
 - **前提**: 環境構築、フェーズ0。
 - **完了条件**: 機体が離陸し、QGroundControlで指示した地点へ移動し、着陸する。そのときの飛行モードの変化を、QGroundControlやPX4のシェルの表示で確かめられる。
 
@@ -101,7 +101,7 @@
 |---|---|---|
 | 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。期待する結果は、実際に導入したときの表示に差し替えた |
 | 0 | [`docs/phase0_drone_px4.md`](phase0_drone_px4.md) | 作成済み（2026-10-31）。図の見た目もGitHubで確かめた |
-| 1 | [`docs/phase1_first_flight.md`](phase1_first_flight.md) | 作成済み（2026-10-31）。6-2〜6-4節と、飛んでいる間のQGCの表示は想定のまま（実際に使って違っていたら直す） |
+| 1 | [`docs/phase1_first_flight.md`](phase1_first_flight.md) | 作成済み（2026-10-31）。想定のままの表示は [`docs/pending_checks.md`](pending_checks.md) に一覧した（実際に使って違っていたら直す） |
 | 2 | `docs/phase2_ros2_observe.md` | 未作成 |
 | 3 | `docs/phase3_offboard.md` | 未作成 |
 | 4 | `docs/phase4_lidar.md` | 未作成 |

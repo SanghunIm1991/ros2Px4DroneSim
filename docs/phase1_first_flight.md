@@ -4,11 +4,11 @@
 
 - 想定環境: [環境構築](setup_px4_gazebo.md) を終えたWSL2のUbuntu 24.04
 - 所要の目安: 1コマ
-- 必須の範囲: 2〜7節（8節の課題は任意）
+- 必須の範囲: 1〜7節（8節の課題は任意）
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の、5節（アームと飛行モード）・6節（地上局とMAVLink）・8節（座標系）を、実際に動かして確かめる。用語の意味は、フェーズ0で確かめる。
 >
-> **期待する結果の出どころ**: 2節・5節・6-1節のT1（PX4のシミュレーション）の表示、2節のQGCの警告、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。5節の、飛んでいる間のQGCの表示と、6-2〜6-4節の表示は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。
+> **期待する結果の出どころ**: 2節・5節・6-1節のT1（PX4のシミュレーション）の表示、2節のQGCの警告、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。5節の、飛んでいる間のQGCとGazeboの様子と `commander status` の表示、6-2〜6-5節の表示は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。
 
 ## 0. 学習目標と完了条件
 
@@ -24,16 +24,16 @@
 **完了条件**（すべて満たしたら完了）:
 
 1. QGCの指示で、機体が離陸し、地図で指した地点へ移動し、着陸する（5節）。
-2. そのときの飛行モードの変化（Takeoff → Hold → Land）と、着陸の後のディスアームを、QGCとPX4のシェルの表示で確かめられる（5節）。
-3. PX4のシェルの `commander` のコマンドで離陸させ、帰還させ（Return）、着陸の後にディスアームしたことを、`commander status` で確かめられる（6節）。
+2. そのときの飛行モードの変化（Takeoff → Hold → Land）をQGCの表示で、Holdで止まっていることを `commander status` で、アーム・離陸と着陸の検知・ディスアームをT1の表示で確かめられる（5節）。
+3. PX4のシェルの `commander` のコマンドで、離陸させ、帰還させ（Return）、もう一度離陸させてその場に着陸させ、着陸の後にディスアームしたことを、`commander status` で確かめられる（6節）。
 
 ## 1. 全体像
 
-この手順書では、2つのターミナルを使う。T1でPX4のシミュレーション（PX4のSITLとGazebo）を起動し、T2でQGCを起動する。T1の最後の行に出る `pxh>` は、PX4のシェルのプロンプトで、6節ではここにコマンドを打つ。
+この手順書では、2つのターミナルを使う。T1でPX4のシミュレーション（PX4のSITLとGazebo）を起動し、T2でQGCを起動する。T1の最後の行に出る `pxh>` は、PX4のシェルのプロンプトで、5節と6節ではここにコマンドを打つ。この手順書では、打つコマンドの前に `pxh> ` を付けて書くが、`pxh>` はプロンプトなので打たない（`pxh> commander status` とまるごと打つと、`Invalid command: pxh>` と表示される）。
 
 1回の飛行で、飛行モードとアームは、次のように移り変わる。
 
-![1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、ホームの位置へ戻って着陸し、同じように自動でディスアームする](img/phase1_modes.svg)
+![1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、必要なら上昇してから、ホームの位置へ戻って着陸し、同じように自動でディスアームする](img/phase1_modes.svg)
 
 <details>
 <summary>同じ図（mermaid版）</summary>
@@ -42,7 +42,7 @@
 flowchart LR
     G["地上<br/>ディスアーム"] -- "離陸の指示" --> T["Takeoff<br/>アームして上昇し<br/>決めた高さで止まる"]
     T -- "高さに着く" --> H["Hold<br/>その場で止まる<br/>Go to locationで<br/>止まる位置を移す"]
-    H -- "帰還の指示" --> R["Return<br/>ホームの位置へ<br/>戻って着陸する"]
+    H -- "帰還の指示" --> R["Return<br/>必要なら上昇し<br/>ホームへ戻って着陸"]
     H -- "着陸の指示" --> L["Land<br/>その場に着陸する"]
     L -- "着地" --> D["着陸を検知<br/>少し後に<br/>自動でディスアーム"]
     R -- "着地" --> D
@@ -56,7 +56,7 @@ flowchart LR
 | 指示 | QGC（5節） | PX4のシェル（6節） |
 |---|---|---|
 | 離陸の指示（アームして離陸） | 左の **Takeoff** のボタン | `commander takeoff` |
-| 止まる位置を移す | 地図をクリックして **Go to location** | 無い（シェルのコマンドには、地点を指す指示が無い） |
+| 止まる位置を移す | 地図をクリックして **Go to location** | 無い（`commander` のコマンドには、地点を指す指示が無い） |
 | 帰還の指示 | 左の **Return**（RTL）のボタン | `commander mode auto:rtl` |
 | 着陸の指示 | 左の **Land** のボタン | `commander land` |
 
@@ -96,11 +96,11 @@ T2のQGCの表示には、環境構築の6節で見た警告のほかに、`"Bin
 
 ## 3. Gazeboの画面の見方
 
-Gazeboのウィンドウは、中央の3Dの画面（シーン）と、右の一覧（エンティティツリー。ワールドの中の物の一覧）、下の再生の操作でできている。機体は、エンティティツリーの中で `x500_0` という名前で見える（模型の名前 `x500` に、PX4のインスタンスの番号 `0` を付けた名前。T1の `INFO  [gz_bridge] world: default, model: x500_0` の行と同じ）。
+Gazeboのウィンドウは、3Dの画面（シーン）と、右の一覧（エンティティツリー。ワールドの中の物の一覧）、3Dの画面の下の再生の操作でできている。機体は、エンティティツリーの中で `x500_0` という名前で見える（模型の名前 `x500` に、PX4のインスタンスの番号 `0` を付けた名前。T1の `INFO  [gz_bridge] world: default, model: x500_0` の行と同じ）。
 
-![Gazeboのウィンドウ。左の3Dの画面の灰色の地面の上に、離陸して浮かんでいるドローン（x500）が見える。左上に物を置くための道具のボタン、左下に一時停止・ステップ・リセットの3つのボタン、右下にRTF（99.62 %）が並ぶ。右上は選んだ物の情報（ここでは ground_plane）、右下のEntity Treeには default・ground_plane・sunUTC・x500_0 が並ぶ](img/phase1_gazebo.png)
+![Gazeboのウィンドウ。左の3Dの画面の灰色の地面の上に、離陸して浮かんでいるドローン（x500）が見える。左上に物を置く道具と、選択・移動などの道具のボタン、3Dの画面の左下に一時停止・ステップ・リセットの3つのボタン、3Dの画面の右下にRTF（99.62 %）が並ぶ。右上は選んだ物の情報（ここでは ground_plane）、右下のEntity Treeには default・ground_plane・sunUTC・x500_0 が並ぶ](img/phase1_gazebo.png)
 
-上の画像は、5-1節で離陸した後のGazeboのウィンドウである。右の上半分は、選んだ物の情報（ここでは地面の `ground_plane`）、右の下半分の **Entity Tree** がエンティティツリーで、`x500_0` が機体である。左下の3つのボタンは、左から一時停止（再生中は ‖ の形）・1歩ずつ進める・リセットで、右下の数（RTF。Real Time Factor）は、シミュレーションの時間が、現実の時間の何倍の速さで進んでいるかを表す（100 % に近いほど、現実と同じ速さ。PCの速さや負荷で、実行ごとに変わる）。
+上の画像は、5-1節で離陸した後のGazeboのウィンドウである。右の上半分は、選んだ物の情報（ここでは地面の `ground_plane`）、右の下半分の **Entity Tree** がエンティティツリーで、`x500_0` が機体である。左下の3つのボタンは、左から一時停止（再生中は ‖ の形）・1歩ずつ進める・リセットで、3Dの画面の右下の数（RTF。Real Time Factor）は、シミュレーションの時間が、現実の時間の何倍の速さで進んでいるかを表す（100 % に近いほど、現実と同じ速さ。PCの速さや負荷で、実行ごとに変わる）。
 
 シーンの視点は、マウスで次のように動かす（Gazebo Harmonicの公式の文書による）。
 
@@ -137,7 +137,7 @@ QGCは、起動すると、飛行の画面（Fly View）を表示する。この
 ### 5-1. 離陸する
 
 1. 左の **Takeoff** のボタンを押す。
-2. 右に出る縦のスライダーで、離陸の高さを決める（そのままでもよい）。最初は **10 ft** と表示される。
+2. 右に出る縦のスライダーで、離陸の高さを決める（そのままでもよい）。最初は **10 ft** と表示される（QGCの単位の設定がフィートの場合。メートルの場合は約3m）。
 3. 確定のボタンを、押したまま離さずにいて、指示が受け付けられるまで待つ（安全のための確認。QGCで、取り消しにくい指示はこの形で確定する）。
 
 **期待する結果**（T1。抜粋）:
@@ -162,6 +162,23 @@ QGCは、高さをフィート（ft）で表示することがある。1ftは約
 
 **期待する結果**: 機体が、指した地点へ向かって水平に飛び、その上で止まる。飛行モードの表示は **Hold** のままである（1節のとおり、Holdの止まる位置を移す指示だから）。Gazeboの画面では、機体が少し前に傾いて進み、止まるときに逆に傾いてブレーキをかける様子が見える（フェーズ0の2-3節）。
 
+止まったら、T1で、機体の状態をPX4のシェルで見る（`commander status` の表示の読み方は、6-1節で詳しく見る）。
+
+```text
+pxh> commander status
+```
+
+**期待する結果**（最初の4行）:
+
+```text
+INFO  [commander] Armed
+INFO  [commander] navigation mode: Hold
+INFO  [commander] user intended navigation mode: Hold
+INFO  [commander] in failsafe: no
+```
+
+1行目の `Armed` はアームしていること、2行目の `Hold` は、今の飛行モードがHoldであることを示す。QGCの飛行モードの表示と同じである。
+
 ### 5-3. 着陸する
 
 1. 左の **Land** のボタンを押す。
@@ -180,7 +197,7 @@ INFO  [logger] closed logfile, bytes written: <バイト数>
 
 ## 6. PX4のシェルで飛ばす
 
-T1の `pxh>` のプロンプトに、PX4のコマンドを打つ。この手順書では、打つコマンドの前に `pxh> ` を付けて書くが、`pxh>` はプロンプトなので打たない（`pxh> commander status` とまるごと打つと、`Invalid command: pxh>` と表示される）。飛行モードとアームを扱うのは、`commander` というモジュールのコマンドである。QGCは、つないだままにしておく（フェーズ0の9-1節のとおり、地上局がつながっていないとアームできない）。シェルで出した指示の結果も、QGCの画面に表示される。
+T1の `pxh>` のプロンプトに、PX4のコマンドを打つ（1節のとおり、`pxh>` は打たない）。飛行モードとアームを扱うのは、`commander` というモジュールのコマンドである。QGCは、つないだままにしておく（フェーズ0の9-1節のとおり、地上局がつながっていないとアームできない）。シェルで出した指示の結果も、QGCの画面に表示される。
 
 ### 6-1. 機体の状態を見る
 
@@ -188,7 +205,7 @@ T1の `pxh>` のプロンプトに、PX4のコマンドを打つ。この手順�
 pxh> commander status
 ```
 
-**期待する結果**（5節で着陸した後に打った場合。最後の2行は、PX4の処理の時間の計測で、数は実行ごとに変わるので省いた）:
+**期待する結果**（5節で着陸した後に打った場合。最後の2行は、PX4の処理の時間の計測で、数は実行ごとに変わるので `...` で省いた）:
 
 ```text
 INFO  [commander] Disarmed
@@ -199,7 +216,7 @@ commander: cycle: ...
 commander: preflight check: ...
 ```
 
-1行目がアームの状態、2行目が今の飛行モードである。3行目は、人や地上局が選んだ飛行モードで、ふだんは2行目と同じになる。フェイルセーフ（フェーズ0の9-2節）が働くと、2行目だけがフェイルセーフの動作のモードに変わり、4行目が `yes` になる。5節で着陸した後は、飛行モードがHoldに戻っている（Landは、着地してディスアームすると終わる）。最後の2行（`cycle`・`preflight check`）は、`commander` の処理の回数と時間の計測で、この手順書では読まなくてよい。
+1行目がアームの状態、2行目が今の飛行モードである。3行目は、人や地上局が選んだ飛行モードで、ふだんは2行目と同じになる。フェイルセーフ（フェーズ0の9-2節）が働くと、2行目だけがフェイルセーフの動作のモードに変わり、4行目が `yes` になる。5節で着陸した後は、飛行モードがHoldに戻っている（PX4は、Landで着地してディスアームすると、Landの前に選んでいたモード（ここではHold）に戻す）。最後の2行（`cycle`・`preflight check`）は、`commander` の処理の回数と時間の計測で、この手順書では読まなくてよい。
 
 ### 6-2. 離陸して、高さを見る
 
@@ -226,11 +243,11 @@ TOPIC: vehicle_local_position
     z: -2.5...
 ```
 
-`x`・`y`・`z` は、離陸した地点を原点にしたNEDの座標（フェーズ0の8節）の位置で、単位はmである。2.5mの高さにいるのに、`z` は約−2.5になる。NEDのzは下が正だからである。
+`x`・`y`・`z` は、NEDの座標（フェーズ0の8節）の位置で、単位はmである。原点は、PX4の推定（EKF2）が動き始めたときの機体の位置で、この手順書では、Gazeboで機体が現れた地点である。5-2節で移動した先で着陸し、そこから離陸したので、`x`・`y` は、5-2節で移動した分だけ0から離れている。地面の高さは同じなので、2.5mの高さにいると、`z` は約−2.5になる。NEDのzは下が正だからである。
 
 ### 6-3. 地点へ移動させてから、帰還させる
 
-PX4のシェルのコマンドには、地図の上の地点を指して移動させる指示が無い。そこで、移動は5-2節と同じようにQGCの **Go to location** で行い、帰還（Return）をシェルで指示する。
+`commander` のコマンドには、地図の上の地点を指して移動させる指示が無い。そこで、移動は5-2節と同じようにQGCの **Go to location** で行い、帰還（Return）をシェルで指示する。
 
 ```text
 pxh> commander mode auto:rtl
@@ -242,15 +259,29 @@ Go to locationで指す地点は、離陸した地点から10m以内にする。
 
 `auto:rtl` の `rtl` は、Return To Launch（離陸した所へ戻る）の頭文字である。`commander mode` に渡せる飛行モードの名前は、`commander` とだけ打つと表示される使い方の説明にある（例: Holdは `auto:loiter`、Landは `auto:land`、Takeoffは `auto:takeoff`、Positionは `posctl`、Offboardは `offboard`）。
 
-### 6-4. 着陸の後の状態を見る
+### 6-4. 帰還の後の状態を見る
 
 ```text
 pxh> commander status
 ```
 
-**期待する結果**（抜粋。想定）: 1行目が `Disarmed` に戻る。
+**期待する結果**: 1行目が `Disarmed` に戻る。2行目は、Returnの前に選んでいたモード（Hold）に戻る。
 
-着陸の指示は、`commander land` でも出せる。その場に着陸する点が、Returnとの違いである。
+### 6-5. その場に着陸させる
+
+もう一度離陸させ、今度は、その場に着陸させる。
+
+```text
+pxh> commander takeoff
+```
+
+2.5mの高さで止まったら、着陸を指示する。
+
+```text
+pxh> commander land
+```
+
+**期待する結果**: 飛行モードが **Land** に変わり、機体がその場で真下に降りて着地する。5-3節と同じように、`Landing detected` と `Disarmed by landing` が表示される。帰還（Return）と違い、離陸した地点へは戻らない。着地した後に `commander status` を打つと、1行目が `Disarmed` になっている。
 
 ## 7. 止める
 
@@ -258,7 +289,7 @@ T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutd
 
 ## 8. 課題（任意）
 
-1. 5-1節で、離陸の高さを5mにして離陸し、6-2節の `listener vehicle_local_position` で、`z` が約−5になることを確かめる。
+1. 5-1節で、離陸の高さを5m（単位がフィートなら約16ft）にして離陸し、6-2節の `listener vehicle_local_position` で、`z` が約−5になることを確かめる。
 2. 飛んでいる間に、QGCの上のツールバーの飛行モードの表示をクリックし、一覧から **Land** を選んでみる。左のボタンで着陸を指示したときと、同じことが起きるかを確かめる。
 
 ## つまずきやすい点
@@ -279,9 +310,11 @@ T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutd
 - PX4 User Guide（v1.17。[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）: [Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、[Flight Modes (Multicopter)](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/index.md)、[Takeoff](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/takeoff.md)、[Land](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/land.md)、[Return](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/return.md)
 - PX4 v1.17のソース（作成に使った環境に取得したもの）
   - `commander` のコマンドの一覧と、離陸・着陸の扱い、状態の表示: [`src/modules/commander/Commander.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/Commander.cpp)（`takeoff` はTakeoffのモードに切り替えてからアームする。地点への移動の指示（`VEHICLE_CMD_DO_REPOSITION`）は、Holdのモードへの切り替えとして扱う。アーム・ディスアーム・離陸と着陸の検知の表示）
+  - Returnの高さ（6-3節）: [`src/modules/navigator/rtl.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/rtl.cpp)（`calculate_return_alt_from_cone_half_angle`）と [`src/modules/navigator/rtl_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/rtl_params.c)（`RTL_RETURN_ALT` は60m、`RTL_DESCEND_ALT` は30m、`RTL_MIN_DIST` は10m、`RTL_CONE_ANG` は45°）
+  - 位置の原点（6-2節）: [`msg/versioned/VehicleLocalPosition.msg`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/msg/versioned/VehicleLocalPosition.msg)。Landの後に前のモードに戻すこと（6-1節）: [`src/modules/commander/UserModeIntention.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/UserModeIntention.cpp)
   - 離陸の高さの既定: [`src/modules/navigator/mission_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/mission_params.c)（`MIS_TAKEOFF_ALT` は2.5m）
   - Gazeboの起動（すぐに再生する指定と、機体の名前 `x500_0`）: [`ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim)
 - Gazeboの画面の操作: Gazebo Harmonicの文書の [Understanding the GUI](https://github.com/gazebosim/docs/blob/master/harmonic/GUI_tutorial.md)（Open Robotics）
 - QGCの画面と操作: QGroundControl v5.1.5の文書の [General Settings](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/general.md)（単位の設定）・[Fly View](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_view.md)・[Fly View Toolbar](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_view_toolbar.md)・[Fly Tools](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_tools.md)
 - 図（`img/phase1_modes.svg`）は、この教材で作ったもの。
-- 3節の画像（`img/phase1_gazebo.png`）は、筆者の環境で撮影したGazebo（Open Source Robotics Foundation、Apache License 2.0）の画面である。写っている機体の模型 `x500` は、PX4に付属するGazeboの模型（[PX4-gazebo-models](https://github.com/PX4/PX4-gazebo-models)。Copyright (c) 2022, Rudis Laboratories、BSD 3-Clause License）で、模型のファイルそのものは、このリポジトリに含まない。
+- 3節の画像（`img/phase1_gazebo.png`）は、筆者の環境で撮影したGazebo（Open Source Robotics Foundation、Apache License 2.0）の画面である。写っている機体の模型 `x500` は、PX4に付属するGazeboの模型（[PX4-gazebo-models の `models/x500_base`](https://github.com/PX4/PX4-gazebo-models/tree/main/models/x500_base)。そのフォルダの `LICENSE` によると、Copyright (c) 2022, Rudis Laboratories、BSD 3-Clause License）で、模型のファイルそのものは、このリポジトリに含まない。

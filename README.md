@@ -28,6 +28,7 @@ PX4・Gazebo・ROS 2を使い、3Dの環境でドローンを飛ばし、障害�
 | [docs/learning_plan.md](docs/learning_plan.md) | 学習計画（各フェーズの内容・前提・完了条件、作る予定の手順書） |
 | [docs/handoff_from_parent.md](docs/handoff_from_parent.md) | 立ち上げの経緯・親プロジェクトから引き継いだ知見・未決事項 |
 | [docs/qa_log.md](docs/qa_log.md) | 判断・承認の記録 |
+| [docs/pending_checks.md](docs/pending_checks.md) | 手順書の期待する結果のうち、想定のままで、実際の表示で確かめる項目の一覧 |
 | [docs/public_release_review.md](docs/public_release_review.md) | 公開前と更新のたびの点検の観点と実施記録 |
 
 ## ライセンス

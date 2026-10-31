@@ -51,7 +51,8 @@ the author (SanghunIm1991) and the license are credited.
 
    - docs/setup_px4_gazebo.md の2-3で抜粋したROS 2の導入のコマンド:
      ROS 2 Documentation（Open Robotics）, CC BY 4.0
-   - docs/setup_px4_gazebo.md の4節と6節で、公式の手順に従って載せたPX4の
+   - docs/setup_px4_gazebo.md の4節と6節（と、同じコマンドを載せた
+     docs/phase1_first_flight.md の2節）で、公式の手順に従って載せたPX4の
      取得・導入・ビルドのコマンド:
      PX4 User Guide（Dronecode/PX4）, CC BY 4.0
    - 「期待する結果」等に載せたコマンドの出力: 各ツールの表示

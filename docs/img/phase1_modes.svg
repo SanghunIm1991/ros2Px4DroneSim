@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1110 380" width="1110" height="380" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、ホームの位置へ戻って着陸し、同じように自動でディスアームする">
-<title>1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、ホームの位置へ戻って着陸し、同じように自動でディスアームする</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1110 380" width="1110" height="380" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、必要なら上昇してから、ホームの位置へ戻って着陸し、同じように自動でディスアームする">
+<title>1回の飛行での、飛行モードとアームの移り変わり。地上でディスアームの状態から、離陸の指示でアームしてTakeoffになり、決めた高さに着くとHoldになる。Holdのまま、Go to locationで止まる位置を移せる。Holdから、着陸の指示でLandになり、帰還の指示でReturnになる。Landは、着地すると着陸を検知して自動でディスアームする。Returnは、必要なら上昇してから、ホームの位置へ戻って着陸し、同じように自動でディスアームする</title>
 <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
 <rect x="0" y="0" width="1110" height="380" fill="#ffffff"/>
 <g fill="#1a1a1a">
@@ -26,8 +26,8 @@
 <text x="700" y="89" text-anchor="middle">Go to locationで</text>
 <text x="700" y="109" text-anchor="middle">止まる位置を移す</text>
 <text x="990" y="59" text-anchor="middle" font-weight="bold">Return</text>
-<text x="990" y="79" text-anchor="middle">ホームの位置へ</text>
-<text x="990" y="99" text-anchor="middle">戻って着陸する</text>
+<text x="990" y="79" text-anchor="middle">必要なら上昇し</text>
+<text x="990" y="99" text-anchor="middle">ホームへ戻って着陸</text>
 <text x="700" y="249" text-anchor="middle" font-weight="bold">Land</text>
 <text x="700" y="269" text-anchor="middle">その場に</text>
 <text x="700" y="289" text-anchor="middle">着陸する</text>
