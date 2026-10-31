@@ -123,7 +123,7 @@
 | 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 6 | [`docs/phase6_replan.md`](phase6_replan.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 間章 | [`docs/interlude_custom_sensor.md`](interlude_custom_sensor.md) | 下書き（2026-10-31）。模型のファイルは `gz sdf -k` の点検だけを通した。起動と飛行の表示は想定 |
-| 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。4節の表示は想定 |
+| 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。1-1節の部品がaptの版（1.3.13）ですべて入ることは確かめた。4節の表示は想定 |
 | Tips集 | `docs/tips.md` | 未作成 |
 
 ## 6. 未決事項

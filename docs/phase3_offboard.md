@@ -149,7 +149,7 @@ classDiagram
         mode_pub・setpoint_pub・command_pub 送り手
         position 最後に届いた位置
         status 最後に届いた状態
-        cycles on_timerが呼ばれた回数
+        cycles 位置と状態が届いてから数えた回数
         index 今目指している経由点の番号
         started 一度Offboardでアームしたか
         landing 着陸を指示したか

@@ -22,7 +22,7 @@
 <text x="430" y="198">mode_pub・setpoint_pub・command_pub: 送り手（右の3つ）</text>
 <text x="430" y="218">position: 最後に届いた位置（左の上）</text>
 <text x="430" y="238">status: 最後に届いた状態（左の下）</text>
-<text x="430" y="258">cycles: on_timer が呼ばれた回数</text>
+<text x="430" y="258">cycles: 位置と状態が届いてから数えた回数</text>
 <text x="430" y="278">index: 今目指している経由点の番号</text>
 <text x="430" y="298">started: 一度Offboardでアームしたか</text>
 <text x="430" y="318">landing: 着陸を指示したか</text>

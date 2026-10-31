@@ -105,12 +105,14 @@ sudo apt install ros-jazzy-navigation2
 **期待する結果**（抜粋。`<username>` は、各自のユーザー名。パッケージの数・容量・版は、既に入っているものと、導入する時期によって変わる）:
 
 ```text
+$ sudo apt update
 [sudo] password for <username>:
 ...
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
 All packages are up to date.
+$ sudo apt install ros-jazzy-navigation2
 ...
 The following NEW packages will be installed:
   ...
