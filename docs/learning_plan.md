@@ -105,7 +105,7 @@
 | 2 | [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) | 下書き（2026-10-31）。2節（Agentと `px4_msgs` のビルド、型の表示）は実際の表示に差し替えた。3節以降の表示は想定で、実際に動かして確かめる |
 | 3-0 | [`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 下書き（2026-10-31）。表示はすべて想定 |
-| 4 | `docs/phase4_lidar.md` | 未作成 |
+| 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 5 | `docs/phase5_collision_prevention.md` | 未作成 |
 | 6 | `docs/phase6_avoidance.md` | 未作成 |
 | Tips集 | `docs/tips.md` | 未作成 |

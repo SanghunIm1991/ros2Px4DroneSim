@@ -357,7 +357,7 @@ T5の `ros2 topic echo` を Ctrl+C で止める。ノードは、着陸してデ
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ4（センサの値を見る）へ進む。フェーズ4の手順書は、まだ作成中である。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ4（センサの値を見る）へ進む。手順書は [`docs/phase4_lidar.md`](phase4_lidar.md) である（下書き）。
 
 ## 出典
 
