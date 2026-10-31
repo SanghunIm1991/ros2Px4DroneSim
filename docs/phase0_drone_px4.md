@@ -411,7 +411,7 @@ NEDでは (1, 0, −2)、ENUでは (0, 1, 2) になる。NEDはxが北・zが下
 
 ## 次へ
 
-環境構築がまだなら、[環境構築の手順書](setup_px4_gazebo.md) へ進む。済んでいれば、学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ1（PX4とGazeboで、ドローンを離陸・移動・着陸させる）へ進む。フェーズ1の手順書は、まだ作成中である。
+環境構築がまだなら、[環境構築の手順書](setup_px4_gazebo.md) へ進む。済んでいれば、学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ1（[PX4とGazeboで、ドローンを離陸・移動・着陸させる](phase1_first_flight.md)）へ進む。
 
 ## 出典
 

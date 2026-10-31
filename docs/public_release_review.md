@@ -89,7 +89,7 @@ git ls-files | grep -E '^(notes|ws|ros2_ws|build|install|log|PX4-Autopilot|Micro
 追跡しているファイルのうち、Markdown・SVG・Gitの設定・ライセンスのファイル以外のものを一覧する。
 
 ```bash
-git ls-files | grep -vE '\.(md|svg)$|^\.git(attributes|ignore)$|^LICENSE(-APACHE-2\.0)?$'
+git ls-files | grep -vE '\.(md|svg)$|^\.git(attributes|ignore)$|^LICENSE(-APACHE-2\.0)?$|^docs/img/phase1_gazebo\.png$'
 ```
 
 模型のファイルの形（SDF・メッシュ等）が追跡されていないかを見る。
