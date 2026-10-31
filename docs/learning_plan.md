@@ -36,7 +36,7 @@
 ### 環境構築
 
 - **内容**: WSL2・Ubuntu 24.04・ROS 2 Jazzyの導入は、詳しい説明を親プロジェクトの [環境構築の手順書](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/setup_wsl2_ros2.md) に任せ、この教材の手順書には最低限の実行の手順（コマンドと期待する結果）だけを載せる。ROS 2のパッケージとしてのGazebo（`ros-jazzy-ros-gz`）の導入と確かめ方は、この教材の手順書で書く。その上に、PX4専用のPythonの仮想環境（`~/px4-venv`）、PX4のソース（`~/PX4-Autopilot`、v1.17）、PX4に付属する導入のスクリプト（`--no-nuttx`）、PX4のビルド、QGroundControl（WSLの中で動かすAppImage版）を導入する。
-- **予備の実験**: PX4の導入のスクリプトが入れるGazebo公式の `gz-harmonic` と、`ros-jazzy-ros-gz` で入れたGazeboが共存するかを確かめる。
+- **予備の実験**: PX4の導入のスクリプトが入れるGazebo公式の `gz-harmonic` と、`ros-jazzy-ros-gz` で入れたGazeboが共存するかを確かめる → 共存し、PX4のシミュレーションも動いた（2026-10-31）。
 - **完了条件**: PX4のシミュレーション（`make px4_sitl gz_x500`）が起動し、Gazeboの中に機体が現れ、PX4のシェル（`pxh>`）が使え、QGroundControlが機体につながる。
 
 ### フェーズ0: ドローンとPX4の用語と仕組み（読み物）
@@ -99,7 +99,7 @@
 
 | フェーズ | 手順書 | 状態 |
 |---|---|---|
-| 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。4-2〜6節の表示は想定で、実際に導入して確かめる前 |
+| 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。期待する結果は、実際に導入したときの表示に差し替えた |
 | 0 | `docs/phase0_drone_px4.md` | 未作成 |
 | 1 | `docs/phase1_first_flight.md` | 未作成 |
 | 2 | `docs/phase2_ros2_observe.md` | 未作成 |
