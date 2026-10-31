@@ -211,7 +211,7 @@ QGCの **Application Settings** の **Virtual Joystick** のチェックを外�
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。フェーズ6の手順書は、まだ作成中である。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。手順書は [`docs/phase6_replan.md`](phase6_replan.md) である（下書き）。
 
 ## 出典
 
