@@ -28,3 +28,16 @@
 ## フェーズ2（[`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md)）
 
 2026-10-31に下書き。すべての表示（Agentと `px4_msgs` のビルド、AgentとPX4がつながったときの表示、`ros2 topic list`・`info -v`・`echo`、QoSが合わないときの警告、機体を動かしたときの位置の値の変化）が想定で、まだ動かしていない。AgentがROS 2 Jazzyの環境でビルドでき、親プロジェクトのフェーズ1の1-3節で設定する `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかも、確かめていない（学習計画のフェーズ2の予備の実験に当たる）。動かしたら、表示を差し替え、この節を、確かめた項目と残りの項目の表に直す。
+
+## フェーズ3-0（[`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md)）とフェーズ3（[`docs/phase3_offboard.md`](phase3_offboard.md)）
+
+2026-10-31に下書き。サンプルのコードは、ROS 2のリンタ（`ament_flake8`）とPythonの文法の点検だけを通した。`px4_msgs` が無い環境で書いたので、ビルドと起動はしていない。すべての表示（`ros2 pkg create`・`colcon build`・ノードのログ・`ros2 node info`・`ros2 topic info -v`・QoSが合わないときの警告・`ros2 topic hz`）と、機体の動き（Offboardへの切り替え、四角形の飛行、着陸の後にノードが自分で終わること）が想定である。とくに、次を確かめる。
+
+| ページ・節 | 確かめること | 今の記述（想定） |
+|---|---|---|
+| フェーズ3-0の5節 | QoSを `10` にしたときの、受け手の側の警告の文言 | `New publisher discovered on topic ..., offering incompatible QoS. ... Last incompatible policy: RELIABILITY` |
+| フェーズ3の5節 | 切り替えとアームが1回の指示で通るか | 10回の合図の後の最初の指示で、Offboardになりアームする（通らなければ、1秒ごとに指示し直す） |
+| フェーズ3の5節 | 飛行中にQGCのLandで止めたときの、ノードの動き | 「Offboardから別のモードに移った。終わる」と出して終わる |
+| フェーズ3の5節 | 経由点に着いたとみなす距離（0.5m）で、すべての経由点を回れるか | 回れる |
+| フェーズ3の5節 | 着陸の後に、ノードが `SystemExit` で終わるか | 「着陸してディスアームした。終わる」の後に終わる |
+| フェーズ3の5節 | 飛行中にノードを Ctrl+C で止めたときのPX4の動き | 少しHoldした後、Returnで離陸した地点へ戻って着陸する（既定の設定と、送信機が無いこと。ソースの読み取りによる） |
