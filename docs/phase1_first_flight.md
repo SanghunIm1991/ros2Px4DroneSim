@@ -301,7 +301,7 @@ T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutd
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ2（ROS 2から、機体の状態を見る）へ進む。フェーズ2の手順書は、まだ作成中である。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ2（ROS 2から、機体の状態を見る）へ進む。手順書は [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) である（下書き）。
 
 ## 出典
 

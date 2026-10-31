@@ -38,6 +38,8 @@ WindowsのPCのWSL2（Windowsの上でLinuxを動かす仕組み）に入れたU
 | PX4のビルドの道具・Gazebo Harmonic（Gazebo公式のパッケージ） | PX4のビルドと、PX4のシミュレーションが使うGazebo | PX4の導入のスクリプトがaptで入れる | 4-3 |
 | QGroundControl（v5.1.5） | 地上局のソフトウェア。機体の位置を地図で見て、離陸・移動・着陸を指示する | `~/qgc` にAppImage（1つのファイルで動くアプリの形）を置く | 5節 |
 
+このほかに、PX4とROS 2をつなぐMicro XRCE-DDS Agentと、PX4のトピックの型（`px4_msgs`）はフェーズ2で、経路の計画に使うNav2はフェーズ6で入れる（使う直前に入れる）。
+
 Gazebo Harmonicが、ROS 2のパッケージと、Gazebo公式のパッケージの2通りで入ることになる。どちらも同じ版の系列（Harmonic）で、4-4で、2通りが入ったことと、どちらが使われるかを確かめる。
 
 PX4のビルドに要るPythonのパッケージを仮想環境に入れるのは、PX4の導入のスクリプトが、仮想環境の外では、Pythonのパッケージを `pip`（Pythonのパッケージの導入の道具）で `~/.local` に入れるためである。`~/.local` に入ったパッケージは、ROS 2がaptで入れたPythonのパッケージ（`numpy` 等）より優先して読み込まれ、版が違うと、ROS 2のPythonのノードが動かなくなることがある。仮想環境に入れておけば、ROS 2の側には影響しない。

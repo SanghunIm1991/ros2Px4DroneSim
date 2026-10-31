@@ -385,7 +385,7 @@ T3のQGCのウィンドウを閉じ、T2で Ctrl+C を押してPX4のシミュ�
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ3（ROS 2から指令して、機体を飛ばす）へ進む。フェーズ3の手順書は、まだ作成中である。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ3（ROS 2から指令して、機体を飛ばす）へ進む。先に、自作のノードとQoSの復習の [フェーズ3-0](phase3_0_node_qos.md) を読み、続けて [フェーズ3](phase3_offboard.md) へ進む（どちらも下書き）。
 
 ## 出典
 

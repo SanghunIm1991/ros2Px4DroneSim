@@ -211,7 +211,7 @@ QGCの **Application Settings** の **Virtual Joystick** のチェックを外�
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。手順書は [`docs/phase6_replan.md`](phase6_replan.md) である（下書き）。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。手順書は [`docs/phase6_replan.md`](phase6_replan.md) である（下書き）。6-4節の「真後ろへは動けない」を、模型のファイルの側から確かめ、真後ろも見える機体を自分で作ってみたい場合は、先に任意の [間章（機体の模型を読み解き、自分でセンサを付ける）](interlude_custom_sensor.md) を読んでもよい。
 
 ## 出典
 
