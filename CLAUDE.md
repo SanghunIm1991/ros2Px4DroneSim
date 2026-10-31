@@ -50,7 +50,8 @@
 このプロジェクトは、WSL2 の Ubuntu 24.04（ROS 2 Jazzy）内で作業する。グローバル `~/.claude/CLAUDE.md` は Windows 用に書かれた共有設定のため、**次の点はこのプロジェクトではグローバルの記述より優先する**（親プロジェクトと同じ）。
 
 - **シェル**: PowerShell ツールはなく、Bash を使う。グローバルの「PowerShellツール利用時の技術的な罠」「Windows開発者モード」等の Windows 固有の記述は適用しない（Markdown・mermaidの表示の罠は、WSLでも使う汎用スキル `markdown-mermaid` にある）。
-- **Python**: `py` ランチャー（`py -3.11` 等）は使えない。`python3`（3.12系）を使う。ROS 2 の Python パッケージは apt 由来のシステム Python に依存するため、`pip install` でシステム側へ入れない。パッケージ導入が必要な場合は venv を使い、導入前にユーザーへ確認する。PX4のビルドに要るPythonのパッケージも、どこに入れるか（PX4の付属スクリプトの既定・venv）を、導入の手順書を書く前に決める。
+- **Python**: `py` ランチャー（`py -3.11` 等）は使えない。`python3`（3.12系）を使う。ROS 2 の Python パッケージは apt 由来のシステム Python に依存するため、`pip install` でシステム側へ入れない。パッケージ導入が必要な場合は venv を使い、導入前にユーザーへ確認する。PX4のビルドに要るPythonのパッケージは、PX4専用のvenv（`--system-site-packages` 付き）に入れ、そのvenvを有効にしてから `ubuntu.sh` を実行する（スクリプトの既定の `pip install --break-system-packages` が `~/.local` に入れて、ROS 2のPythonに影響するのを避けるため。2026-10-31、ユーザー判断）。
+- **環境は分けない**: 既に入っているROS 2 JazzyとGazebo（親プロジェクトのために入れたもの）を、このプロジェクトでも共通で使う。導入の手順書は整える。分ける必要が出てきたら、その時点でユーザーに相談する（2026-10-31、ユーザー判断）。
 - **ROS 2**: `source /opt/ros/jazzy/setup.bash` は `~/.bashrc` で読み込み済み。ノードを自動実行する場合はユーザーの承認を得たうえで `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` と、ユーザーのノードと混ざらない `ROS_DOMAIN_ID` を付け、ログは `stdbuf -oL -eL` で行バッファ化する（`timeout` 終了時の出力欠けを防ぐ）。
 - **PX4・Gazeboの起動**: PX4のSITL（PCの上でPX4を動かすシミュレーション）・Gazebo・Micro XRCE-DDS Agentの起動は、ノードの起動と同じく、毎回、目的と影響を説明して承認を得てから行う。画面なしで起動する方法・ユーザーのシミュレーションと混ざらないように分ける方法（Gazeboの `GZ_PARTITION`、PX4のインスタンスの番号とUDPのポート等）は、`docs/handoff_from_parent.md` の「確かめる必要がある技術的な事実」にあり、確かめてから使う。止めるときは `pkill -f` を使わず、PIDを確かめて止める。
 - **セキュリティ**: グローバルのセキュリティのルール（機微情報の扱い、外部送信の確認、著作権・個人情報への配慮）は環境を問わず有効。WSL から `/mnt/c` 配下の Windows 側の資格情報・ブラウザプロファイルへアクセスしない。
