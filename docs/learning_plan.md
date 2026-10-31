@@ -100,7 +100,7 @@
 | フェーズ | 手順書 | 状態 |
 |---|---|---|
 | 環境構築 | [`docs/setup_px4_gazebo.md`](setup_px4_gazebo.md) | 作成済み（2026-10-31）。期待する結果は、実際に導入したときの表示に差し替えた |
-| 0 | [`docs/phase0_drone_px4.md`](phase0_drone_px4.md) | 作成済み（2026-10-31）。図の見た目は未確認 |
+| 0 | [`docs/phase0_drone_px4.md`](phase0_drone_px4.md) | 作成済み（2026-10-31）。図の見た目もGitHubで確かめた |
 | 1 | `docs/phase1_first_flight.md` | 未作成 |
 | 2 | `docs/phase2_ros2_observe.md` | 未作成 |
 | 3 | `docs/phase3_offboard.md` | 未作成 |
