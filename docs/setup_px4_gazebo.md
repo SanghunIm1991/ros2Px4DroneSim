@@ -1,0 +1,414 @@
+# 環境構築: Gazebo・PX4・QGroundControl（WSL2 + Ubuntu 24.04 + ROS 2 Jazzy）
+
+WindowsのPCのWSL2（Windowsの上でLinuxを動かす仕組み）に入れたUbuntu 24.04とROS 2 Jazzyの上に、3Dの物理シミュレータのGazebo、ドローンのフライトコントローラのソフトウェアのPX4、地上局のソフトウェアのQGroundControlを導入する。[学習計画](learning_plan.md) の最初の作業で、ここで作った環境を、フェーズ1以降のすべての手順書で使う。
+
+- 想定環境: Windows 11（WSL2が使えるWindows 10でもよい）。CPUの仮想化支援機能が有効であること
+- 所要の目安: 半日程度（ダウンロードとPX4のビルドに時間がかかる。回線とPCの速さで大きく前後する）
+- 必須の範囲: 2〜6節のすべて
+
+> **この手順書の位置づけ**: WSL2・Ubuntu・ROS 2の導入（2節）は、親プロジェクトの [環境構築の手順書](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/setup_wsl2_ros2.md) と同じもので、ここには最低限の実行の手順だけを載せる。各手順の意味や、つまずいたときの詳しい対処は、そちらを読む。親プロジェクトの手順書で既にROS 2 Jazzyを導入している場合は、2節は2-4の確認だけでよい。PX4・Gazebo・QGroundControlの導入（3〜5節）は、この教材で書いたもの。PCとROS 2の導入から始める場合も、この手順書だけで進められる。
+>
+> **期待する結果の出どころ**: 2節の表示は、親プロジェクトの手順書と同じもの（そこでの注記のとおり、筆者の環境で確かめたものと、仕様から想定したものが混ざる）。3節の `gz sim --version` の表示と、4-1の仮想環境の表示は、筆者の環境で確かめたもの。4-2〜4-5、5節、6節の表示は、PX4とQGroundControlの公式の文書とスクリプトから想定したもので、まだ実際の表示で確かめていない（確かめたら差し替える）。版の数字・時刻・パスなど、環境や実行ごとに変わる部分は、その旨を各所に書いた。
+
+## 0. 学習目標と完了条件
+
+この手順書を終えると、次のことができるようになる。
+
+1. WSL2のUbuntu 24.04で、ROS 2 Jazzyが動く（2節）。
+2. ROS 2のパッケージとして入れたGazebo（Harmonic）の版を確かめられる（3節）。
+3. PX4のソース（v1.17.0）を取得し、PX4専用のPythonの仮想環境の中で、PX4に付属する導入のスクリプトを実行し、PX4をビルドできる（4節）。
+4. QGroundControlを、WSLの中で起動できる（5節）。
+
+**完了条件**（すべて満たしたら完了）:
+
+1. `ros2 run demo_nodes_cpp talker` と `ros2 run demo_nodes_py listener` の間でメッセージが届く（2-4）。
+2. `make px4_sitl gz_x500` で、Gazeboの画面にドローン（`x500`）が現れ、PX4のシェルのプロンプト `pxh>` が表示される（6節）。
+3. そのまま起動したQGroundControlが、シミュレーションの機体につながり、地図の上に機体が表示される（6節）。
+
+## 1. 全体像
+
+この手順書で入れるものと、置き場所は次のとおり。どれもWSLのUbuntuの中に入れる。
+
+| 入れるもの | 何に使うか | 置き場所・入れ方 | 節 |
+|---|---|---|---|
+| ROS 2 Jazzy | ROS 2のノードとツール | aptのパッケージ（`/opt/ros/jazzy`） | 2節 |
+| Gazebo Harmonic（ROS 2のパッケージ） | 3Dの物理シミュレータと、ROS 2とつなぐ道具（`ros_gz`） | aptのパッケージ `ros-jazzy-ros-gz`（`/opt/ros/jazzy` の下） | 3節 |
+| PX4専用のPythonの仮想環境 | PX4のビルドに要るPythonのパッケージを、ROS 2のPythonと分けて入れる | `~/px4-venv` | 4-1 |
+| PX4のソース（v1.17.0） | フライトコントローラのソフトウェア。PC上でシミュレーションとして動かす（SITL） | `~/PX4-Autopilot` | 4-2 |
+| PX4のビルドの道具・Gazebo Harmonic（Gazebo公式のパッケージ） | PX4のビルドと、PX4のシミュレーションが使うGazebo | PX4の導入のスクリプトがaptで入れる | 4-3 |
+| QGroundControl（v5.1.5） | 地上局のソフトウェア。機体の位置を地図で見て、離陸・移動・着陸を指示する | `~/qgc` にAppImage（1つのファイルで動くアプリの形）を置く | 5節 |
+
+Gazebo Harmonicが、ROS 2のパッケージと、Gazebo公式のパッケージの2通りで入ることになる。どちらも同じ版の系列（Harmonic）で、4-4で、2通りが入ったことと、どちらが使われるかを確かめる。
+
+PX4のビルドに要るPythonのパッケージを仮想環境に入れるのは、PX4の導入のスクリプトが、仮想環境の外では、Pythonのパッケージを `pip`（Pythonのパッケージの導入の道具）で `~/.local` に入れるためである。`~/.local` に入ったパッケージは、ROS 2がaptで入れたPythonのパッケージ（`numpy` 等）より優先して読み込まれ、版が違うと、ROS 2のPythonのノードが動かなくなることがある。仮想環境に入れておけば、ROS 2の側には影響しない。
+
+## 2. WSL2・Ubuntu・ROS 2（最低限の手順）
+
+詳しい説明・つまずいたときの対処は、親プロジェクトの [環境構築の手順書](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/setup_wsl2_ros2.md) の1〜5節にある。
+
+### 2-1. WSL2とUbuntu 24.04（Windows側）
+
+**管理者権限**のPowerShellで実行する。再起動を求められたら再起動し、Ubuntuの初回起動で、Linuxのユーザー名とパスワードを設定する（Windowsのアカウントとは別のもの）。
+
+```powershell
+wsl --install -d Ubuntu-24.04
+
+wsl -l -v
+```
+
+**期待する結果**（`wsl -l -v`。表示の言語はWindowsの設定による）:
+
+```text
+  NAME            STATE           VERSION
+* Ubuntu-24.04    Running         2
+```
+
+`VERSION` が `2` であればよい。
+
+### 2-2. Ubuntuの更新（Ubuntuの中）
+
+ここから先は、Ubuntuのターミナルで実行する。作業はホーム（`~`）の下で行う（`/mnt/c` などWindowsのドライブの下で作業すると、ビルドが非常に遅くなる）。
+
+```bash
+cd ~
+
+sudo apt update && sudo apt upgrade
+
+lsb_release -a
+```
+
+**期待する結果**（`lsb_release -a`。`Description` の末尾の小さな版数は、更新によって変わる）:
+
+```text
+No LSB modules are available.
+Distributor ID: Ubuntu
+Description:    Ubuntu 24.04.1 LTS
+Release:        24.04
+Codename:       noble
+```
+
+`Release` が `24.04` であればよい。
+
+### 2-3. ROS 2 Jazzy（Ubuntuの中・公式の手順）
+
+ROS 2の公式の導入のページ（[Ubuntu (deb packages)](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)）の手順に従う。下のコマンドは、親プロジェクトの手順書の4節（ROS 2の公式の文書から抜粋したもの）と同じで、コメントを省いた。ROS 2の文書は [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) で公開されている。版によって変わりうるので、**実行する前に公式のページと照らし、食い違いがあれば公式のページを正とする**。
+
+ロケール（文字の扱いの設定）をUTF-8にする（`locale` の表示の `LANG=` が既に `UTF-8` で終わっていれば不要）。
+
+```bash
+sudo apt update && sudo apt install locales
+
+sudo locale-gen en_US en_US.UTF-8
+
+sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+export LANG=en_US.UTF-8
+```
+
+ROS 2のaptの取得元を追加する。
+
+```bash
+sudo apt install software-properties-common
+
+sudo add-apt-repository universe
+
+sudo apt update && sudo apt install curl -y
+
+export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | grep -F "tag_name" | awk -F'"' '{print $4}')
+
+curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb"
+
+dpkg -I /tmp/ros2-apt-source.deb
+
+sudo dpkg -i /tmp/ros2-apt-source.deb
+```
+
+`sudo dpkg -i` は、GitHubから取得したパッケージを管理者の権限で入れる操作なので、その前の `dpkg -I` の表示で、`Package:` が `ros2-apt-source` であることを確かめてから実行する。
+
+開発の道具とROS 2の本体を入れ、新しいターミナルでもROS 2が使えるように `~/.bashrc` に読み込みの行を足す。
+
+```bash
+sudo apt update && sudo apt install ros-dev-tools
+
+sudo apt upgrade
+
+sudo apt install ros-jazzy-desktop
+
+echo 'source /opt/ros/jazzy/setup.bash' >> ~/.bashrc
+
+source ~/.bashrc
+```
+
+**期待する結果**: `apt install` は、入れるパッケージの一覧を表示し、`Do you want to continue? [Y/n]` と聞くので `Y` で進める。最後にエラー（`E:` で始まる行）が出ずにプロンプトへ戻れば成功。`echo` と `source` は何も表示しない。`~/.bashrc` に同じ行が既にある場合は、`echo` の行は実行しない（2回書かれても動くが、無駄になる）。
+
+### 2-4. ROS 2の動作の確認
+
+```bash
+printenv ROS_DISTRO
+
+# T1
+ros2 run demo_nodes_cpp talker
+
+# T2
+ros2 run demo_nodes_py listener
+```
+
+**期待する結果**（時刻の数字は実行ごとに変わる）:
+
+```text
+$ printenv ROS_DISTRO
+jazzy
+
+# T1（talker）
+[INFO] [1790072000.123456789] [talker]: Publishing: 'Hello World: 1'
+[INFO] [1790072001.123456789] [talker]: Publishing: 'Hello World: 2'
+
+# T2（listener）
+[INFO] [1790072001.124567890] [listener]: I heard: [Hello World: 2]
+```
+
+T2に `I heard:` の行が出れば、ROS 2の通信が動いている。T1・T2とも Ctrl+C で止める。
+
+## 3. Gazebo（ROS 2のパッケージ）
+
+ROS 2 Jazzyと組み合わせて使うGazeboの版はHarmonicで、ROS 2のパッケージ `ros-jazzy-ros-gz` を入れると、Gazebo Harmonicの本体と、GazeboとROS 2をつなぐ道具（`ros_gz`。フェーズ4で使う `ros_gz_bridge` を含む）がまとめて入る。
+
+```bash
+sudo apt install ros-jazzy-ros-gz
+
+gz sim --version
+```
+
+**期待する結果**（`gz sim --version`。小さな版数は更新によって変わる）:
+
+```text
+Gazebo Sim, version 8.15.0
+Copyright (C) 2018 Open Source Robotics Foundation.
+Released under the Apache 2.0 License.
+```
+
+`version 8.` で始まっていれば、Gazebo Harmonic（Gazebo Simの8番台）が入っている。`gz` が見つからない（`command not found`）場合は、`source /opt/ros/jazzy/setup.bash` を実行し直す（このパッケージの `gz` は、ROS 2の読み込みで使えるようになる）。
+
+## 4. PX4
+
+### 4-1. PX4専用のPythonの仮想環境
+
+PX4のビルドに要るPythonのパッケージを入れる仮想環境（Pythonのパッケージを、ほかと分けて入れておく場所）を `~/px4-venv` に作り、有効にする。`--system-site-packages` は、仮想環境の中からも、aptで入れたPythonのパッケージを使えるようにする指定である。
+
+```bash
+python3 -m venv --system-site-packages ~/px4-venv
+
+source ~/px4-venv/bin/activate
+
+command -v python3
+```
+
+**期待する結果**（`<ユーザー名>` は各自のもの）:
+
+```text
+(px4-venv) $ command -v python3
+/home/<ユーザー名>/px4-venv/bin/python3
+```
+
+プロンプトの先頭に `(px4-venv)` が付き、`python3` が仮想環境の中のものになっていれば、仮想環境が有効になっている。`python3 -m venv` が `ensurepip is not available` のエラーで止まる場合は、`sudo apt install python3-venv` を実行してからやり直す。
+
+仮想環境は、ターミナルごとに有効にする。**PX4のビルドと起動（4-3・4-5・6節）の前には、毎回 `source ~/px4-venv/bin/activate` を実行する。** 止めるときは `deactivate` を実行する。`~/.bashrc` に有効にする行を書くと、ROS 2のノードを動かすターミナルでも仮想環境が有効になってしまうので、書かない。
+
+### 4-2. PX4のソースの取得（v1.17.0）
+
+PX4の公式の文書の手順（特定の版のソースを取る方法）に従って、ホームの下にPX4のソースを取得し、v1.17.0に切り替える。`make submodulesclean` は、PX4が中で使うほかのリポジトリ（サブモジュール）を、その版に合わせて取得し直す。
+
+```bash
+cd ~
+
+git clone https://github.com/PX4/PX4-Autopilot.git
+
+cd ~/PX4-Autopilot
+
+git checkout v1.17.0
+
+make submodulesclean
+
+git describe --tags
+```
+
+**期待する結果**（`git checkout` の表示の抜粋と、`git describe --tags`）:
+
+```text
+$ git checkout v1.17.0
+Note: switching to 'v1.17.0'.
+
+You are in 'detached HEAD' state. ...
+
+$ git describe --tags
+v1.17.0
+```
+
+`detached HEAD` は、ブランチではなく版の印（タグ）の位置にいることを示す表示で、異常ではない。`git describe --tags` が `v1.17.0` を示せばよい。`git clone` と `make submodulesclean` は、多くのファイルを取得するので時間がかかる。
+
+### 4-3. PX4の導入のスクリプト
+
+4-1の仮想環境が有効なターミナルで、PX4に付属する導入のスクリプト `Tools/setup/ubuntu.sh` を実行する。`--no-nuttx` は、実機のフライトコントローラ（マイコン）に書き込むための道具を省く指定で、シミュレーションだけを使うこの教材では要らない。
+
+```bash
+source ~/px4-venv/bin/activate
+
+cd ~/PX4-Autopilot
+
+bash ./Tools/setup/ubuntu.sh --no-nuttx
+```
+
+このスクリプトは、次のことを行う（v1.17.0のスクリプトを読んで確かめた）。
+
+- aptで、PX4のビルドの道具を入れる（`sudo` のパスワードを聞かれる）。
+- Gazebo公式のaptの取得元（`packages.osrfoundation.org`）を追加し、Gazebo Harmonic（`gz-harmonic`）を入れる。このとき「Earlier versions will be removed」（古い版は削除される）と表示するが、削除する処理は無い。3節で入れたROS 2のパッケージのGazeboは、そのまま残る。
+- `pip` で、PX4のビルドに要るPythonのパッケージ（約30個）を入れる。仮想環境が有効なので、`~/px4-venv` の中に入る。
+
+**期待する結果**（想定。抜粋）: `[ubuntu.sh]` で始まる案内の行と、aptと `pip` の表示が流れる。途中で `[ubuntu.sh] Gazebo (Harmonic) will be installed` が表示される。最後にエラーで止まらずにプロンプトへ戻れば成功。
+
+```text
+[ubuntu.sh] ...
+[ubuntu.sh] Installing PX4 Python3 dependencies
+...
+[ubuntu.sh] Gazebo (Harmonic) will be installed
+[ubuntu.sh] Earlier versions will be removed
+...
+```
+
+スクリプトが終わったら、WSLを再起動する（入れたものを確実に反映させるため。PX4の公式の文書の手順）。Ubuntuのターミナルを `exit` で閉じ、Windowsの PowerShell で次を実行してから、Ubuntuのターミナルを開き直す。
+
+```powershell
+wsl --shutdown
+```
+
+**期待する結果**: 何も表示されない。開いていたUbuntuのターミナルはすべて閉じる。
+
+### 4-4. 2通りのGazeboの確認
+
+3節のGazebo（ROS 2のパッケージ）と、4-3のGazebo（Gazebo公式のパッケージ）が両方入ったことと、`gz` のコマンドがどちらを使うかを確かめる。
+
+```bash
+dpkg -l gz-harmonic | tail -1
+
+which -a gz
+
+gz sim --version
+```
+
+**期待する結果**（想定）:
+
+```text
+$ dpkg -l gz-harmonic | tail -1
+ii  gz-harmonic  <版>  ...
+
+$ which -a gz
+/opt/ros/jazzy/opt/gz_tools_vendor/bin/gz
+/usr/bin/gz
+
+$ gz sim --version
+Gazebo Sim, version 8.x.x
+...
+```
+
+`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く見込みである（実際につながるかは、フェーズ4で確かめる）。
+
+### 4-5. PX4のビルド
+
+仮想環境を有効にして、PX4をシミュレーション用にビルドする。
+
+```bash
+source ~/px4-venv/bin/activate
+
+cd ~/PX4-Autopilot
+
+make px4_sitl
+```
+
+**期待する結果**（想定。抜粋）: コンパイルの進み具合（`[123/1234] Building CXX object ...` のような行）が長く流れる。初めてのビルドは時間がかかる。エラー（`error:` や `FAILED:`）で止まらず、最後にプロンプトへ戻るか、PX4の起動の表示に続けば成功。ビルドだけで止まらずにPX4が起動した場合は、6節と同じ状態なので、そのまま6節の確認をしてよい。
+
+## 5. QGroundControl
+
+QGroundControl（QGC）を、WSLの中で動かすLinux版のAppImageで入れる。PX4の公式の文書（WSLの環境のページ）は、WSLの中のLinux版を、シミュレーションにつなぐいちばん簡単な方法としている。開発中のビルドではなく、安定版のリリース（v5.1.5）を使う。
+
+QGCの公式の導入の手順に従って、QGCの実行に要るライブラリを入れる。
+
+```bash
+sudo apt install -y libfuse2 libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor0
+```
+
+**期待する結果**: エラー（`E:` で始まる行）が出ずにプロンプトへ戻れば成功。Ubuntu 24.04では、`libfuse2` を指定すると、その代わりのパッケージ（`libfuse2t64`）が入る旨が表示されることがある。
+
+QGCの公式の手順には、ほかに、シリアルポート（実機をUSBでつなぐときの口）を使うための設定（`dialout` のグループへの追加と、ModemManagerの停止）がある。WSLの中のQGCは、シミュレーションにつなぐだけで、シリアルポートを使わないので、この教材では行わない。
+
+AppImageを取得し、実行できるようにする（AppImageは約200MB）。
+
+```bash
+mkdir -p ~/qgc
+
+cd ~/qgc
+
+wget https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
+
+chmod +x QGroundControl-x86_64.AppImage
+
+ls -l
+```
+
+**期待する結果**（`ls -l`。日付・サイズ・ユーザー名は環境によって変わる）:
+
+```text
+-rwxr-xr-x 1 <ユーザー名> <ユーザー名> 195xxxxxx Oct  1 12:00 QGroundControl-x86_64.AppImage
+```
+
+左端に `x`（実行の許可）が付いていればよい。起動は6節で、PX4のシミュレーションと一緒に行う。
+
+## 6. 確かめる（完了条件）
+
+PX4のシミュレーションとQGCを、別々のターミナルで起動する。
+
+```bash
+# T1
+source ~/px4-venv/bin/activate
+
+cd ~/PX4-Autopilot
+
+make px4_sitl gz_x500
+
+# T2
+cd ~/qgc
+
+./QGroundControl-x86_64.AppImage
+```
+
+**期待する結果**（想定）:
+
+```text
+# T1（PX4のシミュレーション。最後の部分の抜粋）
+...
+pxh>
+```
+
+- T1: PX4の起動の表示が流れた後、Gazeboのウィンドウが開き、地面の上にドローン（`x500`）が現れる。T1の最後に、PX4のシェルのプロンプト `pxh>` が表示される。`pxh>` に続けてコマンドを打つと、PX4に直接指示できる（フェーズ1で使う）。
+- T2: QGCのウィンドウが開き、しばらくすると、自動でシミュレーションの機体につながり、地図の上に機体の印が表示される。
+
+この状態になれば、この手順書は完了である。止めるときは、T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押す（`pxh>` で `shutdown` と打ってもよい）。
+
+## つまずきやすい点
+
+- **ビルドが非常に遅い・権限のエラーが出る**: `/mnt/c` などWindowsのドライブの下で作業している。ホーム（`~`）の下にソースを置く（4-2）。
+- **`make px4_sitl` が、Pythonのモジュールが無い（`ModuleNotFoundError`）で止まる**: 仮想環境が有効になっていない。`source ~/px4-venv/bin/activate` を実行し、プロンプトの先頭に `(px4-venv)` が付いていることを確かめてからやり直す（4-1）。
+- **`ninja: error: unknown target 'gz_x500'` で止まる**: PX4の公式の文書は、`make distclean` で生成物を消してから、もう一度 `make px4_sitl gz_x500` を実行するよう案内している。
+- **`gz` が見つからない**: ROS 2を読み込んでいない。`source /opt/ros/jazzy/setup.bash` を実行する（3節）。
+- **QGCが機体につながらない**: QGCを、PX4のシミュレーションと同じWSLの中で起動しているかを確かめる。Windows版のQGCを使う場合は、WSLのIPアドレスへの接続の設定が別に要る（PX4の公式の文書のWSLの環境のページ）。この教材では、WSLの中のQGCを使う。
+
+## 次へ
+
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ0（ドローンとPX4の用語と仕組みの読み物）と、フェーズ1（PX4とGazeboで、ドローンを離陸・移動・着陸させる）へ進む。どちらの手順書も、まだ作成中である。
+
+## 出典
+
+- 2節のコマンドは、ROS 2の公式の文書（[Installation: Ubuntu (deb packages)](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html)、Open Robotics、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)）から、親プロジェクトの手順書が抜粋したものを、コメントを省き、`~/.bashrc` への追記をコマンドにして載せた（改変あり）。
+- 4-2の `git clone`・`git checkout`・`make submodulesclean`、4-3の `ubuntu.sh` の実行とWSLの再起動、4-5と6節の `make` のコマンドは、PX4の公式の文書（PX4 User Guide v1.17: [Windows Development Environment (WSL2-Based)](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/dev_env_windows_wsl.md)、[Git Examples](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/contribute/git_examples.md)、[Building PX4 Software](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/building_px4.md)、[Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、Dronecode/PX4、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)）の手順に従ったもの。仮想環境の中で実行する形と、`--no-nuttx` の指定は、この教材で加えた（改変あり）。4-3のスクリプトの説明は、v1.17.0の [`Tools/setup/ubuntu.sh`](https://github.com/PX4/PX4-Autopilot/blob/v1.17.0/Tools/setup/ubuntu.sh) を読んで、自分の言葉でまとめたもの。
+- 5節のライブラリの導入とAppImageの扱いは、QGroundControlの公式の文書（[Download and Install](https://docs.qgroundcontrol.com/master/en/qgc-user-guide/getting_started/download_and_install.html)）の手順を参考に書いた。AppImageの取得元は、QGroundControlのGitHubのリリース（[v5.1.5](https://github.com/mavlink/qgroundcontrol/releases/tag/v5.1.5)）。
+- 3節の `gz sim --version` の表示は、Gazebo（Open Source Robotics Foundation、Apache License 2.0）の表示。
+- WSL2の導入: [Install WSL](https://learn.microsoft.com/windows/wsl/install)（Microsoft）

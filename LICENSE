@@ -44,11 +44,19 @@ the author (SanghunIm1991) and the license are credited.
 3. 第三者の著作物（上の1・2の対象外）
    Third-party material (not covered by sections 1 and 2)
 
-   現時点で、このリポジトリに第三者の著作物は含まれていない。公式ドキュメントの
-   抜粋やツールの出力などを載せた場合は、ここに一覧し、各文書の該当箇所に出典を
-   書く。
-   At present, this repository contains no third-party material. Any
-   excerpts added later will be listed here and credited where they appear.
+   次の部分は、それぞれの権利者のもので、元のライセンスに従う。各文書の該当箇所に
+   出典を書いている。
+   The following parts belong to their respective owners and remain under
+   their original licenses. Each is credited where it appears.
+
+   - docs/setup_px4_gazebo.md の2-3で抜粋したROS 2の導入のコマンド:
+     ROS 2 Documentation（Open Robotics）, CC BY 4.0
+   - docs/setup_px4_gazebo.md の4節と6節で、公式の手順に従って載せたPX4の
+     取得・導入・ビルドのコマンド:
+     PX4 User Guide（Dronecode/PX4）, CC BY 4.0
+   - 「期待する結果」等に載せたコマンドの出力: 各ツールの表示
+     （例: docs/setup_px4_gazebo.md の3節の `gz sim --version` の表示は、
+     Gazebo（Open Source Robotics Foundation）, Apache License 2.0）
 
    このリポジトリは、PX4・Gazebo・ROS 2・Micro XRCE-DDS Agent等のソフトウェアと、
    PX4に付属するGazeboの機体・ワールドの模型を同梱していない。読者は、各自で
