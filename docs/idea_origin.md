@@ -2,11 +2,13 @@
 
 この教材の構想（なぜ作るか・何を目指すか・どんな技術を選び、なぜそれを選んだか）をまとめた文書。学習の順番と各段階の完了条件は [`docs/learning_plan.md`](learning_plan.md) にある。決めた経緯は [`docs/qa_log.md`](qa_log.md)、立ち上げのときの申し送りは [`docs/handoff_from_parent.md`](handoff_from_parent.md) にある。
 
+この文書に出てくるドローンとPX4の用語は、学習計画のフェーズ0（ドローンとPX4の用語と仕組みの読み物）で詳しく説明する。ここでは、読み進めるのに要る語だけを、4節の表の前に短く説明する。
+
 ## 1. 概要・きっかけ
 
 親プロジェクトの [ros2MinimalPhysicalAi](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi) では、ROS 2の最低限の構成で、慣性のある車両を目標の速度に追従させるシミュレーションを作り、その制御を強化学習のNNに置き換えた。地面の上を1方向に走る車両は、ROS 2の仕組みを学ぶ題材としては扱いやすい。一方で、フィジカルAIの代表的な応用であるドローンは、空中で3次元に動き、姿勢を自分で保ちながら、周りの障害物をセンサで見て進む道を選ぶ。必要な技術も、フライトコントローラ（機体の姿勢と位置を制御するソフトウェア）・3Dの物理シミュレータ・センサの扱い・経路の計画と、一段広くなる。
 
-ドローンを自分で作る経験が無い人にとって、フライトコントローラの中身から作るのは遠回りになる。実際の開発の現場でも、姿勢の制御のような機体の中の仕事は、PX4のような実績のあるソフトウェアに任せ、その外側で「どこへ飛ぶか」を決める知能を作る分担がよく取られる。親プロジェクトのフェーズ0の4-4節（ドローン: 機体の中の制御と、外の知能を分ける）で紹介したのは、この分担である。
+ドローンを自分で作る経験が無い人にとって、フライトコントローラの中身から作るのは遠回りになる。実際の開発の現場でも、姿勢の制御のような機体の中の仕事は、PX4のような実績のあるソフトウェアに任せ、その外側で「どこへ飛ぶか」を決める知能を作る分担がよく取られる。親プロジェクトの [フェーズ0](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase0_overview.md) の4-4節（ドローン: 機体の中の制御と、外の知能を分ける）で紹介したのは、この分担である。
 
 この教材は、その分担に沿って、既存のソフトウェアをつなぎながら、ドローンのシミュレーション環境を段階的に組み立てる。最初は、用意されたドローンをGazeboの中で飛ばしてみるところから始める。次に、ROS 2から機体を見て、動かす。最後に、センサで障害物を見つけたら、進む道を計画し直して避けるところまで作る。どの段階でも「動いた」と目で確かめられる区切りを置き、ドローンやPX4に初めて触れる人が、1つずつ理解しながら進めることを目指す。
 
@@ -15,53 +17,68 @@
 - **目的**: ドローンのシミュレーション環境を段階的に構築して動かし、PX4・Gazebo・ROS 2をつないで使えるようになる。
 - **想定する学習者**: ROS 2に初めて触れる人（C++かPythonのどちらかでプログラムを書いた経験と、Linuxの基本的なコマンドの経験を前提にする）。ドローンとPX4についても素人を想定し、飛行の仕組み・PX4の役割・飛行モード・座標系などを、使う前に説明する。
 - **既存のパッケージを活用する**: 各段階では、まずPX4・Gazeboに付属するものや、公開されているサンプル・パッケージで目的を果たせるかを調べる。自作のノードは、既存のもので足りない部分に限る。
-- **ROS 2の基礎は少なめにする**: ワークスペースとパッケージ・ノードの基本・launchは、親プロジェクトの手順書（フェーズ2〜4）を参照し、この教材では書き直さない。親プロジェクトのフェーズ1（CLIでの観察）の作り直しとQoSの復習は、ドローンの3Dシミュレーションを主軸にするため後回しにし、必要になったときに用意する。
+- **ROS 2の基礎は少なめにする**: ワークスペースとパッケージ・ノードの基本・launchは、親プロジェクトの手順書（フェーズ2〜4）を参照し、この教材では書き直さない。ROS 2のコマンドでの観察（親プロジェクトのフェーズ1に当たるもの）とQoSの復習は、ドローンの3Dシミュレーションを主軸にするため後回しにし、必要になったときにこの教材で用意する。
+- **文脈の違う章は書き直す**: 親プロジェクトの章のうち、車両の制御が中心のもの（Gazeboの導入と画面の見方、`ros_gz_bridge`、RViz2の使い方など）は、前提にせず、要る部分をこの教材で書き直す。
 
 ## 3. ゴール
 
 - **最初のゴール**: Gazeboの中のドローンを、PX4で離陸させ、移動させ、着陸させる。公開済みのサンプル（PX4に付属する機体の模型とシミュレーションの起動の仕組み）で足りるので、プログラムは書かない。
-- **最終ゴール**: ドローンにセンサ（2DのLiDAR）を取り付け、障害物を検知したら経路を計画し直して、ぶつからずに目的地へ着く。
+- **最終ゴール**: ドローンにセンサ（2DのLiDAR）を取り付け、飛行中に障害物を検知したら経路を計画し直して、ぶつからずに目的地へ着く。
 
 ## 4. 段階のロードマップ
 
 6つの段階で進める。①が最初のゴール、⑥が最終ゴールに当たる。各段階の内容・完了条件・必須の範囲は [`docs/learning_plan.md`](learning_plan.md) にある。
 
+表に出てくる語の短い説明:
+
+- **SITL**: PX4を、実機のフライトコントローラの代わりにPCの上で動かすシミュレーションの形。
+- **QGroundControl（QGC）**: ドローンの地上局のソフトウェア。地図の上で機体の位置を見て、離陸・移動・着陸を指示できる。PX4は既定で、地上局か操縦の送信機がつながっていないと飛ばせないので、全段階でつないでおく。
+- **アーム**: プロペラを回せる状態にすること。飛ぶ前に必ず行う。
+- **オフボード制御**: 機体の外のプログラム（この教材ではROS 2のノード）から、行き先などの指令を送って飛ばすPX4の飛行モード。
+- **Position mode**: 操縦の入力（スティック）で、位置を保ちながら飛ばすPX4の飛行モード。
+- **uXRCE-DDS**: PX4の中のデータを、ROS 2のトピックとしてやり取りする仕組み。PCの側では、中継のソフトウェア（Micro XRCE-DDS Agent）を動かす。`px4_msgs` は、そのトピックの型の定義のパッケージ。
+- **LiDAR**: レーザーで周りの物までの距離を測るセンサ。2DのLiDARは、水平の1つの面の上で、周りの距離を測る。
+- **RViz2**: ROS 2のデータ（センサの値・経路など）を3Dの画面に表示するツール。
+
 | 段階 | やること | 主に使うもの | 自作のノード |
 |---|---|---|---|
-| ① | PX4とGazeboで、ドローンを離陸・移動・着陸させる | PX4のSITL（PCの上でPX4を動かすシミュレーション）、Gazeboの機体 `x500`、QGroundControl | 不要 |
-| ② | ROS 2から、機体の状態（位置・姿勢など）を見る | uXRCE-DDS（Micro XRCE-DDS Agent）、`px4_msgs`、`ros2 topic` | 不要 |
+| ① | PX4とGazeboで、ドローンを離陸・移動・着陸させる | PX4のSITL、Gazeboの機体 `x500`、QGC | 不要 |
+| ② | ROS 2から、機体の状態（位置・姿勢など）を見る | uXRCE-DDS、`px4_msgs`、`ros2 topic` | 不要 |
 | ③ | ROS 2から指令して、機体を飛ばす（オフボード制御） | `px4_ros_com` のオフボード制御のサンプル | 要る（サンプルを改造して経由点を回る） |
-| ④ | センサ付きの機体と障害物のワールドで、センサの値をROS 2で見る | 機体 `x500_lidar_2d`、ワールド `walls`、RViz2 | 不要の見込み |
-| ⑤ | PX4に組み込みの衝突防止を試す | PX4の Collision Prevention、QGroundControl（手動の操縦の入力） | 不要 |
+| ④ | センサ付きの機体と障害物のワールドで、センサの値をROS 2で見る | 機体 `x500_lidar_2d`、ワールド `walls`、`ros_gz_bridge`、RViz2 | 不要の見込み |
+| ⑤ | PX4に組み込みの衝突防止を試す | PX4の Collision Prevention、QGCからの操縦の入力 | 不要 |
 | ⑥ | 障害物を検知したら、経路を計画し直して回避する | ③と④の組み合わせ、経路計画（既存のパッケージを実験で確かめてから決める） | 要る |
 
-⑤と⑥を並べたのは、「障害物の手前で止まる」と「計画し直して避ける」の違いを比べて学ぶためである。PX4に組み込みの衝突防止は、手動の操縦で飛ぶときに、障害物に近づくと減速・停止し、進む向きを少し補正するが、目的地までの経路を計画し直しはしない。⑥では、その先の「どの道を通れば着くか」を、ROS 2の側で決める。
+どの段階でも、QGCはPX4につないでおく（上の説明のとおり、つながっていないと飛ばせないため）。
+
+⑤と⑥を並べたのは、「障害物の手前で止まる」と「計画し直して避ける」の違いを比べて学ぶためである。PX4に組み込みの衝突防止は、Position modeで手動で飛ぶときに働き、障害物に近づくと減速・停止し、進む向きを少し補正するが、目的地までの経路を計画し直しはしない。⑥では、その先の「どの道を通れば着くか」を、ROS 2の側で決める。
 
 ## 5. 技術の選定と理由
 
 | 技術 | 選んだもの | 理由 |
 |---|---|---|
-| OS・ROS 2 | WSL2 + Ubuntu 24.04 + ROS 2 Jazzy | 親プロジェクトと同じ環境を、そのまま共通で使う（環境を分けない）。Jazzyは長期のサポートの版 |
+| OS・ROS 2 | WSL2 + Ubuntu 24.04 + ROS 2 Jazzy | 親プロジェクトの環境をそのまま使える。Jazzyは長期のサポートの版 |
 | フライトコントローラ | PX4（安定版v1.17で始める） | オープンソースで、シミュレーションと実機の両方で広く使われている。v1.17の文書はROS 2の推奨をHumble（Ubuntu 22.04）としているが、Ubuntu 24.04とGazebo Harmonicには対応している。Jazzyとの組み合わせは、使い始める前に予備の実験で確かめる。v1.18が安定版になったら、上げるかを改めて決める |
 | 3Dの物理シミュレータ | Gazebo Harmonic | PX4のシミュレーションが標準で使い、機体とワールドの模型が付属する。親プロジェクトでも使った |
-| PX4とROS 2のつなぎ方 | uXRCE-DDS | PX4の内部のデータを、そのままROS 2のトピックとして出す、PX4が公式に推している方式。もう1つの方式のMAVROSは、Tips集で違いと使いどころを紹介するに留める |
-| 地上局のソフトウェア | QGroundControl（WSLの中で動かす） | 地図の上で機体の位置を見て、離陸・移動・着陸を指示できる。PX4は既定で、地上局か送信機がつながっていないとアームできず、組み込みの衝突防止も手動の操縦の入力が要るので、全段階で使う |
+| PX4とROS 2のつなぎ方 | uXRCE-DDS | PX4の内部のデータ（uORBのトピックのうち、設定で選んだもの）を、ROS 2のトピックとして出す。PX4のROS 2の公式の文書と、そのサンプルが使う方式。もう1つの方式のMAVROSは、Tips集で違いと使いどころを紹介するに留める |
+| 地上局のソフトウェア | QGroundControl（WSLの中で動かす） | 地図の上で機体の位置を見て、離陸・移動・着陸を指示できる。PX4は既定で、地上局か送信機がつながっていないとアームできず、組み込みの衝突防止も操縦の入力が要るので、全段階で使う |
 | センサ | 2DのLiDAR | 水平の面で周りの距離を測る。データが単純で、組み込みの衝突防止の公式の例と同じ機体を使える。障害物は、同じ高さを飛んで水平に避ける形に限る。深度カメラは、後から間章として扱うかもしれない |
 | 経路計画 | ⑥を作るときに決める | 既存のパッケージを使えないかを実験で確かめてから決める。足りなければ、2Dの格子の地図とA*のような簡単な計画器を自作する |
 | 言語 | Python | 親プロジェクトと同じ。最終ゴールまでPythonで作り切る。PX4の公式のサンプルにはC++のものが多く、必要に応じて後からC++を付け加える余地を残す |
 
 ## 6. 先に確かめること（リスク）
 
-次の点は、作成に使う環境で動くかが分かっていないので、その段階を書く前に、短い予備の実験で確かめる。
+次の点は、動くかがまだ分かっていないので、その段階の手順書を書く前に、短い予備の実験で確かめる。
 
+- **2通りのGazebo**（環境構築、PX4の導入の後）: PX4の導入のスクリプトは、Gazebo公式のパッケージの `gz-harmonic` を入れる。ROS 2のパッケージ（`ros-jazzy-ros-gz`）で入れたGazeboと共存し、`ros_gz_bridge` とつながるか。
 - **PX4 v1.17とROS 2 Jazzyの組み合わせ**（②の前）: `px4_msgs` の `release/1.17` のブランチがJazzyでビルドでき、PX4のトピックを受け取れるか。
-- **2通りのGazebo**（①の導入の後）: PX4の導入のスクリプトは、Gazebo公式のパッケージの `gz-harmonic` を入れる。ROS 2のパッケージとして既に入っているGazeboと共存し、`ros_gz_bridge` とつながるか。
 - **センサの描画**（④の前）: Gazeboのセンサは描画の仕組みを使う。専用のGPUが無いPCや、画面なしの起動でも、2DのLiDARの値が出るか。
 - **経路計画のパッケージ**（⑥の前）: ROS 2 Jazzyで、2DのLiDARとPX4のオフボード制御に組み合わせられる既存のパッケージがあるか。
 
 ## 7. 出典
 
-この文書の技術的な記述は、次の公式の文書（PX4 v1.17の版）を読んで、自分の言葉でまとめたもの（逐語の転載ではない）。PX4の文書のライセンスは、手順書で引用するときに確かめる。
+この文書と [`docs/learning_plan.md`](learning_plan.md) の技術的な記述は、次の公式の文書とファイル（PX4 v1.17の版）を読んで、自分の言葉でまとめたもの（逐語の転載ではない）。PX4の文書のライセンスは、手順書で引用するときに確かめる。
 
-- PX4 User Guide（v1.17）: [Ubuntu Development Environment](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/dev_env_linux_ubuntu.md)、[Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、[ROS 2 User Guide](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/user_guide.md)、[ROS 2 Offboard Control Example](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/offboard_control.md)、[Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)
+- PX4 User Guide（v1.17）: [Ubuntu Development Environment](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/dev_setup/dev_env_linux_ubuntu.md)、[Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、[Gazebo Vehicles](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/vehicles.md)、[Gazebo Worlds](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/worlds.md)、[ROS 2 User Guide](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/user_guide.md)、[ROS 2 Offboard Control Example](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/offboard_control.md)、[Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)
+- PX4の導入のスクリプト: [Tools/setup/ubuntu.sh](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/Tools/setup/ubuntu.sh)（v1.17）
 - [PX4/px4_msgs](https://github.com/PX4/px4_msgs)、[PX4/px4_ros_com](https://github.com/PX4/px4_ros_com)
