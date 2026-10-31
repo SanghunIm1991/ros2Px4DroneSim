@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 470" width="520" height="470" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="クアッドコプターを上から見た図。機体の前は図の上。前左と後右のプロペラは時計回り、前右と後左のプロペラは反時計回りに回る。対角のプロペラは同じ向きに回る">
+<title>クアッドコプターを上から見た図。機体の前は図の上。前左と後右のプロペラは時計回り、前右と後左のプロペラは反時計回りに回る。対角のプロペラは同じ向きに回る</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="520" height="470" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<line x1="260" y1="250" x2="150" y2="140" stroke="#666666" stroke-width="8"/>
+<line x1="260" y1="250" x2="370" y2="140" stroke="#666666" stroke-width="8"/>
+<line x1="260" y1="250" x2="150" y2="360" stroke="#666666" stroke-width="8"/>
+<line x1="260" y1="250" x2="370" y2="360" stroke="#666666" stroke-width="8"/>
+<rect x="225" y="215" width="70" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<circle cx="150" cy="140" r="55" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<path d="M116.3,111.7 A44,44 0 0 1 183.7,111.7" fill="none" stroke="#9a3412" stroke-width="2" marker-end="url(#a)"/>
+<circle cx="370" cy="140" r="55" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<path d="M403.7,111.7 A44,44 0 0 0 336.3,111.7" fill="none" stroke="#9a3412" stroke-width="2" marker-end="url(#a)"/>
+<circle cx="150" cy="360" r="55" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<path d="M183.7,331.7 A44,44 0 0 0 116.3,331.7" fill="none" stroke="#9a3412" stroke-width="2" marker-end="url(#a)"/>
+<circle cx="370" cy="360" r="55" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<path d="M336.3,331.7 A44,44 0 0 1 403.7,331.7" fill="none" stroke="#9a3412" stroke-width="2" marker-end="url(#a)"/>
+<path d="M260,210 L260,130" fill="none" stroke="#333333" stroke-width="2" marker-end="url(#a)"/>
+<text x="150" y="144" text-anchor="middle" font-weight="bold">前左</text>
+<text x="150" y="164" text-anchor="middle">時計回り</text>
+<text x="370" y="144" text-anchor="middle" font-weight="bold">前右</text>
+<text x="370" y="164" text-anchor="middle">反時計回り</text>
+<text x="150" y="364" text-anchor="middle" font-weight="bold">後左</text>
+<text x="150" y="384" text-anchor="middle">反時計回り</text>
+<text x="370" y="364" text-anchor="middle" font-weight="bold">後右</text>
+<text x="370" y="384" text-anchor="middle">時計回り</text>
+<text x="260" y="34" text-anchor="middle" font-weight="bold">機体の前</text>
+<text x="260" y="255" text-anchor="middle">胴体</text>
+<text x="260" y="452" text-anchor="middle">上から見た図。対角のプロペラは同じ向きに回る</text>
+</g></svg>

@@ -592,7 +592,7 @@ make: *** [Makefile:227: px4_sitl] Interrupt
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ0（ドローンとPX4の用語と仕組みの読み物）と、フェーズ1（PX4とGazeboで、ドローンを離陸・移動・着陸させる）へ進む。どちらの手順書も、まだ作成中である。
+[フェーズ0](phase0_drone_px4.md)（ドローンとPX4の用語と仕組みの読み物）をまだ読んでいなければ、先に読む。読み終えていれば、学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ1（PX4とGazeboで、ドローンを離陸・移動・着陸させる）へ進む。フェーズ1の手順書は、まだ作成中である。
 
 ## 出典
 

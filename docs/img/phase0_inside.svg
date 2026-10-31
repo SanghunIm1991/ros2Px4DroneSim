@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 490" width="1050" height="490" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="PX4の中の流れ。行き先を決めるもの（QGroundControl・送信機・ROS 2のノード）から目標が届き、飛行モードがどの目標に従うかを選ぶ。位置と速度の制御が傾きと推力を決め、姿勢と角速度の制御がトルクを決め（推力はそのまま渡す）、配分が各モーターの回転に直す。機体が動くとセンサが値を出し、推定（EKF2）が位置・速度・姿勢を推定して、制御に返す。SITLでは、機体とセンサをGazeboが計算する">
+<title>PX4の中の流れ。行き先を決めるもの（QGroundControl・送信機・ROS 2のノード）から目標が届き、飛行モードがどの目標に従うかを選ぶ。位置と速度の制御が傾きと推力を決め、姿勢と角速度の制御がトルクを決め（推力はそのまま渡す）、配分が各モーターの回転に直す。機体が動くとセンサが値を出し、推定（EKF2）が位置・速度・姿勢を推定して、制御に返す。SITLでは、機体とセンサをGazeboが計算する</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1050" height="490" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M220,75 L290,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M490,75 L560,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M760,75 L830,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M930,130 L930,190" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M930,300 L930,360" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M830,415 L760,415" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M660,360 L660,300" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M660,190 L660,130" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="20" y="20" width="200" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="290" y="20" width="200" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="560" y="20" width="200" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="830" y="20" width="200" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="830" y="190" width="200" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="830" y="360" width="200" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="560" y="360" width="200" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="560" y="190" width="200" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="120" y="59" text-anchor="middle" font-weight="bold">行き先を決めるもの</text>
+<text x="120" y="79" text-anchor="middle">QGC・送信機</text>
+<text x="120" y="99" text-anchor="middle">ROS 2のノード</text>
+<text x="390" y="59" text-anchor="middle" font-weight="bold">飛行モード</text>
+<text x="390" y="79" text-anchor="middle">どの目標に従うかを</text>
+<text x="390" y="99" text-anchor="middle">選ぶ</text>
+<text x="660" y="59" text-anchor="middle" font-weight="bold">位置と速度の制御</text>
+<text x="660" y="79" text-anchor="middle">目標へ向かうための</text>
+<text x="660" y="99" text-anchor="middle">傾きと推力を決める</text>
+<text x="930" y="59" text-anchor="middle" font-weight="bold">姿勢と角速度の制御</text>
+<text x="930" y="79" text-anchor="middle">決めた傾きにする</text>
+<text x="930" y="99" text-anchor="middle">トルクを決める</text>
+<text x="930" y="229" text-anchor="middle" font-weight="bold">配分</text>
+<text x="930" y="249" text-anchor="middle">推力とトルクを</text>
+<text x="930" y="269" text-anchor="middle">各モーターの回転に</text>
+<text x="930" y="399" text-anchor="middle" font-weight="bold">機体</text>
+<text x="930" y="419" text-anchor="middle">プロペラの推力で動く</text>
+<text x="930" y="439" text-anchor="middle">（SITLではGazebo）</text>
+<text x="660" y="399" text-anchor="middle" font-weight="bold">センサ</text>
+<text x="660" y="419" text-anchor="middle">加速度・角速度・GPS</text>
+<text x="660" y="439" text-anchor="middle">（SITLではGazebo）</text>
+<text x="660" y="229" text-anchor="middle" font-weight="bold">推定（EKF2）</text>
+<text x="660" y="249" text-anchor="middle">センサの値から</text>
+<text x="660" y="269" text-anchor="middle">位置・速度・姿勢を推定</text>
+<text x="255" y="67" text-anchor="middle" font-size="13">目標</text>
+<text x="525" y="67" text-anchor="middle" font-size="13">目標</text>
+<text x="795" y="67" text-anchor="middle" font-size="13">傾き・推力</text>
+<text x="938" y="165" text-anchor="start" font-size="13">トルク・推力</text>
+<text x="938" y="335" text-anchor="start" font-size="13">モーターの回転</text>
+<text x="795" y="407" text-anchor="middle" font-size="13">動き</text>
+<text x="668" y="335" text-anchor="start" font-size="13">センサの値</text>
+<text x="668" y="165" text-anchor="start" font-size="13">推定した状態</text>
+<rect x="20" y="217" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="48" y="230">PX4の外</text>
+<rect x="20" y="252" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="48" y="265">PX4の中</text>
+<rect x="20" y="287" width="20" height="14" rx="3" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="48" y="300">実機では本物。SITLではGazeboが計算する</text>
+</g></svg>

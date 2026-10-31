@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1290 520" width="1290" height="520" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="この教材の最終ゴール（フェーズ6）の構成の見通し。Gazebo（フェーズ4）が、2DのLiDAR付きの機体 x500_lidar_2d と壁のワールド walls を計算する。ros_gz_bridge（フェーズ4）がLiDARの距離の値をROS 2へ中継し、地図と経路計画のノード（フェーズ6）が壁を見つけたら経路を計画し直す。経由点を送るノード（フェーズ3）が、ENUをNEDに直した目標の位置を、Micro XRCE-DDS Agent（フェーズ2）を通してPX4（SITL、フェーズ1・3）へ送り続け、機体の位置を受け取る。RViz2（フェーズ4・6）が壁の形と経路を表示し、QGroundControlが機体の状態を見守る">
+<title>この教材の最終ゴール（フェーズ6）の構成の見通し。Gazebo（フェーズ4）が、2DのLiDAR付きの機体 x500_lidar_2d と壁のワールド walls を計算する。ros_gz_bridge（フェーズ4）がLiDARの距離の値をROS 2へ中継し、地図と経路計画のノード（フェーズ6）が壁を見つけたら経路を計画し直す。経由点を送るノード（フェーズ3）が、ENUをNEDに直した目標の位置を、Micro XRCE-DDS Agent（フェーズ2）を通してPX4（SITL、フェーズ1・3）へ送り続け、機体の位置を受け取る。RViz2（フェーズ4・6）が壁の形と経路を表示し、QGroundControlが機体の状態を見守る</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1290" height="520" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M250,80 L360,80" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M590,80 L700,80" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M475,140 L475,200" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M475,320 L475,380" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M815,140 L815,200" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M815,320 L815,380" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M700,420 L590,420" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M590,465 L700,465" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M930,440 L1040,440" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="20" y="20" width="230" height="120" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="360" y="20" width="230" height="120" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="700" y="20" width="230" height="120" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="360" y="200" width="230" height="120" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="700" y="200" width="230" height="120" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="360" y="380" width="230" height="120" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="700" y="380" width="230" height="120" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="1040" y="380" width="230" height="120" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="135" y="64" text-anchor="middle" font-weight="bold">QGroundControl</text>
+<text x="135" y="84" text-anchor="middle">機体の状態を見守る</text>
+<text x="135" y="106" text-anchor="middle" fill="#9a3412" font-weight="bold">全段階（フェーズ1から）</text>
+<text x="475" y="54" text-anchor="middle" font-weight="bold">PX4（SITL）</text>
+<text x="475" y="74" text-anchor="middle">オフボード制御で</text>
+<text x="475" y="94" text-anchor="middle">経由点へ飛ぶ</text>
+<text x="475" y="116" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ1・3</text>
+<text x="815" y="54" text-anchor="middle" font-weight="bold">Gazebo</text>
+<text x="815" y="74" text-anchor="middle">x500_lidar_2d と</text>
+<text x="815" y="94" text-anchor="middle">ワールド walls</text>
+<text x="815" y="116" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ4</text>
+<text x="475" y="234" text-anchor="middle" font-weight="bold">Micro XRCE-DDS Agent</text>
+<text x="475" y="254" text-anchor="middle">PX4とROS 2を</text>
+<text x="475" y="274" text-anchor="middle">つなぐ</text>
+<text x="475" y="296" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ2</text>
+<text x="815" y="234" text-anchor="middle" font-weight="bold">ros_gz_bridge</text>
+<text x="815" y="254" text-anchor="middle">LiDARの値を</text>
+<text x="815" y="274" text-anchor="middle">ROS 2へ中継する</text>
+<text x="815" y="296" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ4</text>
+<text x="475" y="414" text-anchor="middle" font-weight="bold">経由点を送るノード</text>
+<text x="475" y="434" text-anchor="middle">ENUをNEDに直して</text>
+<text x="475" y="454" text-anchor="middle">目標の位置を送り続ける</text>
+<text x="475" y="476" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ3</text>
+<text x="815" y="414" text-anchor="middle" font-weight="bold">地図と経路計画のノード</text>
+<text x="815" y="434" text-anchor="middle">LiDARで壁を見つけたら</text>
+<text x="815" y="454" text-anchor="middle">経路を計画し直す</text>
+<text x="815" y="476" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ6</text>
+<text x="1155" y="414" text-anchor="middle" font-weight="bold">RViz2</text>
+<text x="1155" y="434" text-anchor="middle">壁の形と経路を</text>
+<text x="1155" y="454" text-anchor="middle">表示する</text>
+<text x="1155" y="476" text-anchor="middle" fill="#9a3412" font-weight="bold">フェーズ4・6</text>
+<text x="305" y="72" text-anchor="middle" font-size="13">MAVLink</text>
+<text x="645" y="72" text-anchor="middle" font-size="13">物理の計算</text>
+<text x="483" y="175" text-anchor="start" font-size="13">uXRCE-DDS</text>
+<text x="483" y="355" text-anchor="start" font-size="13">目標の位置／機体の位置</text>
+<text x="823" y="175" text-anchor="start" font-size="13">LiDARの値</text>
+<text x="823" y="355" text-anchor="start" font-size="13">距離の値</text>
+<text x="645" y="412" text-anchor="middle" font-size="13">経由点</text>
+<text x="645" y="457" text-anchor="middle" font-size="13">機体の位置</text>
+<text x="985" y="432" text-anchor="middle" font-size="13">地図・経路</text>
+</g></svg>
