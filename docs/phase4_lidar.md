@@ -285,7 +285,7 @@ T5のRViz2のウィンドウを閉じ、T3の `parameter_bridge` を Ctrl+C で�
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ5（組み込みの衝突防止を試す）へ進む。フェーズ5の手順書は、まだ作成中である。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ5（組み込みの衝突防止を試す）へ進む。手順書は [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) である（下書き）。
 
 ## 出典
 

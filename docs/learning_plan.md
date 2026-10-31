@@ -106,7 +106,7 @@
 | 3-0 | [`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
-| 5 | `docs/phase5_collision_prevention.md` | 未作成 |
+| 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 6 | `docs/phase6_avoidance.md` | 未作成 |
 | Tips集 | `docs/tips.md` | 未作成 |
 
