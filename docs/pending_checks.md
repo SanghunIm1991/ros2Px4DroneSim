@@ -27,4 +27,4 @@
 
 ## フェーズ2（[`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md)）
 
-2026-10-31に下書き。すべての表示（Agentと `px4_msgs` のビルド、AgentとPX4がつながったときの表示、`ros2 topic list`・`info -v`・`echo`、QoSが合わないときの警告、機体を動かしたときの位置の値の変化）が想定で、まだ動かしていない。AgentがROS 2 Jazzyの環境でビルドでき、`~/.bashrc` の `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかも、確かめていない（学習計画のフェーズ2の予備の実験に当たる）。動かしたら、表示を差し替え、この節を、確かめた項目と残りの項目の表に直す。
+2026-10-31に下書き。すべての表示（Agentと `px4_msgs` のビルド、AgentとPX4がつながったときの表示、`ros2 topic list`・`info -v`・`echo`、QoSが合わないときの警告、機体を動かしたときの位置の値の変化）が想定で、まだ動かしていない。AgentがROS 2 Jazzyの環境でビルドでき、親プロジェクトのフェーズ1の1-3節で設定する `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかも、確かめていない（学習計画のフェーズ2の予備の実験に当たる）。動かしたら、表示を差し替え、この節を、確かめた項目と残りの項目の表に直す。
