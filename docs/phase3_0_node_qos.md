@@ -9,7 +9,7 @@
 
 > **このページの位置づけ**: 親プロジェクトのフェーズ1（コマンドでの観察）とフェーズ3-1（PublisherとSubscriber）・3-2b（QoS）のうち、フェーズ3に要る部分を、ドローンの題材で書き直したもの。親プロジェクトのそれらのページは、前提にしない（さらに詳しく知りたい場合の参考）。
 >
-> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。ビルド・起動の表示は、ROS 2 Jazzyと `px4_msgs` の定義から想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。3節の `qos_profile_sensor_data` の値は、ROS 2 Jazzyの `rclpy` で表示して確かめた。ビルド・起動の表示は、ROS 2 Jazzyと `px4_msgs` の定義から想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -197,12 +197,12 @@ Node name: altitude_monitor
 Endpoint type: SUBSCRIPTION
 ...
   Reliability: BEST_EFFORT
-  History (Depth): KEEP_LAST (5)
+  History (Depth): UNKNOWN
   Durability: VOLATILE
 ...
 ```
 
-送り手（PX4。信頼性 `BEST_EFFORT`・耐久性 `TRANSIENT_LOCAL`）と、受け手（自分のノード。信頼性 `BEST_EFFORT`・耐久性 `VOLATILE`）が並ぶ。
+送り手（PX4。信頼性 `BEST_EFFORT`・耐久性 `TRANSIENT_LOCAL`）と、受け手（自分のノード。信頼性 `BEST_EFFORT`・耐久性 `VOLATILE`）が並ぶ。履歴と深さは、ほかの参加者に伝わらない設定なので、`ros2 topic info -v` では `UNKNOWN` と表示される（自分のノードの値は、3節のコードの `qos_profile_sensor_data` で決まる）。
 
 ## 5. QoSを既定に戻して、確かめる
 

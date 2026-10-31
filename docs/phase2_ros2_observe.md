@@ -97,7 +97,7 @@ Summary: 1 package finished [<時間>]
 
 最初の部分は `git clone` の表示である。`-b v2.4.3` は、ブランチではなく、版に付けた名前（タグ）なので、Gitは「detached HEAD」（どのブランチにもいない状態）の説明を出す。版を決めて取得したときの普通の表示で、誤りではない。
 
-`microxrcedds_agent` は、Agentのパッケージの名前である（取得したフォルダの名前とは違う）。Agentのビルドは、必要なライブラリのうち、決まった版が見つからないものを、ビルドの途中でGitHubから取得して一緒にビルドする。そのため、時間がかかる。`--- stderr:` と `---` の間の行が、その取得の表示である。ROS 2 Jazzyを入れたPCでは、DDSのライブラリ（Fast DDS・Fast CDR）はROS 2に入っているものが使われ、取得されるのは、ログの出力のライブラリ（spdlog）と、Micro XRCE-DDSのクライアントとデータの変換のライブラリ（`microxrcedds_client`・`microcdr`）である。これらの表示は、エラーの出力（stderr）に出るので、最後に `1 package had stderr output` と書かれるが、`Finished` と `1 package finished` が出ていれば、ビルドは成功している。取得したライブラリも、ワークスペースの `install/` の中に入り、PCのほかの場所には入らない。PX4の文書には、Agentを `sudo make install` で `/usr/local` に入れる方法もあるが、この教材では、ほかのソフトウェアに影響しないように、ワークスペースの中でビルドする方法を使う。
+`microxrcedds_agent` は、Agentのパッケージの名前である（取得したフォルダの名前とは違う）。Agentのビルドは、必要なライブラリのうち、決まった版が見つからないものを、ビルドの途中でGitHubから取得して一緒にビルドする。そのため、時間がかかる。`--- stderr:` と `---` の間の行が、その取得の表示である。ROS 2 Jazzyの環境を読み込んだターミナル（`~/.bashrc` で `/opt/ros/jazzy/setup.bash` を読み込んでいる状態）でビルドすると、DDSのライブラリ（Fast DDS・Fast CDR）はROS 2に入っているものが見つかって使われ、この教材を作るときに確かめた環境で取得されたのは、ログの出力のライブラリ（spdlog）と、Micro XRCE-DDSのクライアントとデータの変換のライブラリ（`microxrcedds_client`・`microcdr`）だった。これらの表示は、エラーの出力（stderr）に出るので、最後に `1 package had stderr output` と書かれるが、`Finished` と `1 package finished` が出ていれば、ビルドは成功している。取得したライブラリも、ワークスペースの `install/` の中に入り、PCのほかの場所には入らない。PX4の文書には、Agentを `sudo make install` で `/usr/local` に入れる方法もあるが、この教材では、ほかのソフトウェアに影響しないように、ワークスペースの中でビルドする方法を使う。
 
 ### 2-3. `px4_msgs` を取得してビルドする
 

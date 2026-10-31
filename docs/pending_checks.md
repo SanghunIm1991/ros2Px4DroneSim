@@ -35,6 +35,7 @@
 
 | ページ・節 | 確かめること | 今の記述（想定） |
 |---|---|---|
+| フェーズ3-0の4節 | `ros2 topic info -v` の受け手の履歴と深さの表示 | `History (Depth): UNKNOWN` |
 | フェーズ3-0の5節 | QoSを `10` にしたときの、受け手の側の警告の文言 | `New publisher discovered on topic ..., offering incompatible QoS. ... Last incompatible policy: RELIABILITY` |
 | フェーズ3の5節 | 切り替えとアームが1回の指示で通るか | 10回の合図の後の最初の指示で、Offboardになりアームする（通らなければ、1秒ごとに指示し直す） |
 | フェーズ3の5節 | 飛行中にQGCのLandで止めたときの、ノードの動き | 「Offboardから別のモードに移った。終わる」と出して終わる |
