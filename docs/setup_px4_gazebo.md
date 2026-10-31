@@ -340,7 +340,7 @@ sudo apt install -y libfuse2 libxcb-xinerama0 libxkbcommon-x11-0 libxcb-cursor0
 
 QGCの公式の手順には、ほかに、シリアルポート（実機をUSBでつなぐときの口）を使うための設定（`dialout` のグループへの追加と、ModemManagerの停止）がある。WSLの中のQGCは、シミュレーションにつなぐだけで、シリアルポートを使わないので、この教材では行わない。
 
-AppImageを取得し、実行できるようにする（AppImageは約200MB）。
+AppImageを取得する（約200MB）。AppImageは、取得したファイルをそのまま実行する形なので、取得元は、QGroundControlのGitHubの公式のリリースのページ（[v5.1.5](https://github.com/mavlink/qgroundcontrol/releases/tag/v5.1.5)）に限り、検索で見つけた別の配布元は使わない。取得したら、実行する前に、ファイルのSHA-256のハッシュ（ファイルの中身から計算する指紋。1文字でも違うと値が変わる）を計算し、リリースのページの添付ファイルの一覧で `QGroundControl-x86_64.AppImage` の横に表示される `sha256:` の値と同じかを確かめる。
 
 ```bash
 mkdir -p ~/qgc
@@ -349,6 +349,20 @@ cd ~/qgc
 
 wget https://github.com/mavlink/qgroundcontrol/releases/download/v5.1.5/QGroundControl-x86_64.AppImage
 
+sha256sum QGroundControl-x86_64.AppImage
+```
+
+**期待する結果**（`sha256sum`。値はv5.1.5のこのファイルに固有で、GitHubのリリースの情報で確かめたもの）:
+
+```text
+9a47e4cf269d9e4f897f582f6b19aa7ebf1e9e67c9d68a532a45b541354bc344  QGroundControl-x86_64.AppImage
+```
+
+左の値が、リリースのページの `sha256:` の値と一致すれば、取得したファイルは公開されたものと同じである。一致しない場合は、実行せずに消し（`rm QGroundControl-x86_64.AppImage`）、取得し直す。何度やっても一致しない場合は、使わない。
+
+一致したら、実行できるようにする。
+
+```bash
 chmod +x QGroundControl-x86_64.AppImage
 
 ls -l
