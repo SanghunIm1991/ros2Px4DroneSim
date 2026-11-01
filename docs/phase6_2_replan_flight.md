@@ -7,7 +7,7 @@
 - 必須の範囲: 1〜4節（5節の課題は任意）
 - 前提（親プロジェクト）: フェーズ6-1と同じ
 
-> **この手順書の位置づけ**: フェーズ6-1の1-1節の図（最終ゴールの構成）の部品を、すべて同時に動かす。仕組み（コストマップ・計画器・アクション・ライフサイクル・TF・時刻）は、フェーズ6-1の2節で説明した。この手順書の中で仕組みを思い出したくなったら、フェーズ6-1の2節と、4-3節のクラス図に戻る。
+> **この手順書の位置づけ**: フェーズ6-1の1-1節の図（最終ゴールの構成）の部品を、すべて同時に動かす。仕組み（コストマップ・計画器・アクション・ライフサイクル・TF・時刻）は、フェーズ6-1の2節で説明した。この手順書の中で仕組みを思い出したくなったら、フェーズ6-1の2節と、4-2節のクラス図に戻る。
 >
 > **期待する結果の出どころ**: （作成中）1-2節のT5の表示、1-3節の表示、3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。ほかの起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
 
@@ -38,7 +38,59 @@
 
 ## 1. 起動する
 
-起動するものと、そのつながりは、フェーズ6-1の1-1節の図と1-3節の表のとおりである。
+起動するものと、そのつながりは、フェーズ6-1の1-1節の図と1-3節の表のとおりである。起動する前に、すべてが動いているときに、どの値がどこからどこへ流れるかを、次の図で見ておく。線は、値の出どころで3つに分けてある。
+
+- **ユーザーの指令値**（赤の点線）: 学習者が決めて与える値。目的地、計画器の有効化、途中で止めるときのモードの切り替え。
+- **センサの値**（灰色の破線）: Gazeboが計算したセンサの値と、それをもとにPX4が推定した機体の位置・状態。自作のノードが送るTF（位置から作る `map` → `base_link` と、LiDARの取り付け位置の動かない `base_link` → `link`）も、ここに含める。
+- **ソフトウェアの指令値**（黒の実線）: プログラムが計算して送る値。計画の頼みと答えの経路、自作のノードがPX4へ送る合図・目標・指令、PX4がモーターへ送る指令。
+
+![フェーズ6の最終形の、代表的なデータの流れ。線は3種類で、ユーザーの指令値、センサの値、ソフトウェアの指令値に分けてある。ユーザーの指令値: 学習者が、目的地（GOAL_ENU）を自作のノード replan_flight のコードに書き、ros2 lifecycle で計画器 planner_server を設定・有効化し、途中で止めるときは QGroundControl から PX4 へ Land 等のモードの切り替えを送る。センサの値: Gazebo が計算した IMU・GPS・LiDAR 等の値を PX4 が受け取り、PX4 は機体の状態を QGroundControl へ、機体の位置・状態を Micro XRCE-DDS Agent を通して /fmu/out のトピックで replan_flight へ送る。replan_flight は位置から TF を作って planner_server へ送る。Gazebo の LiDAR の値は parameter_bridge が /scan にして planner_server へ送る。ソフトウェアの指令値: replan_flight が planner_server に経路を頼み、planner_server が経路を返す。replan_flight は合図・目標・指令を /fmu/in のトピックで Agent を通して PX4 へ送り、PX4 はモーターの回転数の指令を Gazebo へ送る](img/phase6_dataflow.svg)
+
+<details>
+<summary>同じ図（mermaid版）</summary>
+
+```mermaid
+flowchart TB
+    QGC["QGroundControl（T2）"]
+    PX4["PX4（SITL。T1）"]
+    GZ["Gazebo（T1）"]
+    AG["Micro XRCE-DDS Agent（T3）"]
+    BR["parameter_bridge（T4）"]
+    USER["学習者"]
+    NODE["replan_flight（T6）"]
+    PLAN["planner_server（T5）"]
+    PX4 -->|"機体の状態（MAVLink）"| QGC
+    QGC -->|"モードの切り替え（Land 等）"| PX4
+    PX4 -->|"モーターの回転数の指令"| GZ
+    GZ -->|"IMU・GPS・LiDAR等の値"| PX4
+    PX4 -->|"機体の位置・状態"| AG
+    AG -->|"合図・目標・指令"| PX4
+    AG -->|"/fmu/out/…（位置・状態）"| NODE
+    NODE -->|"/fmu/in/…（合図・目標・指令）"| AG
+    GZ -->|"LiDARの値"| BR
+    BR -->|"/scan"| PLAN
+    USER -->|"目的地（GOAL_ENU）"| NODE
+    NODE -->|"経路を頼む（目的地）"| PLAN
+    NODE -->|"TF（map→base_link→link）"| PLAN
+    PLAN -->|"経路（Path）"| NODE
+    USER -->|"操作（Land 等）"| QGC
+    USER -->|"計画器の設定・有効化（ros2 lifecycle。T8）"| PLAN
+    linkStyle 1,10,14,15 stroke:#c62828,stroke-width:2px,stroke-dasharray:2 4
+    linkStyle 0,3,4,6,8,9,12 stroke:#6b6b6b,stroke-width:2px,stroke-dasharray:9 5
+    linkStyle 2,5,7,11,13 stroke:#1a1a1a,stroke-width:2px
+```
+
+mermaid版には、箱の中の役割の説明を載せていない。
+
+</details>
+
+図の読み方の要点は、次の3つである。
+
+- **計画器には、センサの値が2つの道で届く**。障害物の形（LiDARの値の `/scan`）は、中継を通って計画器へ直接届く。機体の位置は、PX4が推定した値が、Agentと自作のノードを通り、TFになって計画器へ届く。計画器は、この2つを合わせて、壁を地図の上に置く（フェーズ6-1の2-1節）。
+- **自作のノードは、LiDARの値を直接は読まない**。自作のノードが受け取るのは、計画器が返す経路と、PX4の位置・状態だけである。壁を見つけたことは、経路が変わることで、自作のノードに伝わる。
+- **学習者が飛行中に与える指令は、止めるときだけである**。目的地はコードに書いておき、計画器を有効にすると、後はソフトウェアの指令値だけで、離陸から着陸まで進む。
+
+PX4は、Gazeboから、LiDARの値も直接受け取っている（フェーズ5の組み込みの衝突防止で使った道）。ただし、フェーズ5の8節で `CP_DIST` を−1に戻して衝突防止を無効にしたので、フェーズ6では使っていない。図には、表示のための流れ（RViz2が `/scan`・TF・地図・経路を受け取る流れ）と、Gazeboの時計の流れは載せていない。
 
 ### 1-1. シミュレーションと中継
 
@@ -209,7 +261,7 @@ average rate: 2.000
 ## 5. 課題（任意）
 
 1. 設定ファイル（フェーズ6-1の3-2節の `planner.yaml`）の地図の幅を `width: 40`（東へ25mまで）に広げると、壁3の東の端の外を回る道が地図に入る。角を回ったときに引き直される経路が、北回りになるか、東回りになるかを、壁3と壁4の配置（フェーズ4の3-1節）と、`obstacle_max_range` から予想し、確かめる。
-2. `GOAL_ENU`（フェーズ6-1の4-2節）を (東−5m, 北8m)（壁2の向こう側）に変えて、壁2の東の端と壁1の間（幅約2.5m）を通る経路が引かれるか、西の端を大きく回る経路が引かれるかを予想し、確かめる。`robot_radius` と `inflation_radius` を変えると、どちらになるかが変わることも確かめる。
+2. `GOAL_ENU`（フェーズ6-1の4-3節）を (東−5m, 北8m)（壁2の向こう側）に変えて、壁2の東の端と壁1の間（幅約2.5m）を通る経路が引かれるか、西の端を大きく回る経路が引かれるかを予想し、確かめる。`robot_radius` と `inflation_radius` を変えると、どちらになるかが変わることも確かめる。
 3. 設定ファイルの `track_unknown_space` を `true` に、`allow_unknown` を `false` に変えると、まだ見ていない場所を通る経路を引かなくなる。最初の計画がどうなるかを予想し、確かめる（設定ファイルを変えたら、下の段落のとおり、1節から起動し直す）。
 4. `use_astar` を `false` にすると、NavFnは、A\*ではなく、出発点から全方向に同じように広げて調べる探し方（ダイクストラ法）を使う。経路の形と、計画にかかる時間（アクションの答えの `planning_time`）を比べる。
 5. Nav2のライフサイクルの管理の部品 `lifecycle_manager`（パッケージ `nav2_lifecycle_manager`）を使って、1-3節の切り替えを自動にする。パラメータ `node_names` と `autostart` を調べる。さらに、T4〜T6をlaunchのファイルでまとめて起動する。この課題は、親プロジェクトの [フェーズ4](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase4_launch.md) の2節〜4節（launchのファイルの書き方）を前提にする。
@@ -245,4 +297,5 @@ source ~/px4_ws/install/setup.bash
 - 計画器の起動とライフサイクルの切り替え（`ros2 run nav2_planner planner_server`・`ros2 lifecycle`）: [Nav2](https://github.com/ros-navigation/navigation2)（`jazzy`、Apache License 2.0）のソース（`nav2_planner`）を読んで、自分の言葉でまとめたもの。設定ファイルとノードの出典は、フェーズ6-1の出典のとおり。
 - 中継の時刻の付け替え（`override_timestamps_with_wall_time`）: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEを読んで、自分の言葉でまとめたもの。
 - 壁の配置: フェーズ4の出典のとおり、PX4 v1.17に付属する模型のファイルを読んだもの。
+- 1節のデータの流れの図（`img/phase6_dataflow.svg`）は、この教材で作ったもの。PX4がGazeboから受け取る値（IMU・磁気・気圧・GPS・LiDAR等）と、モーターへの指令は、PX4 v1.17のソース（`src/modules/simulation/gz_bridge`）を読んで確かめた。
 

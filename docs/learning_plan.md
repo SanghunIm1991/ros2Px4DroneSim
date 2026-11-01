@@ -130,7 +130,7 @@
 | 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 6-1 | [`docs/phase6_1_planner_node.md`](phase6_1_planner_node.md) | 下書き（2026-10-31。2026-11-01にフェーズ6を2つに分け、構成の図の再掲とクラス図を足した）。3-1節のNav2の導入の表示と、4-4節のビルドの表示は確かめた。クラス図の見た目は未確認 |
-| 6-2 | [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md) | 下書き（2026-10-31。2026-11-01にフェーズ6-1から分けた）。計画器を単体で起動したときの表示（1-2節のT5・1-3節・3節の一部。2026-11-01）は確かめた。ほかの表示と飛行は想定 |
+| 6-2 | [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md) | 下書き（2026-10-31。2026-11-01にフェーズ6-1から分け、1節にデータの流れの図を足した）。計画器を単体で起動したときの表示（1-2節のT5・1-3節・3節の一部。2026-11-01）は確かめた。ほかの表示と飛行は想定。データの流れの図の見た目は未確認 |
 | 間章 | [`docs/interlude_flight_controller.md`](interlude_flight_controller.md) | 作成済み（2026-11-01）。読み物で、コマンドは無い。PX4の事実はv1.17の文書とソースで確かめた。図の見た目は未確認 |
 | 間章 | [`docs/interlude_custom_sensor.md`](interlude_custom_sensor.md) | 下書き（2026-10-31）。模型のファイルは `gz sdf -k` の点検だけを通した。起動と飛行の表示は想定 |
 | 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。1-1節の部品がaptの版（1.3.13）ですべて入ること、名前が同じであること、計画器を単体で起動したときの4節の表示と6節の課題1・2の「設定」は確かめた（2026-11-01）。飛行中の動きは想定 |

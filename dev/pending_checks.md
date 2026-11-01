@@ -104,6 +104,7 @@
 | 6-2の3節 | `ros2 topic hz /plan` の表示（`ros2 lifecycle get` の `active [3]` は、単体の起動で確かめた） | 約2.0 |
 | 6-1の4-1節 | `tf2_ros_py` の依存で、ノードを実行できるか（ビルドとモジュールの読み込みは、使い捨てのワークスペースで確かめた） | できる |
 | 6-2のつまずきやすい点 | 時刻が合わないときのT5の警告の文言 | 未確認 |
+| 6-1のつまずきやすい点 | `package.xml` の1行目の前に空行があるときに、colconが警告を出さずに普通のPythonのパッケージとしてビルドし、`colcon list` の行の最後が `(python)` になるか（筆者の環境で起きたつまずきで見た表示。使い捨ての環境では未確認） | なる。正しいときは `(ros.ament_python)` |
 
 ## 間章（[`docs/interlude_custom_sensor.md`](../docs/interlude_custom_sensor.md)）
 

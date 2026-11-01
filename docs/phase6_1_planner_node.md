@@ -11,7 +11,7 @@
 
 > **この手順書の位置づけ**: フェーズ6（6-1と6-2）は、フェーズ3（オフボード制御）、フェーズ4（LiDARの値をROS 2へ中継する）、フェーズ5（組み込みの衝突防止にできないこと）を組み合わせる。Nav2は、本来は地面を走るロボットのためのパッケージ群で、フェーズ6では、その中の地図（コストマップ）と経路の計画器だけを使う。Nav2全体の使い方（自己位置の推定・走行の制御・行動の木など）は扱わない。
 >
-> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2の設定の名前・プラグインの名前・アクションの型は、導入した版でも同じであることを確かめた。4-4節のビルドの表示は、フェーズ3と4節のファイルを、手順書のとおりに使い捨てのワークスペースに置いてビルドしたもの（2026-11-01。実行ファイル `replan_flight` ができ、Pythonでモジュールを読み込めることも確かめた）。3-2節の `mkdir` の表示（何も表示されない）は想定したもの。
+> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2の設定の名前・プラグインの名前・アクションの型は、導入した版でも同じであることを確かめた。4-4節のビルドの表示は、フェーズ3と4節のファイルを、手順書のとおりに使い捨てのワークスペースに置いてビルドしたもの（2026-11-01。実行ファイル `replan_flight` ができ、Pythonでモジュールを読み込めることも確かめた）。3-2節の `mkdir` の表示（何も表示されない）は想定したもの。つまずきやすい点の `colcon list` の表示（`(ros.ament_python)` と `(python)`）は、筆者の環境で起きたつまずきを調べたときの表示で、使い捨ての環境ではまだ確かめていない。
 
 ## 0. 学習目標と完了条件
 
@@ -20,12 +20,12 @@
 1. LiDARの値から、障害物の地図（コストマップ）を作る仕組みを説明できる（2節）。
 2. 地図の上で経路を計画する計画器に、ROS 2のアクションで経路を頼む仕組みを説明でき、そのためのノードを書ける（2節・4節）。
 3. 機体の位置をTF（座標系の間の位置関係）で知らせ、LiDARの値を地図の座標に置けるようにする仕組みを説明できる（2節・4節）。
-4. 自作のノード `replan_flight` のクラス `ReplanFlight` の属性とメソッドの役割を、クラス図を使って説明できる（4-3節）。
+4. 自作のノード `replan_flight` のクラス `ReplanFlight` の属性とメソッドの役割を、クラス図を使って説明できる（4-2節）。
 
 **完了条件**（すべて満たしたら完了）:
 
 1. 4-4節のビルドが通り、実行ファイル `replan_flight` ができる。
-2. 4-3節のクラス図を見ながら、「計画器から新しい経路が届いてから、機体へ送る目標が変わるまで」を、メソッドの名前を使って説明できる。
+2. 4-2節のクラス図を見ながら、「計画器から新しい経路が届いてから、機体へ送る目標が変わるまで」を、メソッドの名前を使って説明できる。
 
 この手順書では、ターミナルを1つだけ使う。
 
@@ -283,7 +283,103 @@ global_costmap:
     },
 ```
 
-### 4-2. ノードを書く
+### 4-2. クラス図で、ノードの組み立てを見る
+
+4-3節で書くノードは、フェーズ3のノードより長く、メソッドも多い。長いコードを読む前に、次の図で、クラス `ReplanFlight` が何を覚えておき（属性）、何を受け取り、何を送るかと、メソッドの役割の分け方を見て、大枠をつかんでおく。
+
+![フェーズ6のノード ReplanFlight のクラス図。ReplanFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読する。右の3つの型（合図・目標・指令）をPX4へ送り、2つのTF（map から base_link、base_link から link）を送り、Nav2の計画器 planner_server に、アクション compute_path_to_pose で経路を頼んで、経路を受け取る。メソッドは、作る、PX4とのやりとり、TF、経路の計画、経路をたどる、段階を進める、の6つの役割に分けてある。同じファイルの定数を読み、座標の変換などの関数を使う。下の補足は、0.1秒ごとの on_timer の流れと、0.5秒ごとの計画の流れを示す](img/phase6_class.svg)
+
+<details>
+<summary>同じ図（mermaid版）</summary>
+
+```mermaid
+classDiagram
+    class Node {
+        ROS 2のノードの元になるクラス
+    }
+    class ReplanFlight {
+        mode_pub・setpoint_pub・command_pub PX4への送り手
+        tf_pub・static_tf_pub TFの送り手
+        planner 計画器のアクションのクライアント
+        position・status 最後に届いた位置・状態
+        home 離陸した地点
+        yaw 機首を向ける向き
+        path 最後に届いた経路
+        hold 経路が無い間に止まる位置
+        planning 計画の答えを待っているか
+        climbed・started・landing 段階の目印
+        cycles 経路が届いてから数えた回数
+        timer・plan_timer 0.1秒と0.5秒のタイマー
+        __init__() 送り手・受け手・アクションのクライアント・タイマーを作る
+        on_position(msg) 位置を覚えTFを送る
+        on_status(msg) 状態を覚える
+        send_setpoint(east, north, yaw) 合図と目標
+        send_command(command, ...) 指令を送る
+        enu_position() ENUの位置
+        enu_heading() ENUの向き
+        engaged() Offboardでアームしているか
+        now_us() ノードの時計の値
+        send_lidar_tf() base_linkからlinkを1回送る
+        request_plan() 計画器に経路を頼む
+        on_plan_accepted(future) 受け付けたら答えを待つ
+        on_plan_result(future) 経路を覚える
+        nearest_index(east, north) 最も近い点の番号
+        lookahead_point(east, north) 1.0m先の点
+        choose_target(east, north, up) 今の目標を決める
+        on_timer() 目標を送り段階を進める
+        keep_landing() Landまで送り直し終える
+    }
+    class VehicleLocalPosition {
+        /fmu/out/vehicle_local_position_v1
+    }
+    class VehicleStatus {
+        /fmu/out/vehicle_status_v1
+    }
+    class OffboardControlMode {
+        /fmu/in/offboard_control_mode
+    }
+    class TrajectorySetpoint {
+        /fmu/in/trajectory_setpoint
+    }
+    class VehicleCommand {
+        /fmu/in/vehicle_command
+    }
+    class TF {
+        map から base_link（位置が届くたび）
+        base_link から link（起動時に1回）
+    }
+    class planner_server {
+        Nav2の計画器
+        アクション compute_path_to_pose
+    }
+    Node <|-- ReplanFlight : 受け継ぐ
+    VehicleLocalPosition --> ReplanFlight : 購読（センサ向けのQoS）
+    VehicleStatus --> ReplanFlight : 購読（センサ向けのQoS）
+    ReplanFlight --> OffboardControlMode : 送る（既定のQoS）
+    ReplanFlight --> TrajectorySetpoint : 送る（既定のQoS）
+    ReplanFlight --> VehicleCommand : 送る（既定のQoS）
+    ReplanFlight --> TF : TFを送る
+    ReplanFlight --> planner_server : 経路を頼む
+    planner_server --> ReplanFlight : 経路を返す
+    note for ReplanFlight "補足1 on_timerの流れ（0.1秒ごと）<br>【1】位置・状態と最初の経路が届くまでは何もしない<br>【2】着陸を指示した後はkeep_landingだけ<br>【3】choose_targetで目標を決め、合図と目標を送る<br>【4】Offboardでアームするまで1秒ごとに指示し直す<br>【5】一度Offboardになった後に抜けたら終える<br>【6】目的地まで0.5m以内なら着陸を指示する<br>補足2 計画の流れ（0.5秒ごと）<br>【1】request_planで頼む<br>【2】on_plan_acceptedで受け付けを確かめる<br>【3】on_plan_resultで経路をpathに入れ替える"
+```
+
+mermaid版には、定数と、クラスの外の関数（SVGの図の左下と右下）、メソッドの役割の分け方（SVGの図の「■」の見出し）、計画器の頼みと答えの中身、補足の一部（上昇中は離陸した地点の真上を目標にすること、計画が失敗したら `path` を空にしてその場で止まること、残りの長さが3m以上変わったら「引き直した」と出すこと）を載せていない。SVGとmermaid版のどちらにも、ログを1回だけ出すための目印（`waiting_logged`・`rejected_logged`）は載せていない。
+
+</details>
+
+図の中央がクラスで、上の区画が属性、その下の6つの区画が、役割ごとに分けたメソッドである。左の2つの型と右の3つの型は、フェーズ3のノードと同じで（[フェーズ3](phase3_offboard.md) の4-2節のクラス図）、右に新しく加わったのが、TFと計画器である。
+
+このノードの動きは、2つのタイマーが別々に進める2つの流れでできている（図の下の補足）。
+
+- **補足2（計画の流れ、0.5秒ごと）**: `request_plan` が計画器に頼み、答えが届くと `on_plan_result` が `path` を新しい経路に入れ替える。アクションの答えは、すぐには返らないので、頼む関数と答えを受け取る関数が分かれている。
+- **補足1（段階を進める流れ、0.1秒ごと）**: `on_timer` が、毎回 `choose_target` で目標を決めて、PX4へ送る。`choose_target` は、そのときの `path` の上の1.0m先の点を目標にする。
+
+2つの流れは、主に属性の `path` でつながっている（ほかに、どちらの流れも、最後に届いた位置 `position` を使い、`on_timer` が着陸を始めて `landing` を立てると、`request_plan` は計画を頼まなくなる）。計画の流れが `path` を入れ替えると、次の `on_timer` から、新しい経路の上の点が目標になる。これが、「経路が引き直されると、機体がそのまま新しい経路へ曲がる」仕組みである（4-3節の最後の段落）。完了条件の2は、この流れを、`request_plan` → `on_plan_result` → `path` → `on_timer` → `choose_target` → `lookahead_point` → `send_setpoint` の順に説明できればよい。
+
+### 4-3. ノードを書く
+
+4-2節のクラス図と見比べながら読むと、どのメソッドがどの役割の区画に当たるかが分かる。
 
 ファイル: `~/px4_ws/src/drone_offboard/drone_offboard/replan_flight.py`
 
@@ -602,100 +698,6 @@ def main(args=None):
 
 このノードは、経路を「少し先の点を、位置の目標として送り続ける」ことでたどる。目標の点は、機体の1.0m先にあるので、機体は、目標に追いつくことなく、経路に沿って進み続ける。経路が引き直されると、次の目標の点は新しい経路の上に移るので、機体はそのまま新しい経路へ曲がる。
 
-### 4-3. クラス図で、ノードの組み立てを見る
-
-4-2節のノードは、フェーズ3のノードより長く、メソッドも多い。次の図で、クラス `ReplanFlight` が何を覚えておき（属性）、何を受け取り、何を送るかと、メソッドの役割の分け方を見ておく。
-
-![フェーズ6のノード ReplanFlight のクラス図。ReplanFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読する。右の3つの型（合図・目標・指令）をPX4へ送り、2つのTF（map から base_link、base_link から link）を送り、Nav2の計画器 planner_server に、アクション compute_path_to_pose で経路を頼んで、経路を受け取る。メソッドは、作る、PX4とのやりとり、TF、経路の計画、経路をたどる、段階を進める、の6つの役割に分けてある。同じファイルの定数を読み、座標の変換などの関数を使う。下の補足は、0.1秒ごとの on_timer の流れと、0.5秒ごとの計画の流れを示す](img/phase6_class.svg)
-
-<details>
-<summary>同じ図（mermaid版）</summary>
-
-```mermaid
-classDiagram
-    class Node {
-        ROS 2のノードの元になるクラス
-    }
-    class ReplanFlight {
-        mode_pub・setpoint_pub・command_pub PX4への送り手
-        tf_pub・static_tf_pub TFの送り手
-        planner 計画器のアクションのクライアント
-        position・status 最後に届いた位置・状態
-        home 離陸した地点
-        yaw 機首を向ける向き
-        path 最後に届いた経路
-        hold 経路が無い間に止まる位置
-        planning 計画の答えを待っているか
-        climbed・started・landing 段階の目印
-        cycles 経路が届いてから数えた回数
-        timer・plan_timer 0.1秒と0.5秒のタイマー
-        __init__() 送り手・受け手・アクションのクライアント・タイマーを作る
-        on_position(msg) 位置を覚えTFを送る
-        on_status(msg) 状態を覚える
-        send_setpoint(east, north, yaw) 合図と目標
-        send_command(command, ...) 指令を送る
-        enu_position() ENUの位置
-        enu_heading() ENUの向き
-        engaged() Offboardでアームしているか
-        now_us() ノードの時計の値
-        send_lidar_tf() base_linkからlinkを1回送る
-        request_plan() 計画器に経路を頼む
-        on_plan_accepted(future) 受け付けたら答えを待つ
-        on_plan_result(future) 経路を覚える
-        nearest_index(east, north) 最も近い点の番号
-        lookahead_point(east, north) 1.0m先の点
-        choose_target(east, north, up) 今の目標を決める
-        on_timer() 目標を送り段階を進める
-        keep_landing() Landまで送り直し終える
-    }
-    class VehicleLocalPosition {
-        /fmu/out/vehicle_local_position_v1
-    }
-    class VehicleStatus {
-        /fmu/out/vehicle_status_v1
-    }
-    class OffboardControlMode {
-        /fmu/in/offboard_control_mode
-    }
-    class TrajectorySetpoint {
-        /fmu/in/trajectory_setpoint
-    }
-    class VehicleCommand {
-        /fmu/in/vehicle_command
-    }
-    class TF {
-        map から base_link（位置が届くたび）
-        base_link から link（起動時に1回）
-    }
-    class planner_server {
-        Nav2の計画器
-        アクション compute_path_to_pose
-    }
-    Node <|-- ReplanFlight : 受け継ぐ
-    VehicleLocalPosition --> ReplanFlight : 購読（センサ向けのQoS）
-    VehicleStatus --> ReplanFlight : 購読（センサ向けのQoS）
-    ReplanFlight --> OffboardControlMode : 送る（既定のQoS）
-    ReplanFlight --> TrajectorySetpoint : 送る（既定のQoS）
-    ReplanFlight --> VehicleCommand : 送る（既定のQoS）
-    ReplanFlight --> TF : TFを送る
-    ReplanFlight --> planner_server : 経路を頼む
-    planner_server --> ReplanFlight : 経路を返す
-    note for ReplanFlight "補足1 on_timerの流れ（0.1秒ごと）<br>【1】位置・状態と最初の経路が届くまでは何もしない<br>【2】着陸を指示した後はkeep_landingだけ<br>【3】choose_targetで目標を決め、合図と目標を送る<br>【4】Offboardでアームするまで1秒ごとに指示し直す<br>【5】一度Offboardになった後に抜けたら終える<br>【6】目的地まで0.5m以内なら着陸を指示する<br>補足2 計画の流れ（0.5秒ごと）<br>【1】request_planで頼む<br>【2】on_plan_acceptedで受け付けを確かめる<br>【3】on_plan_resultで経路をpathに入れ替える"
-```
-
-mermaid版には、定数と、クラスの外の関数（SVGの図の左下と右下）、メソッドの役割の分け方（SVGの図の「■」の見出し）、計画器の頼みと答えの中身、補足の一部（上昇中は離陸した地点の真上を目標にすること、計画が失敗したら `path` を空にしてその場で止まること、残りの長さが3m以上変わったら「引き直した」と出すこと）を載せていない。SVGとmermaid版のどちらにも、ログを1回だけ出すための目印（`waiting_logged`・`rejected_logged`）は載せていない。
-
-</details>
-
-図の中央がクラスで、上の区画が属性、その下の6つの区画が、役割ごとに分けたメソッドである。左の2つの型と右の3つの型は、フェーズ3のノードと同じで（[フェーズ3](phase3_offboard.md) の4-2節のクラス図）、右に新しく加わったのが、TFと計画器である。
-
-このノードの動きは、2つのタイマーが別々に進める2つの流れでできている（図の下の補足）。
-
-- **補足2（計画の流れ、0.5秒ごと）**: `request_plan` が計画器に頼み、答えが届くと `on_plan_result` が `path` を新しい経路に入れ替える。アクションの答えは、すぐには返らないので、頼む関数と答えを受け取る関数が分かれている。
-- **補足1（段階を進める流れ、0.1秒ごと）**: `on_timer` が、毎回 `choose_target` で目標を決めて、PX4へ送る。`choose_target` は、そのときの `path` の上の1.0m先の点を目標にする。
-
-2つの流れは、主に属性の `path` でつながっている（ほかに、どちらの流れも、最後に届いた位置 `position` を使い、`on_timer` が着陸を始めて `landing` を立てると、`request_plan` は計画を頼まなくなる）。計画の流れが `path` を入れ替えると、次の `on_timer` から、新しい経路の上の点が目標になる。これが、「経路が引き直されると、機体がそのまま新しい経路へ曲がる」仕組みである（4-2節の最後の段落）。完了条件の2は、この流れを、`request_plan` → `on_plan_result` → `path` → `on_timer` → `choose_target` → `lookahead_point` → `send_setpoint` の順に説明できればよい。
-
 ### 4-4. ビルドする
 
 ```bash
@@ -720,6 +722,36 @@ Summary: 1 package finished [<time>]
 
 - **`sudo apt install` で、パッケージが見つからない（`E: Unable to locate package`）**: `sudo apt update` を先に実行したかを確かめる。ROS 2のリポジトリの設定（[環境構築](setup_px4_gazebo.md) の2-3節）が済んでいるかも確かめる。
 - **ビルドは通るが、フェーズ6-2の `ros2 run drone_offboard replan_flight` で `No executable found` が出る**: 4-1節の `setup.py` の `entry_points` に `replan_flight` の行を足したかを確かめる（足し忘れても、ビルドは通る）。足した後は、4-4節のビルドをし直し、`source ~/px4_ws/install/setup.bash` を実行し直してから起動する。ファイルの場所が `~/px4_ws/src/drone_offboard/drone_offboard/replan_flight.py` かも確かめる。
+- **ビルドは通るが、フェーズ6-2の `ros2 run` で `Package 'drone_offboard' not found` が出る**: `package.xml` の1行目が `<?xml version="1.0"?>` になっているか（前に空行や空白が無いか）を確かめる。この行の前に何かあると、colconは `package.xml` を読めず、警告を出さずに、ROS 2のパッケージではない普通のPythonのパッケージとしてビルドする。そのため、ビルドは通るが、ROS 2からはパッケージが見えない。次のコマンドで確かめる（colconは今いるフォルダの下を探すので、`~/px4_ws` に移ってから実行する）。
+
+  ```bash
+  # T6
+  cd ~/px4_ws
+
+  colcon list --packages-select drone_offboard
+  ```
+
+  **期待する結果**（正しくビルドできる場合）:
+
+  ```text
+  drone_offboard	src/drone_offboard	(ros.ament_python)
+  ```
+
+  左から、パッケージの名前、場所、パッケージの種類である。行の最後が `(ros.ament_python)` ではなく `(python)` になっていれば、これに当たる。`package.xml` を直したら、前のビルドの結果を消してから、4-4節のビルドをし直し、`source` し直す。
+
+  ```bash
+  # T6
+  rm -rf ~/px4_ws/build/drone_offboard ~/px4_ws/install/drone_offboard
+
+  cd ~/px4_ws
+
+  colcon build --packages-select drone_offboard
+
+  source ~/px4_ws/install/setup.bash
+  ```
+
+  **期待する結果**: ビルドの表示は4-4節と同じになる。`source` は何も表示しない。この後、`colcon list --packages-select drone_offboard` の行の最後が `(ros.ament_python)` になることを確かめる。
+
 - **ビルドは通るが、フェーズ6-2で起動すると `ModuleNotFoundError` が出る**: 表示の最後の行に、見つからないモジュールの名前が出る。`nav2_msgs` なら、3-1節のNav2の導入が済んでいるかを確かめる。`drone_offboard.waypoint_flight` なら、フェーズ3のノードのファイル（`~/px4_ws/src/drone_offboard/drone_offboard/waypoint_flight.py`）があるかを確かめる。`package.xml` の依存（4-1節）は、使うパッケージを宣言するもので、書いただけではパッケージは入らない。
 
 ## 次へ
