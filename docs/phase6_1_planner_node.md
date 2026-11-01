@@ -1,30 +1,76 @@
-# フェーズ6: 経路を計画し直して、壁を回り込む
+# フェーズ6-1: 地図と経路の計画器を用意し、ノードを書く
 
-[学習計画](learning_plan.md) のフェーズ6の手順書で、この教材の最終ゴールに当たる。LiDARの値から障害物の地図を作り、目的地までの経路を計画して飛び始め、飛行中に新しい壁が見つかったら、経路を計画し直して回り込む。地図と経路の計画には、ROS 2の移動ロボット向けのパッケージ群Nav2の部品を使い、計画した経路を、フェーズ3のオフボード制御で機体に送る。
+[学習計画](learning_plan.md) のフェーズ6の前半の手順書。フェーズ6は、この教材の最終ゴールに当たる。LiDARの値から障害物の地図を作り、目的地までの経路を計画して飛び始め、飛行中に新しい壁が見つかったら、経路を計画し直して回り込む。地図と経路の計画には、ROS 2の移動ロボット向けのパッケージ群Nav2の部品を使い、計画した経路を、フェーズ3のオフボード制御で機体に送る。
+
+フェーズ6は分量が多いので、2つの手順書に分けた。この手順書（フェーズ6-1）では、全体の構成と仕組みを学んでから、Nav2を導入し、計画器の設定ファイルと自作のノードを書いて、ビルドするところまでを行う。シミュレーションを起動して飛ばすのは、[フェーズ6-2](phase6_2_replan_flight.md) である。
 
 - 想定環境: [フェーズ5](phase5_collision_prevention.md) を終えたWSL2のUbuntu 24.04
-- 所要の目安: 2〜3コマ
-- 必須の範囲: 1〜8節（9節の課題は任意）
+- 所要の目安: 1〜2コマ
+- 必須の範囲: 1〜4節
 - 前提（親プロジェクト）: [フェーズ2](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase2_packages.md) の2-2節・2-4節・2-5節（フェーズ3と同じ）
 
-> **この手順書の位置づけ**: フェーズ3（オフボード制御）、フェーズ4（LiDARの値をROS 2へ中継する）、フェーズ5（組み込みの衝突防止にできないこと）を組み合わせる。Nav2は、本来は地面を走るロボットのためのパッケージ群で、この手順書では、その中の地図（コストマップ）と経路の計画器だけを使う。Nav2全体の使い方（自己位置の推定・走行の制御・行動の木など）は扱わない。
+> **この手順書の位置づけ**: フェーズ6（6-1と6-2）は、フェーズ3（オフボード制御）、フェーズ4（LiDARの値をROS 2へ中継する）、フェーズ5（組み込みの衝突防止にできないこと）を組み合わせる。Nav2は、本来は地面を走るロボットのためのパッケージ群で、フェーズ6では、その中の地図（コストマップ）と経路の計画器だけを使う。Nav2全体の使い方（自己位置の推定・走行の制御・行動の木など）は扱わない。
 >
-> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2の設定の名前・プラグインの名前・アクションの型は、導入した版でも同じであることを確かめた。5-2節のT5の表示、5-3節の表示、7節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。4-3節のビルドの表示は、フェーズ3と4節のファイルを、手順書のとおりに使い捨てのワークスペースに置いてビルドしたもの（同じ日。実行ファイル `replan_flight` ができ、Pythonでモジュールを読み込めることも確かめた）。ほかのビルド・起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2の設定の名前・プラグインの名前・アクションの型は、導入した版でも同じであることを確かめた。4-4節のビルドの表示は、フェーズ3と4節のファイルを、手順書のとおりに使い捨てのワークスペースに置いてビルドしたもの（2026-11-01。実行ファイル `replan_flight` ができ、Pythonでモジュールを読み込めることも確かめた）。3-2節の `mkdir` の表示（何も表示されない）は想定したもの。
 
 ## 0. 学習目標と完了条件
 
 この手順書を終えると、次のことができるようになる。
 
 1. LiDARの値から、障害物の地図（コストマップ）を作る仕組みを説明できる（2節）。
-2. 地図の上で経路を計画する計画器に、ROS 2のアクションで経路を頼める（2節・4節）。
-3. 機体の位置をTF（座標系の間の位置関係）で知らせ、LiDARの値を地図の座標に置けるようにできる（2節・4節）。
-4. 計画した経路をたどる目標を、オフボード制御で機体に送れる（4節・6節）。
+2. 地図の上で経路を計画する計画器に、ROS 2のアクションで経路を頼む仕組みを説明でき、そのためのノードを書ける（2節・4節）。
+3. 機体の位置をTF（座標系の間の位置関係）で知らせ、LiDARの値を地図の座標に置けるようにする仕組みを説明できる（2節・4節）。
+4. 自作のノード `replan_flight` のクラス `ReplanFlight` の属性とメソッドの役割を、クラス図を使って説明できる（4-3節）。
 
-**完了条件**: 障害物をまだ見ていない向きへの経路を計画して飛び始め、飛行中にLiDARが新しい壁を見つけると、経路が引き直され（RViz2で経路が変わるのが見える）、機体が壁にぶつからずに回り込んで目的地に着き、着陸する（6節・7節）。
+**完了条件**（すべて満たしたら完了）:
+
+1. 4-4節のビルドが通り、実行ファイル `replan_flight` ができる。
+2. 4-3節のクラス図を見ながら、「計画器から新しい経路が届いてから、機体へ送る目標が変わるまで」を、メソッドの名前を使って説明できる。
+
+この手順書では、ターミナルを1つだけ使う。
+
+| ターミナル | 使うこと | 仮想環境 `~/px4-venv` |
+|---|---|---|
+| T6 | Nav2の導入、ファイルの作成、ビルド | 使わない |
+
+T6は、フェーズ6-2で自作のノードを動かすターミナルと同じ番号である（[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T5以降はそのページの作業用で、フェーズ6-1と6-2で番号をそろえた）。
 
 ## 1. 全体像
 
-### 1-1. 何を作るか
+### 1-1. 最終ゴールの構成（再掲）
+
+フェーズ0の10節で見た、最終ゴールの構成の図を再掲する。フェーズ6では、ここまでのフェーズで動かした部品をすべて使う。
+
+![この教材の最終ゴール（フェーズ6）の構成の見通し。Gazebo（フェーズ4）が、2DのLiDAR付きの機体 x500_lidar_2d と壁のワールド walls を計算する。ros_gz_bridge（フェーズ4）がLiDARの距離の値をROS 2へ中継し、地図と経路計画のノード（フェーズ6）が壁を見つけたら経路を計画し直す。経由点を送るノード（フェーズ3）が、ENUをNEDに直した目標の位置を、Micro XRCE-DDS Agent（フェーズ2）を通してPX4（SITL、フェーズ1・3）へ送り続け、機体の位置を受け取る。RViz2（フェーズ4・6）が壁の形と経路を表示し、QGroundControlが機体の状態を見守る](img/phase0_goal.svg)
+
+<details>
+<summary>同じ図（mermaid版）</summary>
+
+```mermaid
+flowchart LR
+    QGC["QGroundControl<br/>機体の状態を見守る<br/>全段階（フェーズ1から）"] <-- "MAVLink" --> PX4["PX4（SITL）<br/>オフボード制御で経由点へ飛ぶ<br/>フェーズ1・3"]
+    PX4 <-- "物理の計算" --> GZ["Gazebo<br/>x500_lidar_2d とワールド walls<br/>フェーズ4"]
+    PX4 <-- "uXRCE-DDS" --> AG["Micro XRCE-DDS Agent<br/>PX4とROS 2をつなぐ<br/>フェーズ2"]
+    GZ -- "LiDARの値" --> BR["ros_gz_bridge<br/>LiDARの値をROS 2へ中継する<br/>フェーズ4"]
+    AG <-- "目標の位置／機体の位置" --> OFF["経由点を送るノード<br/>ENUをNEDに直して目標の位置を送り続ける<br/>フェーズ3"]
+    BR -- "距離の値" --> PLAN["地図と経路計画のノード<br/>LiDARで壁を見つけたら経路を計画し直す<br/>フェーズ6"]
+    PLAN -- "経由点" --> OFF
+    OFF -- "機体の位置" --> PLAN
+    PLAN -- "地図・経路" --> RV["RViz2<br/>壁の形と経路を表示する<br/>フェーズ4・6"]
+```
+
+</details>
+
+フェーズ6では、図の「地図と経路計画のノード」に、Nav2の計画器 `planner_server` を使い、「経由点を送るノード」を、フェーズ3のノードを元に、自作のノード `replan_flight` として書く。図の中で、フェーズ6で新しく加わるのは、この2つと、RViz2での地図と経路の表示である。ほかの部品は、フェーズ1〜4と同じものを、同じように起動する。
+
+フェーズ6の2つの手順書の分担は、次のとおりである。
+
+| 手順書 | 何をするか | 使うターミナル |
+|---|---|---|
+| フェーズ6-1（この手順書） | 構成と仕組み（地図・計画器・アクション・ライフサイクル・TF・時刻）を学び、Nav2を導入し、計画器の設定ファイルと自作のノードを書いて、ビルドする | T6だけ |
+| [フェーズ6-2](phase6_2_replan_flight.md) | シミュレーション・中継・計画器・自作のノード・RViz2を起動し、計画器を有効にして飛ばし、経路が引き直されるのを観察する | T1〜T8 |
+
+### 1-2. 何を作るか
 
 フェーズ5で見たとおり、PX4の組み込みの衝突防止は、決めた向きの動きを止めたり、少し曲げたりするだけで、回り道を探さない。この手順書では、ROS 2の側で、次の3つを繰り返す。
 
@@ -34,7 +80,7 @@
 
 まだ見ていない場所は「何も無い」とみなして計画する。飛んでいる途中で壁が見つかると、地図に壁が加わり、次の計画で経路が変わる。
 
-### 1-2. 部品とつながり
+### 1-3. 部品とつながり
 
 | 部品 | 何をするか | 出どころ |
 |---|---|---|
@@ -56,7 +102,7 @@
 | `planner_server` | RViz2 | 地図と、計画した経路 | トピック `/global_costmap/costmap`・`/plan` |
 | `replan_flight` | PX4 | 合図・目標・指令 | フェーズ3と同じ `/fmu/in/` のトピック |
 
-フェーズ0の10節の図と比べると、`planner_server` が「地図と経路計画のノード」に、`replan_flight` が「経由点を送るノード」に当たる。`replan_flight` は、フェーズ3のノードの経由点を、計画器が返す経路に置き換えたもので、TFを送る仕事も受け持つ。
+`replan_flight` は、フェーズ3のノードの経由点を、計画器が返す経路に置き換えたもので、TFを送る仕事も受け持つ（1-1節の図の「経由点を送るノード」に当たる）。
 
 ## 2. 地図と経路の計画
 
@@ -81,7 +127,7 @@ Nav2の地図は、平面を細かい格子（この手順書では10cm角）に
 
 ### 2-3. ライフサイクル
 
-Nav2の部品は、ライフサイクルノードと呼ばれる、状態を持つノードである。起動しただけでは「未設定」の状態で、何もしない。「設定」（configure）で設定ファイルを読み込んで準備し、「有効化」（activate）で働き始める。ふつうは、Nav2のライフサイクルの管理の部品（`lifecycle_manager`）や、まとめて起動するlaunchのファイルが、この切り替えを自動で行う。この手順書では、仕組みを見るために、`ros2 lifecycle` のコマンドで手で切り替える（5-2節）。
+Nav2の部品は、ライフサイクルノードと呼ばれる、状態を持つノードである。起動しただけでは「未設定」の状態で、何もしない。「設定」（configure）で設定ファイルを読み込んで準備し、「有効化」（activate）で働き始める。ふつうは、Nav2のライフサイクルの管理の部品（`lifecycle_manager`）や、まとめて起動するlaunchのファイルが、この切り替えを自動で行う。この手順書では、仕組みを見るために、`ros2 lifecycle` のコマンドで手で切り替える（フェーズ6-2の1-3節）。
 
 ### 2-4. 時刻をそろえる
 
@@ -93,7 +139,7 @@ Nav2の部品は、ライフサイクルノードと呼ばれる、状態を持�
 
 ### 3-1. Nav2を導入する
 
-Nav2を、aptで導入する（ターミナルの番号は、5-1節の表に合わせて、ビルドと自作のノードに使うT6にする）。
+Nav2を、aptで導入する（ターミナルは、0節の表のT6を使う）。
 
 ```bash
 # T6
@@ -199,13 +245,13 @@ global_costmap:
 - **`planner_server`**: 計画のやり方に、NavFnをA\*で使う（`use_astar`）。`tolerance` は、目的地の格子が通れないときに、近くの通れる格子を目的地の代わりにしてよい距離（m）である。
 - **`global_costmap`**: 計画器の中の地図の設定である。名前を2回重ねるのは、地図が、計画器の中に `global_costmap` という名前の別のノードとして作られるためである。
   - `global_frame` と `robot_base_frame` は、地図の座標系と機体の座標系の名前で、自作のノードが送るTF（4節）の名前と合わせる。
-  - `width`・`height`・`origin_x`・`origin_y` で、地図の範囲を、東へ−15〜20m、北へ−20〜20mにする。計画器は、地図の外を通る経路を引かない。東の端を20mにしたのは、東西に17m延びる壁3（東の端は21.5m）が地図の東の端まで届くようにして、壁3の東の端を回る道を、わざと地図の外に出すためである（6-1節。9節の課題1で、地図を広げたときの違いを確かめる）。
+  - `width`・`height`・`origin_x`・`origin_y` で、地図の範囲を、東へ−15〜20m、北へ−20〜20mにする。計画器は、地図の外を通る経路を引かない。東の端を20mにしたのは、東西に17m延びる壁3（東の端は21.5m）が地図の東の端まで届くようにして、壁3の東の端を回る道を、わざと地図の外に出すためである（フェーズ6-2の2-1節。フェーズ6-2の5節の課題1で、地図を広げたときの違いを確かめる）。
   - `robot_radius` は機体の半径（m）で、x500のプロペラの先までの約0.4mに、少し余裕を足した。
-  - `track_unknown_space` を `false` にすると、まだ見ていない格子を「空いている」とみなす。まだ見ていない向きにも経路を引けるようにするためである（1-1節）。
+  - `track_unknown_space` を `false` にすると、まだ見ていない格子を「空いている」とみなす。まだ見ていない向きにも経路を引けるようにするためである（1-2節）。
 - **`obstacle_layer`**: 障害物の層の設定である（2-1節）。
   - 高さの範囲（`min_obstacle_height`・`max_obstacle_height`）は、層の全体と、`scan` の両方に書く。
   - `inf_is_valid` を `true` にすると、何にも当たらなかった向き（距離が `inf`）も、「その向きは遠くまで空いている」という情報として使う。
-  - `obstacle_max_range` は障害物として置く点の最大の距離、`raytrace_max_range` は空いていると戻す最大の距離（m）である。18mにしたのは、壁1の南の角から、壁3の南の面を地図の東の端まで一度に見られるようにするためである（6-1節）。
+  - `obstacle_max_range` は障害物として置く点の最大の距離、`raytrace_max_range` は空いていると戻す最大の距離（m）である。18mにしたのは、壁1の南の角から、壁3の南の面を地図の東の端まで一度に見られるようにするためである（フェーズ6-2の2-1節）。
 - **`inflation_layer`**: 障害物の周り1.2mまでの格子に、近いほど高いコストを付ける（2-1節）。
 
 壁のワールドの壁の配置は、フェーズ4の3-1節の表のとおりである。
@@ -545,7 +591,7 @@ def main(args=None):
         rclpy.try_shutdown()
 ```
 
-- **定数**: `GOAL_ENU` が目的地で、壁1の向こう側の (東8m, 北−6m) である（6-1節）。`LOOKAHEAD` は、経路の上で目標にする点の先の距離で、大きいほど滑らかに、速く進むが、まだ見ていない壁の向こうに目標を置いてしまうおそれも大きくなる。`PLAN_PERIOD` は、計画を頼む周期で、短いほど、新しい壁に早く気づいて経路を変えられる。`LIDAR_OFFSET` は、本体（`base_link`）の中心から見たLiDARの部品の位置である。模型のファイルでは、LiDARの部品は模型の原点（機体の真下の地面の高さ）から前へ0.12m・上へ0.26mに、本体の中心は原点から上へ0.24mにあるので、本体の中心から見ると、前へ0.12m・上へ約0.02mになる（模型のファイルの読み方は、任意の [間章](interlude_custom_sensor.md) の2-1節）。
+- **定数**: `GOAL_ENU` が目的地で、壁1の向こう側の (東8m, 北−6m) である（フェーズ6-2の2-1節）。`LOOKAHEAD` は、経路の上で目標にする点の先の距離で、大きいほど滑らかに、速く進むが、まだ見ていない壁の向こうに目標を置いてしまうおそれも大きくなる。`PLAN_PERIOD` は、計画を頼む周期で、短いほど、新しい壁に早く気づいて経路を変えられる。`LIDAR_OFFSET` は、本体（`base_link`）の中心から見たLiDARの部品の位置である。模型のファイルでは、LiDARの部品は模型の原点（機体の真下の地面の高さ）から前へ0.12m・上へ0.26mに、本体の中心は原点から上へ0.24mにあるので、本体の中心から見ると、前へ0.12m・上へ約0.02mになる（模型のファイルの読み方は、任意の [間章](interlude_custom_sensor.md) の2-1節）。
 - **ENUとNEDの変換**: フェーズ3の `enu_to_ned` と `enu_yaw_to_ned` を、`waypoint_flight` から読み込んで使う。Nav2とRViz2はENU（フェーズ0の8節）なので、TFと経路はENUのまま扱い、PX4へ送る直前だけNEDに直す。
 - **`send_lidar_tf`**: `base_link` → `link` のTFを送る。機体とLiDARの位置関係は変わらないので、動かないTF（静的なTF）として1回だけ送る。静的なTFは、後から起動したノードにも届く。
 - **`on_position`**: PX4の位置が届くたびに、`map` → `base_link` のTFを送る。`map` の原点はPX4の位置の原点（機体が現れた地点。フェーズ3の3節）で、向きはENUである。機体の傾きは無視して、向き（yaw）だけを入れる。
@@ -556,7 +602,101 @@ def main(args=None):
 
 このノードは、経路を「少し先の点を、位置の目標として送り続ける」ことでたどる。目標の点は、機体の1.0m先にあるので、機体は、目標に追いつくことなく、経路に沿って進み続ける。経路が引き直されると、次の目標の点は新しい経路の上に移るので、機体はそのまま新しい経路へ曲がる。
 
-### 4-3. ビルドする
+### 4-3. クラス図で、ノードの組み立てを見る
+
+4-2節のノードは、フェーズ3のノードより長く、メソッドも多い。次の図で、クラス `ReplanFlight` が何を覚えておき（属性）、何を受け取り、何を送るかと、メソッドの役割の分け方を見ておく。
+
+![フェーズ6のノード ReplanFlight のクラス図。ReplanFlight は rclpy の Node を受け継ぐ。左の2つの型（位置の VehicleLocalPosition と状態の VehicleStatus）を、センサ向けのQoSで購読する。右の3つの型（合図・目標・指令）をPX4へ送り、2つのTF（map から base_link、base_link から link）を送り、Nav2の計画器 planner_server に、アクション compute_path_to_pose で経路を頼んで、経路を受け取る。メソッドは、作る、PX4とのやりとり、TF、経路の計画、経路をたどる、段階を進める、の6つの役割に分けてある。同じファイルの定数を読み、座標の変換などの関数を使う。下の補足は、0.1秒ごとの on_timer の流れと、0.5秒ごとの計画の流れを示す](img/phase6_class.svg)
+
+<details>
+<summary>同じ図（mermaid版）</summary>
+
+```mermaid
+classDiagram
+    class Node {
+        ROS 2のノードの元になるクラス
+    }
+    class ReplanFlight {
+        mode_pub・setpoint_pub・command_pub PX4への送り手
+        tf_pub・static_tf_pub TFの送り手
+        planner 計画器のアクションのクライアント
+        position・status 最後に届いた位置・状態
+        home 離陸した地点
+        yaw 機首を向ける向き
+        path 最後に届いた経路
+        hold 経路が無い間に止まる位置
+        planning 計画の答えを待っているか
+        climbed・started・landing 段階の目印
+        cycles 経路が届いてから数えた回数
+        timer・plan_timer 0.1秒と0.5秒のタイマー
+        __init__() 送り手・受け手・アクションのクライアント・タイマーを作る
+        on_position(msg) 位置を覚えTFを送る
+        on_status(msg) 状態を覚える
+        send_setpoint(east, north, yaw) 合図と目標
+        send_command(command, ...) 指令を送る
+        enu_position() ENUの位置
+        enu_heading() ENUの向き
+        engaged() Offboardでアームしているか
+        now_us() ノードの時計の値
+        send_lidar_tf() base_linkからlinkを1回送る
+        request_plan() 計画器に経路を頼む
+        on_plan_accepted(future) 受け付けたら答えを待つ
+        on_plan_result(future) 経路を覚える
+        nearest_index(east, north) 最も近い点の番号
+        lookahead_point(east, north) 1.0m先の点
+        choose_target(east, north, up) 今の目標を決める
+        on_timer() 目標を送り段階を進める
+        keep_landing() Landまで送り直し終える
+    }
+    class VehicleLocalPosition {
+        /fmu/out/vehicle_local_position_v1
+    }
+    class VehicleStatus {
+        /fmu/out/vehicle_status_v1
+    }
+    class OffboardControlMode {
+        /fmu/in/offboard_control_mode
+    }
+    class TrajectorySetpoint {
+        /fmu/in/trajectory_setpoint
+    }
+    class VehicleCommand {
+        /fmu/in/vehicle_command
+    }
+    class TF {
+        map から base_link（位置が届くたび）
+        base_link から link（起動時に1回）
+    }
+    class planner_server {
+        Nav2の計画器
+        アクション compute_path_to_pose
+    }
+    Node <|-- ReplanFlight : 受け継ぐ
+    VehicleLocalPosition --> ReplanFlight : 購読（センサ向けのQoS）
+    VehicleStatus --> ReplanFlight : 購読（センサ向けのQoS）
+    ReplanFlight --> OffboardControlMode : 送る（既定のQoS）
+    ReplanFlight --> TrajectorySetpoint : 送る（既定のQoS）
+    ReplanFlight --> VehicleCommand : 送る（既定のQoS）
+    ReplanFlight --> TF : TFを送る
+    ReplanFlight --> planner_server : 経路を頼む
+    planner_server --> ReplanFlight : 経路を返す
+    note for ReplanFlight "補足1 on_timerの流れ（0.1秒ごと）<br>【1】位置・状態と最初の経路が届くまでは何もしない<br>【2】着陸を指示した後はkeep_landingだけ<br>【3】choose_targetで目標を決め、合図と目標を送る<br>【4】Offboardでアームするまで1秒ごとに指示し直す<br>【5】一度Offboardになった後に抜けたら終える<br>【6】目的地まで0.5m以内なら着陸を指示する<br>補足2 計画の流れ（0.5秒ごと）<br>【1】request_planで頼む<br>【2】on_plan_acceptedで受け付けを確かめる<br>【3】on_plan_resultで経路をpathに入れ替える"
+```
+
+mermaid版には、定数と、クラスの外の関数（SVGの図の左下と右下）、メソッドの役割の分け方（SVGの図の「■」の見出し）、計画器の頼みと答えの中身、補足の一部（上昇中は離陸した地点の真上を目標にすること、計画が失敗したら `path` を空にしてその場で止まること、残りの長さが3m以上変わったら「引き直した」と出すこと）を載せていない。SVGとmermaid版のどちらにも、ログを1回だけ出すための目印（`waiting_logged`・`rejected_logged`）は載せていない。
+
+</details>
+
+図の中央がクラスで、上の区画が属性、その下の6つの区画が、役割ごとに分けたメソッドである。左の2つの型と右の3つの型は、フェーズ3のノードと同じで（[フェーズ3](phase3_offboard.md) の4-2節のクラス図）、右に新しく加わったのが、TFと計画器である。
+
+このノードの動きは、2つのタイマーが別々に進める2つの流れでできている（図の下の補足）。
+
+- **補足2（計画の流れ、0.5秒ごと）**: `request_plan` が計画器に頼み、答えが届くと `on_plan_result` が `path` を新しい経路に入れ替える。アクションの答えは、すぐには返らないので、頼む関数と答えを受け取る関数が分かれている。
+- **補足1（段階を進める流れ、0.1秒ごと）**: `on_timer` が、毎回 `choose_target` で目標を決めて、PX4へ送る。`choose_target` は、そのときの `path` の上の1.0m先の点を目標にする。
+
+2つの流れは、主に属性の `path` でつながっている（ほかに、どちらの流れも、最後に届いた位置 `position` を使い、`on_timer` が着陸を始めて `landing` を立てると、`request_plan` は計画を頼まなくなる）。計画の流れが `path` を入れ替えると、次の `on_timer` から、新しい経路の上の点が目標になる。これが、「経路が引き直されると、機体がそのまま新しい経路へ曲がる」仕組みである（4-2節の最後の段落）。完了条件の2は、この流れを、`request_plan` → `on_plan_result` → `path` → `on_timer` → `choose_target` → `lookahead_point` → `send_setpoint` の順に説明できればよい。
+
+### 4-4. ビルドする
 
 ```bash
 # T6
@@ -574,214 +714,23 @@ Finished <<< drone_offboard [<time>]
 Summary: 1 package finished [<time>]
 ```
 
-## 5. 起動する
-
-### 5-1. シミュレーションと中継
-
-この手順書では、8つのターミナルを使う。
-
-| ターミナル | 動かすもの | 仮想環境 `~/px4-venv` |
-|---|---|---|
-| T1 | PX4のシミュレーション（`make px4_sitl gz_x500_lidar_2d_walls`） | 使う |
-| T2 | QGroundControl | 使わない |
-| T3 | Micro XRCE-DDS Agent | 使わない |
-| T4 | `parameter_bridge`（LiDARの値の中継） | 使わない |
-| T5 | `planner_server`（計画器） | 使わない |
-| T6 | ビルドと、自作のノード | 使わない |
-| T7 | RViz2 | 使わない |
-| T8 | `ros2 lifecycle` のコマンド | 使わない |
-
-ターミナルの番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T1〜T4がどの手順書でも同じプログラムで、T5以降がそのページの作業用である。この手順書では、T1〜T8のすべてを使う。
-
-PX4のシミュレーションは、起動し直してから使う（位置の原点を、機体が現れた地点にするため。フェーズ3の5節）。T1からT4を、フェーズ4とフェーズ2と同じように起動する。T4の中継には、2-4節の時刻の設定（`-p override_timestamps_with_wall_time:=true`）を足す。
-
-```bash
-# T1
-source ~/px4-venv/bin/activate
-
-cd ~/PX4-Autopilot
-
-make px4_sitl gz_x500_lidar_2d_walls
-
-# T2
-cd ~/qgc
-
-./QGroundControl-x86_64.AppImage
-
-# T3
-source ~/px4_ws/install/setup.bash
-
-MicroXRCEAgent udp4 -p 8888
-
-# T4
-export GZ_IP=127.0.0.1
-
-ros2 run ros_gz_bridge parameter_bridge \
-  /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan \
-  --ros-args -p override_timestamps_with_wall_time:=true \
-  -r /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan:=/scan
-```
-
-**期待する結果**（想定）: T1からT4は、フェーズ4の3-2節・5-1節と、フェーズ2の3節と同じ表示になる。QGCが機体につながり、T1に `Ready for takeoff!` が出るまで待つ。
-
-### 5-2. 計画器と自作のノード
-
-T5で計画器を、T6で自作のノードを、T7でRViz2を起動する。
-
-```bash
-# T5
-ros2 run nav2_planner planner_server --ros-args \
-  --params-file ~/px4_ws/src/drone_offboard/config/planner.yaml
-
-# T6
-source ~/px4_ws/install/setup.bash
-
-ros2 run drone_offboard replan_flight
-
-# T7
-rviz2
-```
-
-**期待する結果**（抜粋。T5は計画器を単体で起動して確かめた表示、T6は想定。時刻は実行ごとに変わる）:
-
-```text
-# T5（planner_server）
-[INFO] [1793491285.908555022] [planner_server]:
-	planner_server lifecycle node launched.
-	Waiting on external lifecycle transitions to activate
-	See https://design.ros2.org/articles/node_lifecycle.html for more information.
-
-# T6（replan_flight）
-[INFO] [<time>] [replan_flight]: 最初の経路を待つ（計画器の有効化を待つ）
-```
-
-T5の計画器は、起動しただけの「未設定」の状態で、外からの切り替えを待っている（2-3節）。T6のノードは、最初の経路が届くまで、TFを送るだけで、機体には何も指示しない。
-
-T7のRViz2で、次の順に設定する（フェーズ4の6-2節と同じ操作）。
-
-1. **Fixed Frame** を `map` にする（今度は、地図の座標系を基準にする）。
-2. **Add** の **By topic** で、`/scan` の **LaserScan** を足し、**Size (m)** を `0.05` にする。
-3. **Add** の **By topic** で、`/global_costmap/costmap` の **Map** を足す（計画器を有効にした後で一覧に出る。出ていなければ、5-3節の後に足す）。
-4. **Add** の **By topic** で、`/plan` の **Path** を足す（同じく、最初の計画の後で一覧に出る）。
-5. **Add** の **By display type** で **TF** を足す（`map`・`base_link`・`link` の座標系の軸が表示される）。
-
-### 5-3. 計画器を有効にする
-
-T8で、計画器を「設定」してから「有効化」する（2-3節）。
-
-```bash
-# T8
-ros2 lifecycle set /planner_server configure
-
-ros2 lifecycle set /planner_server activate
-```
-
-**期待する結果**（計画器を単体で起動して確かめた表示）:
-
-```text
-$ ros2 lifecycle set /planner_server configure
-Transitioning successful
-
-$ ros2 lifecycle set /planner_server activate
-Transitioning successful
-```
-
-「設定」で、計画器は設定ファイルを読み込み、中の地図とアクションの受け口を作る。この時点では、まだ頼みを断るので、T5には `Action server is inactive. Rejecting the goal.` が頼まれるたびに（0.5秒ごとに）出て、T6には「計画器が頼みを断った（有効化を待つ）」が1回だけ出る（T5の行の文言は確かめたもので、繰り返し出ることとT6の表示は想定）。「有効化」で、地図がLiDARの値を受け取り始め、頼みを受け付けるようになる。最初の経路が届くと、T6のノードが飛行を始める（6節）。最初の計画のときに、T5に `[WARN] ... No planners specified in action call. Server will use only plugin GridBased  in server. This warning will appear once.` が1回出る。自作のノードが、どの計画器を使うか（`planner_id`）を指定せずに頼むためで、計画器は `GridBased` の1つだけなので、問題ない。
-
-## 6. 飛ばして、経路が変わるのを見る
-
-### 6-1. 何が起きる見込みか
-
-目的地の (東8m, 北−6m) は、正面の壁1の向こう側にある。フェーズ4の3-1節の表のとおり、壁1の南の端には壁3が、壁3の東の端の近くには壁4がつながっていて、目的地は、壁1・壁3・壁4に三方を囲まれた場所にある。3-2節の地図の範囲では、壁3が地図の東の端まで届いているので、地図の中で目的地へ入れるのは、北からだけである。
-
-機体が現れた地点からは、LiDARで壁1の正面と左の壁2は見えるが、壁3の長い面は見えない（壁3の面は南と北を向いていて、北の面は壁1の陰にあり、南の面は壁1の南の端より南へ出ないと見えない）。まだ見ていない場所は「空いている」とみなすので、最初の計画では、目的地に近い南の端を回る経路が引かれる見込みである。
-
-機体が壁1の西の面に沿って南へ進み、壁1の南の端の角を回ると、壁3の南の面が見え、地図の東の端までの壁3が一度に書き込まれる。南からは入れないことが分かるので、経路が引き直され、北の端を回る経路に変わる。北の端を回る経路は、壁2の東の端と壁1の間の、幅約2.5mの隙間を通る。
-
-### 6-2. 飛ばす
-
-5-3節で計画器を有効にすると、飛行が始まる。
-
-**期待する結果**（T6の抜粋。想定。時刻と経路の長さは実行ごとに変わる）:
-
-```text
-[INFO] [<時刻>] [replan_flight]: 計画器が頼みを断った（有効化を待つ）
-[INFO] [<時刻>] [replan_flight]: 経路を計画した: 長さ <約19> m
-[INFO] [<時刻>] [replan_flight]: Offboardへの切り替えとアームを指示した
-...
-[INFO] [<時刻>] [replan_flight]: 経路を引き直した: 長さ <約8> m → <約45> m
-...
-[INFO] [<時刻>] [replan_flight]: 目的地に着いたので、着陸を指示した
-[INFO] [<時刻>] [replan_flight]: 着陸してディスアームした。終わる
-```
-
-最初の経路が届くと、機体はアームして3mの高さまで上がり、最初の経路（南の端を回る経路）に沿って、南へ飛び始める。QGCの飛行モードの表示は **Offboard** になる。壁1の南の端の角を回ったところで、T6に「経路を引き直した」が出て、経路が北の端を回る長い経路に変わり、機体は向きを変えて北へ戻る。向きを変えている間は、LiDARの真後ろの90°が見えないが、地図には、それまでに見た壁が残っているので、経路はその壁を避ける。機体は、壁1の西の面に沿って北へ飛び、壁2と壁1の隙間を抜け、北の端を回って、壁1と壁4の間を南へ下り、目的地の上で着陸する。ディスアームすると、ノードは自分で終わる。
-
-## 7. 観察する
-
-飛行の間、T7のRViz2で、次を見る。
-
-| 表示 | 見えるもの |
-|---|---|
-| LaserScan（`/scan`） | LiDARの点。機体の向きに合わせて回る |
-| Map（`/global_costmap/costmap`） | 地図。障害物の格子が濃い色、その周りの膨らませた範囲が段々に薄い色で表示される。飛ぶにつれて、見えた壁が書き加えられていく |
-| Path（`/plan`） | 計画した経路の線。0.5秒ごとに計画し直されるので、少しずつ動く。南からは入れないと分かった時点で、大きく形が変わる |
-| TF | `map` の原点（機体が現れた地点）と、機体（`base_link`）とLiDAR（`link`）の座標系の軸 |
-
-**期待する結果**（想定）: 飛び始めは、地図に壁1の正面と左の壁2だけがあり、経路は壁1の南の端を回っている。機体が角を回ると、壁3が地図の東の端まで書き加えられ、すぐに、経路の線が、北の端を回る形に切り替わる。完了条件のとおり、経路が変わり、機体がぶつからずに回り込んで、目的地に着く。
-
-T8で、計画器の状態と、経路のトピックも見られる。
-
-```bash
-# T8
-ros2 lifecycle get /planner_server
-
-ros2 topic hz /plan
-```
-
-**期待する結果**（抜粋。`ros2 lifecycle get` は計画器を単体で起動して確かめた表示、`ros2 topic hz` は想定。数は実行ごとに変わる）:
-
-```text
-$ ros2 lifecycle get /planner_server
-active [3]
-
-$ ros2 topic hz /plan
-average rate: 2.000
-```
-
-`active` は、有効の状態である。`/plan` は、自作のノードが0.5秒ごとに計画を頼むので、毎秒約2回出る。
-
-## 8. 止める
-
-ノードは、着陸してディスアームすると自分で終わる。T8のコマンドを Ctrl+C で止め、T7のRViz2のウィンドウを閉じる。T5の計画器、T4の中継、T3のAgentを Ctrl+C で止める。T2のQGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
-
-途中で止めたいときは、QGCの **Land** で着陸させる。ノードは「Offboardから別のモードに移った。終わる」と出して終わる（フェーズ3の5節と同じ）。
-
-## 9. 課題（任意）
-
-1. 設定ファイルの地図の幅を `width: 40`（東へ25mまで）に広げると、壁3の東の端の外を回る道が地図に入る。角を回ったときに引き直される経路が、北回りになるか、東回りになるかを、壁3と壁4の配置（フェーズ4の3-1節）と、`obstacle_max_range` から予想し、確かめる。
-2. `GOAL_ENU` を (東−5m, 北8m)（壁2の向こう側）に変えて、壁2の東の端と壁1の間（幅約2.5m）を通る経路が引かれるか、西の端を大きく回る経路が引かれるかを予想し、確かめる。`robot_radius` と `inflation_radius` を変えると、どちらになるかが変わることも確かめる。
-3. 設定ファイルの `track_unknown_space` を `true` に、`allow_unknown` を `false` に変えると、まだ見ていない場所を通る経路を引かなくなる。最初の計画がどうなるかを予想し、確かめる（計画器を一度止めて起動し直し、5-3節からやり直す）。
-4. `use_astar` を `false` にすると、NavFnは、A\*ではなく、出発点から全方向に同じように広げて調べる探し方（ダイクストラ法）を使う。経路の形と、計画にかかる時間（アクションの答えの `planning_time`）を比べる。
-5. Nav2のライフサイクルの管理の部品 `lifecycle_manager`（パッケージ `nav2_lifecycle_manager`）を使って、5-3節の切り替えを自動にする。パラメータ `node_names` と `autostart` を調べる。さらに、T4〜T6をlaunchのファイルでまとめて起動する。この課題は、親プロジェクトの [フェーズ4](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase4_launch.md) の2節〜4節（launchのファイルの書き方）を前提にする。
+これで、フェーズ6の準備ができた。[フェーズ6-2](phase6_2_replan_flight.md) で、シミュレーションを起動して飛ばす。
 
 ## つまずきやすい点
 
-- **T6が「最初の経路を待つ」のまま進まない**: 5-3節の有効化をしていない。T8で `ros2 lifecycle get /planner_server` を実行し、`active` かを確かめる。
-- **有効化で止まる・失敗する（T5にTFのエラーが出る）**: 地図が、`map` → `base_link` のTFを見つけられていない。T6のノードが起動していて、T3のAgentがPX4とつながっているか（PX4の位置が届いているか）を確かめる。
-- **RViz2の地図に壁が書き込まれない**: T4の中継に `override_timestamps_with_wall_time:=true` を付けたかを確かめる（2-4節）。T5に、時刻が合わずにLiDARの値を捨てたという警告が出ていないかを見る。設定ファイルの高さの範囲（`min_obstacle_height`・`max_obstacle_height`）も確かめる。
-- **「経路が見つからない」が出続ける**: 機体のいる格子か、目的地の格子が、膨らませた範囲に入って通れなくなっている。`robot_radius` と `inflation_radius` を小さくするか、`tolerance` を大きくする。
-- **目的地の近くで、着陸せずに浮いたままになる**: 計画器は、目的地の格子が通れないと、`tolerance`（0.5m）以内の近くの格子を代わりの終点にする。経路の終点が目的地から0.5m以上ずれると、ノードの「着いた」の判定（`REACHED_DIST`）に入らない。目的地を壁から離すか、`REACHED_DIST` を少し大きくする。
-- **角を回った直後に、壁に近づきすぎる・ぶつかる**: 引き直される前の経路は、まだ見ていない壁3の中を通っている。目標の点がその上にある間に進みすぎると、壁に近づく。`LOOKAHEAD` を小さくする、`PLAN_PERIOD` を短くする、`inflation_radius` を大きくして角から離れて回らせる、のどれかを試す。
+- **`sudo apt install` で、パッケージが見つからない（`E: Unable to locate package`）**: `sudo apt update` を先に実行したかを確かめる。ROS 2のリポジトリの設定（[環境構築](setup_px4_gazebo.md) の2-3節）が済んでいるかも確かめる。
+- **ビルドは通るが、フェーズ6-2の `ros2 run drone_offboard replan_flight` で `No executable found` が出る**: 4-1節の `setup.py` の `entry_points` に `replan_flight` の行を足したかを確かめる（足し忘れても、ビルドは通る）。足した後は、4-4節のビルドをし直し、`source ~/px4_ws/install/setup.bash` を実行し直してから起動する。ファイルの場所が `~/px4_ws/src/drone_offboard/drone_offboard/replan_flight.py` かも確かめる。
+- **ビルドは通るが、フェーズ6-2で起動すると `ModuleNotFoundError` が出る**: 表示の最後の行に、見つからないモジュールの名前が出る。`nav2_msgs` なら、3-1節のNav2の導入が済んでいるかを確かめる。`drone_offboard.waypoint_flight` なら、フェーズ3のノードのファイル（`~/px4_ws/src/drone_offboard/drone_offboard/waypoint_flight.py`）があるかを確かめる。`package.xml` の依存（4-1節）は、使うパッケージを宣言するもので、書いただけではパッケージは入らない。
 
 ## 次へ
 
-ここまでで、この教材の最終ゴール（障害物を見つけたら経路を計画し直して回避する）に着いた。Nav2のほかの部品と、この手順書の設定のうち変えて試してよいところは、[間章（Nav2）](interlude_nav2.md) にまとめた。学習計画（[`docs/learning_plan.md`](learning_plan.md)）に戻り、全体を振り返る。
+[フェーズ6-2](phase6_2_replan_flight.md)（起動して飛ばし、経路が変わるのを見る）へ進む。
 
 ## 出典
 
 - コストマップと計画器の設定の名前・既定値、アクションの型: [Nav2](https://github.com/ros-navigation/navigation2)（`jazzy`、Apache License 2.0）のソース（`nav2_costmap_2d`・`nav2_planner`・`nav2_navfn_planner`・`nav2_msgs`）と、既定の設定ファイル `nav2_bringup/params/nav2_params.yaml` を読んで、この教材の機体とワールドに合わせて、一から書いたもの。
-- 中継の時刻の付け替え（`override_timestamps_with_wall_time`）: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEを読んで、自分の言葉でまとめたもの。
+- 中継の時刻の付け替え（`override_timestamps_with_wall_time`。2-4節）: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEを読んで、自分の言葉でまとめたもの。
 - `nav_msgs/msg/Path` の項目: ROS 2の [`common_interfaces`](https://github.com/ros2/common_interfaces)（`jazzy`、Apache License 2.0）の定義。
 - 壁の配置とLiDARの取り付け位置: フェーズ4の出典のとおり、PX4 v1.17に付属する模型のファイルを読んだもの。
+- 図（`img/phase0_goal.svg`・`img/phase6_class.svg`）は、この教材で作ったもの（`img/phase0_goal.svg` は、フェーズ0の10節の図の再掲）。
 - サンプルのコードと設定ファイルは、この教材で書いたもの（Apache License 2.0）。
