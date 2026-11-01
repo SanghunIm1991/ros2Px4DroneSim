@@ -127,10 +127,10 @@
 | 2 | [`docs/phase2_ros2_observe.md`](phase2_ros2_observe.md) | 作成済み（2026-10-31）。2〜6節の表示は実際の表示に差し替えた。3節のT1（PX4）の表示と、6節の飛ばしたときの値の変化は想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
 | 3-0 | [`docs/phase3_0_node_qos.md`](phase3_0_node_qos.md) | 作成済み（2026-10-31）。離陸させたときの高さの変わり方だけが想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
 | 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 作成済み（2026-10-31）。T5とT6の表示は確かめた。QGCとGazeboの画面の様子・T1（PX4）の表示・途中で止めたときの動きは想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
-| 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
-| 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
+| 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。4節・5-2節・6-2節の主な表示は、実際の表示で確かめた（2026-11-01。画像3枚を載せた）。7節の見え方などは想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
+| 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。起動して飛ばし、仮想ジョイスティックの設定の場所と、Gazeboのリセットで機体が消えることは確かめた（2026-11-01）。起動・設定・飛行の表示と機体の動きは、まだ手順書に反映しておらず想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
 | 6-1 | [`docs/phase6_1_planner_node.md`](phase6_1_planner_node.md) | 下書き（2026-10-31。2026-11-01にフェーズ6を2つに分け、構成の図の再掲とクラス図を足した）。3-1節のNav2の導入の表示と、4-4節のビルドの表示は確かめた。クラス図の見た目は未確認 |
-| 6-2 | [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md) | 下書き（2026-10-31。2026-11-01にフェーズ6-1から分け、1節にデータの流れの図を足した）。3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して確かめた（2026-11-01）。すべてを動かして飛ばし（2026-11-01）、1-2節・1-3節・2-2節の表示と、3節のRViz2の画面を、そのときのものにした。1-1節と3節の `ros2 topic hz` の表示は想定。データの流れの図の見た目は目視で確かめた |
+| 6-2 | [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md) | 下書き（2026-10-31。2026-11-01にフェーズ6-1から分け、1節にデータの流れの図を足した）。3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して確かめた（2026-11-01）。すべてを動かして飛ばし（2026-11-01）、1-2節・1-3節・2-2節の表示と、3節のRViz2の画面を、そのときのものにした（画像の見た目は目視で確かめた）。1-1節と3節の `ros2 topic hz` の表示は想定。データの流れの図の見た目は目視で確かめた |
 | 間章 | [`docs/interlude_flight_controller.md`](interlude_flight_controller.md) | 作成済み（2026-11-01）。読み物で、コマンドは無い。PX4の事実はv1.17の文書とソースで確かめた。図の見た目は未確認 |
 | 間章 | [`docs/interlude_custom_sensor.md`](interlude_custom_sensor.md) | 下書き（2026-10-31）。模型のファイルは `gz sdf -k` の点検だけを通した。起動と飛行の表示は想定 |
 | 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。1-1節の部品がaptの版（1.3.13）ですべて入ること、名前が同じであること、計画器を単体で起動したときの4節の表示と6節の課題1・2の「設定」は確かめた（2026-11-01）。飛行中の動きは想定 |
@@ -138,5 +138,5 @@
 
 ## 6. 未決事項
 
-- 下書きのフェーズ4〜6と間章を、実際に動かして確かめ、READMEの「読む順番」に加える（各ページの前提の節は、そのとき「前提」の列に写す）。確かめる項目は [`dev/pending_checks.md`](../dev/pending_checks.md) にある。
+- フェーズ4〜6は、2026-11-01に最終ゴールまで動かして確かめ、想定の表示が残る下書きのまま、READMEの「読む順番」に加えた。残る想定の表示を確かめて差し替える（とくにフェーズ5の飛行の表示）。間章2つ（機体の模型・Nav2）は、確かめてから加える（各ページの前提の節は、そのとき「前提」の列に写す）。確かめる項目は [`dev/pending_checks.md`](../dev/pending_checks.md) にある。
 - （決定済み）ROS 2のコマンドでの観察とQoSの復習は、フェーズ3-0の1ページにした（2026-10-31）。
