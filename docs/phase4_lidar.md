@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の4節の図の「ros_gz_bridge」の道（Gazeboの値を、PX4を通さずにROS 2へ出す道）を、実際に動かす。親プロジェクトにも、`ros_gz_bridge`（[フェーズ5-4](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase5_4_gazebo_plant.md)）と、RViz2（[間章](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/interlude_urdf_rviz.md)）の説明がある。どちらも車両の文脈が中心なので、前提にはせず、さらに詳しく知りたい場合の参考にする。
 >
-> **期待する結果の出どころ**: （作成中）機体・センサ・ワールドの中身と、Gazeboのトピックの名前は、PX4 v1.17のソースの模型のファイル（SDF）と起動のスクリプトで確かめた。`parameter_bridge` の引数の書き方は、ROS 2 Jazzyの `ros_gz_bridge` の使い方の表示で確かめた。起動・トピック・RViz2の表示は想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）機体・センサ・ワールドの中身と、Gazeboのトピックの名前は、PX4 v1.17のソースの模型のファイル（SDF）と起動のスクリプトで確かめた。`parameter_bridge` の引数の書き方は、ROS 2 Jazzyの `ros_gz_bridge` の使い方の表示で確かめた。3節・6節と「つまずきやすい点」の画像は、筆者の環境で撮影した。4節の `gz topic` の表示、5-2節の `ros2 topic list` と `ros2 topic echo` の表示、6-2節の壁1と壁2の見え方は、筆者の環境で動かした表示と照らして確かめた（`ros2 topic hz` の数は、5-2節に書いたとおり環境によって変わる）。そのほかの起動・トピックの表示と、7節の見え方は想定したもので、実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -131,6 +131,10 @@ INFO  [commander] Ready for takeoff!
 
 `walls.sdf` が読み込まれ、Gazeboの画面に、灰色の壁と、上にLiDARを載せた機体が現れる。そのほかの行は、フェーズ1の2節（環境構築の6節）と同じである。LiDARの光は、Gazeboの画面には表示されない（模型の設定で、見えないようにしてある）。
 
+![Gazeboのウィンドウ。左の3Dの画面に、灰色の地面の上に立つ高い壁が2枚見え、左の壁の右、奥の壁の手前の地面に、小さく機体が写っている。3Dの画面の右下のRTFは43.19 %。右上は選んだ物の情報（ここでは ground_plane）、右下のEntity Treeには default・ground_plane・box1・box2・box3・box4・sunUTC・x500_lidar_2d_0 が並ぶ](img/phase4_gazebo_walls.png)
+
+上の画像は、起動した直後のGazeboのウィンドウである。右下の **Entity Tree** の `box1`〜`box4` がワールドの壁で、`x500_lidar_2d_0` が機体である。機体は小さいので、3Dの画面では、左の壁の右、奥の壁の手前の小さな点に見える（マウスのホイールで拡大すると、形が分かる）。3Dの画面の右下のRTFは、フェーズ1の3節と同じく、PCの速さや負荷で実行ごとに変わる。
+
 ## 4. Gazeboのトピックを見る
 
 ROS 2へ中継する前に、Gazeboの側で、LiDARのトピックが出ていることを確かめる。Gazeboのトピックは、Gazebo自身の通信の仕組み（Gazebo Transport）で流れていて、`ros2 topic` では見えない。見るには、Gazeboのコマンド `gz topic` を使う。
@@ -139,17 +143,17 @@ ROS 2へ中継する前に、Gazeboの側で、LiDARのトピックが出てい�
 # T5
 export GZ_IP=127.0.0.1
 
-gz topic -l | grep lidar
+gz topic -l | grep lidar_2d_v2
 ```
 
-**期待する結果**（想定）:
+**期待する結果**（筆者の環境で確かめた表示）:
 
 ```text
 /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan
 /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan/points
 ```
 
-1行目が2-1節の表のトピックで、1回の走査の値（Gazeboの型 `gz.msgs.LaserScan`）が流れる。2行目は、同じ値を3次元の点の集まり（点群）にしたもので、この手順書では使わない。
+1行目が2-1節の表のトピックで、1回の走査の値（Gazeboの型 `gz.msgs.LaserScan`）が流れる。2行目は、同じ値を3次元の点の集まり（点群）にしたもので、この手順書では使わない。`grep` で絞る語を `lidar` にすると、機体の名前（`x500_lidar_2d_0`）にも `lidar` が含まれるので、機体のほかのトピック（モーター・IMU等）もすべて表示される。
 
 `export GZ_IP=127.0.0.1` は、Gazeboの通信に使うネットワークの場所を、このPCの中だけ（127.0.0.1）にする設定である。PX4の `make` の対象（3-2節）は、Gazeboを `GZ_IP=127.0.0.1` で起動するので、Gazeboのトピックを見る・中継するターミナルでも同じ値にそろえる。`export` した値は、そのターミナルを閉じるまで有効である。
 
@@ -195,7 +199,7 @@ ros2 topic echo /scan --once --no-arr
 
 `ros2 topic hz` は、Ctrl+Cで止めてから、次のコマンドを実行する。`--no-arr` は、並びの項目（`ranges`・`intensities`）の中身を表示せず、個数だけを表示する指定である（1080個の数が流れて、ほかの項目が読めなくなるのを避ける）。
 
-**期待する結果**（抜粋。想定。時刻・数は実行ごとに変わる）:
+**期待する結果**（抜粋。`ros2 topic list` と `ros2 topic echo` は筆者の環境で確かめた表示、`ros2 topic hz` はRTFが100 %に近いときの想定。時刻・数は実行ごとに変わる）:
 
 ```text
 $ ros2 topic list
@@ -218,7 +222,7 @@ angle_max: 2.3561949729919434
 angle_increment: 0.004367367830127478
 time_increment: 0.0
 scan_time: 0.0
-range_min: 0.1
+range_min: 0.10000000149011612
 range_max: 30.0
 ranges: '<sequence type: float, length: 1080>'
 intensities: '<sequence type: float, length: 1080>'
@@ -251,9 +255,13 @@ RViz2のウィンドウが開いたら、次の順に設定する。
 3. **Displays** に足された **LaserScan** の左の三角を開き、**Size (m)** を `0.05` にする（初めの0.01では、点が小さくて見えにくい）。
 4. もう一度 **Add** を押し、**By display type** のタブで **Axes** を選び、**OK** を押す。固定フレームの原点（LiDARの位置）に、座標の軸が表示される。赤がx（前）、緑がy（左）、青がz（上）である。
 
-**期待する結果**（想定）: 軸の原点（LiDARの位置）から見て、前（赤い軸の向き。2-2節の角度0の向き）の約4.4m先に、左右に延びる点の直線が現れる。これが正面の壁1である。左（緑の軸の向き）の約4.5m先にも、前後に延びる点の直線が現れる。これが左の壁2である。右前の約11m先に、壁3の端が数点出ることがある。真後ろの90°には、点が無い（測っていない範囲）。そのほかの向きは、30m以内に何も無いので、点が無い。
+**期待する結果**（壁1と壁2の点の直線は、下の画像のとおり筆者の環境で確かめた。壁3の端と、真後ろに点が無いことは想定）: 軸の原点（LiDARの位置）から見て、前（赤い軸の向き。2-2節の角度0の向き）の約4.4m先に、左右に延びる点の直線が現れる。これが正面の壁1である。左（緑の軸の向き）の約4.5m先にも、前後に延びる点の直線が現れる。これが左の壁2である。右前の約11m先に、壁3の端が数点出ることがある。真後ろの90°には、点が無い（測っていない範囲）。そのほかの向きは、30m以内に何も無いので、点が無い。
 
-**Global Options** の **Fixed Frame** の欄や **Global Status** に、`link` が見つからないという警告が出ることがある。TFを流していないためで、LiDARの点が表示されていれば、この手順書では問題ない。
+**Global Status** が **Warn** になり、その下の **Fixed Frame** の欄に `No tf data` という警告が出る（座標の変換（TF）のデータが届いていない、という意味）。TFを流していないためで、LiDARの点が表示されていれば、この手順書では問題ない。
+
+![RViz2のウィンドウ。左のDisplaysでは、Global OptionsのFixed Frameが link、Global StatusがWarn（Fixed Frameの欄に No tf data）、LaserScanのStatusがOk、Topicが /scan、Size (m)が0.05になっている。中央の3Dの画面には、1 mの格子の上に、原点の座標の軸（赤・緑・青）があり、画面の左に縦に長い赤い点の直線、画面の下に横に延びる赤い点の直線が見える。赤い軸は画面の左を、緑の軸は画面の下を向いている](img/phase4_rviz2.png)
+
+上の画像は、6-2節の設定を終えた後のRViz2のウィンドウである（斜め上から見下ろす向きに回してあり、赤い軸（前）が画面の左を、緑の軸（左）が画面の下を向いている）。赤い軸の先の、縦に長い点の直線が正面の壁1、緑の軸の先の、横に延びる点の直線が左の壁2で、格子の目（1 m）で数えると、どちらも原点から約4.5マス先にある。**Global Status** が **Warn**（**Fixed Frame** の欄に `No tf data`）になっているのは、上に書いたTFの警告である。
 
 画面の見え方は、マウスで変えられる（左のボタンを押したまま動かすと回転、ホイールで拡大・縮小、Shiftを押しながら左のボタンで平行移動）。Gazeboの画面では、Shiftを押しながら左のボタンが回転だった（フェーズ1の3節）ので、逆になることに注意する。上から見下ろす向きにすると、壁の形が分かりやすい。
 
@@ -280,6 +288,11 @@ T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で�
 
 ## つまずきやすい点
 
+- **Gazeboの画面に機体が現れない**: T1に `Ready for takeoff!` が出ていても、Gazeboの画面に機体が現れないことがある。このときは、QGCで離陸させようとしても、PX4が命令に応じないことがある。機体が現れなければ、T1のPX4のシミュレーションを Ctrl+C で止めて、起動し直す（3-2節の `make px4_sitl gz_x500_lidar_2d_walls`）。初めて起動するワールドと機体の組み合わせは、読み込みに時間がかかることがある（T1に `Waiting for Gazebo world...` が何度も出る）。
+
+  ![機体が現れなかったときのGazeboのウィンドウ。左の3Dの画面に、壁のワールドを引きで見た全体が写っているが、機体は無い。右下のEntity Treeには default・ground_plane・box1・box2・box3・box4・sunUTC だけが並び、x500_lidar_2d_0 が無い](img/phase4_gazebo_no_vehicle.png)
+
+  上の画像は、機体が現れなかったときの例である。右下の **Entity Tree** に `x500_lidar_2d_0` が無いので、画面に映っていないだけでなく、ワールドに機体が無いことが分かる（3-2節の画像と比べる）。
 - **`gz topic -l` に何も出ない・LiDARのトピックが無い**: `export GZ_IP=127.0.0.1` を忘れていないかを確かめる。T1を、`gz_x500` ではなく `gz_x500_lidar_2d_walls` で起動したかを確かめる（T1に `walls.sdf` の行が出ているか）。
 - **`/scan` は見えるが、`ros2 topic hz` に何も出ない**: T4で `export GZ_IP=127.0.0.1` をしていないと、中継がGazeboのトピックを受け取れない。T4の引数のトピックの名前が、4節の `gz topic -l` の表示と一字一句同じかを確かめる。
 - **RViz2に点が出ない**: **Fixed Frame** が `link` になっているか、**LaserScan** の **Topic** が `/scan` になっているかを確かめる。点が小さすぎることもあるので、**Size (m)** を大きくしてみる。
@@ -293,5 +306,6 @@ T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で�
 
 - LiDAR付きの機体（`x500_lidar_2d`）とセンサの仕様、壁のワールド（`walls`）の中身: PX4 v1.17に付属するGazeboの模型のファイル（各自のPCの `~/PX4-Autopilot/Tools/simulation/gz/` の下。[PX4-gazebo-models](https://github.com/PX4/PX4-gazebo-models) のリポジトリにある）を読んで、自分の言葉でまとめたもの。模型のファイルは、この教材には含めていない。
 - 機体とワールドの選び方（`make` の対象の名前）: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Gazebo Vehicles](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/vehicles.md) と [Gazebo Worlds](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/worlds.md) を読んで、自分の言葉でまとめたもの。機体の名前の決まり方と、`GZ_IP` の値: PX4 v1.17のソースの [`ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim) と `src/modules/simulation/gz_bridge/CMakeLists.txt`。PX4がLiDARの値を5°ごとの区画にまとめること: 同じソースの [`src/modules/simulation/gz_bridge/GZBridge.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/simulation/gz_bridge/GZBridge.cpp)。
+- 3節・6節と「つまずきやすい点」の画像（`img/phase4_gazebo_walls.png`・`img/phase4_rviz2.png`・`img/phase4_gazebo_no_vehicle.png`）は、筆者の環境で撮影したGazebo（Open Source Robotics Foundation、Apache License 2.0）とRViz2（ROS 2、Apache License 2.0）の画面である（`img/phase4_gazebo_no_vehicle.png` は画面の外の写り込みを除くために端を、`img/phase4_rviz2.png` は撮影の日時とPCの実測値が写る下のTimeパネルを、切り落とした）。写っている壁のワールド `walls` と、機体の模型 `x500_lidar_2d`（`x500` とLiDARの `lidar_2d_v2`）は、PX4に付属するGazeboの模型（[PX4-gazebo-models](https://github.com/PX4/PX4-gazebo-models)。リポジトリの `LICENSE` によると、Copyright (c) 2022, PX4 Autopilot for Drones、BSD 3-Clause License。機体の本体の [`models/x500_base`](https://github.com/PX4/PX4-gazebo-models/tree/main/models/x500_base) は、そのフォルダの `LICENSE` によると、Copyright (c) 2022, Rudis Laboratories、BSD 3-Clause License）で、模型のファイルそのものは、このリポジトリに含まない。
 - `parameter_bridge` の引数の書き方: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEと、使い方の表示を読んで、自分の言葉でまとめたもの。
 - `sensor_msgs/msg/LaserScan` の項目: ROS 2の [`common_interfaces`](https://github.com/ros2/common_interfaces)（`jazzy`、Apache License 2.0）の定義。

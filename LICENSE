@@ -69,6 +69,15 @@ the author (SanghunIm1991) and the license are credited.
      Apache License 2.0。写っている機体の模型 x500 は PX4-gazebo-models
      （Copyright (c) 2022, Rudis Laboratories）, BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/models/x500_base/LICENSE）
+   - docs/img/phase4_gazebo_walls.png・docs/img/phase4_rviz2.png・
+     docs/img/phase4_gazebo_no_vehicle.png（docs/phase4_lidar.md の3節・6節・
+     つまずきやすい点）の画面の撮影画像: 画面は Gazebo（Open Source Robotics
+     Foundation）と RViz2（ROS 2）, Apache License 2.0。写っているワールド
+     walls と機体の模型 x500_lidar_2d は PX4-gazebo-models
+     （Copyright (c) 2022, PX4 Autopilot for Drones。機体の本体の x500_base は
+     Copyright (c) 2022, Rudis Laboratories）, BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/LICENSE 、
+     https://github.com/PX4/PX4-gazebo-models/blob/main/models/x500_base/LICENSE）
    - docs/interlude_custom_sensor.md の2-1節で抜粋した模型のファイル
      （x500_lidar_2d の model.sdf）:
      PX4-gazebo-models, Copyright (c) 2022, PX4 Autopilot for Drones,

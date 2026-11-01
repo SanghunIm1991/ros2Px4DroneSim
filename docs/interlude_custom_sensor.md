@@ -353,7 +353,7 @@ Gazeboの画面に、上に小さな円柱を載せた機体が現れる。模�
 # T5
 export GZ_IP=127.0.0.1
 
-gz topic -l | grep lidar
+gz topic -l | grep lidar_2d_v2
 
 # T4
 export GZ_IP=127.0.0.1
@@ -369,7 +369,7 @@ ros2 topic echo /scan --once --no-arr
 **期待する結果**（抜粋。想定）:
 
 ```text
-$ gz topic -l | grep lidar
+$ gz topic -l | grep lidar_2d_v2
 /world/walls/model/x500_lidar_360_0/link/link/sensor/lidar_2d_v2/scan
 /world/walls/model/x500_lidar_360_0/link/link/sensor/lidar_2d_v2/scan/points
 
