@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1070 510" width="1070" height="510" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="PX4と自作のソフトウェアをつなぐインターフェース。中央のPX4（フライトコントローラ）と、左の地上局・MAVSDKのアプリはMAVLinkで、右のコンパニオンコンピュータのROS 2のノードはuXRCE-DDS（px4_msgs）でつながる。上のPX4の中の自作のモジュールはuORBで、下のモーター・サーボ・センサはPWM・DShot・CAN・シリアル等でつながる">
+<title>PX4と自作のソフトウェアをつなぐインターフェース。中央のPX4（フライトコントローラ）と、左の地上局・MAVSDKのアプリはMAVLinkで、右のコンパニオンコンピュータのROS 2のノードはuXRCE-DDS（px4_msgs）でつながる。上のPX4の中の自作のモジュールはuORBで、下のモーター・サーボ・センサはPWM・DShot・CAN・シリアル等でつながる</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1070" height="510" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M270,255 L410,255" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M660,255 L800,255" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M535,130 L535,200" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M535,310 L535,380" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<rect x="410" y="20" width="250" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="20" y="200" width="250" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="410" y="200" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="800" y="200" width="250" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="410" y="380" width="250" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="535" y="59" text-anchor="middle" font-weight="bold">PX4の中の自作のモジュール</text>
+<text x="535" y="79" text-anchor="middle">C++で書き、PX4と</text>
+<text x="535" y="99" text-anchor="middle">一緒にビルドする</text>
+<text x="145" y="239" text-anchor="middle" font-weight="bold">地上局・MAVSDKのアプリ</text>
+<text x="145" y="259" text-anchor="middle">QGC・MAVROS・</text>
+<text x="145" y="279" text-anchor="middle">MAVLinkのカメラ等</text>
+<text x="535" y="239" text-anchor="middle" font-weight="bold">PX4</text>
+<text x="535" y="259" text-anchor="middle">フライトコントローラ</text>
+<text x="535" y="279" text-anchor="middle">モジュールどうしはuORB</text>
+<text x="925" y="239" text-anchor="middle" font-weight="bold">ROS 2のノード</text>
+<text x="925" y="259" text-anchor="middle">コンパニオンコンピュータ</text>
+<text x="925" y="279" text-anchor="middle">の上で動く</text>
+<text x="535" y="419" text-anchor="middle" font-weight="bold">機体の部品</text>
+<text x="535" y="439" text-anchor="middle">モーター（ESC）・サーボ</text>
+<text x="535" y="459" text-anchor="middle">GPS・距離センサ等</text>
+<text x="340" y="247" text-anchor="middle" font-size="13">MAVLink</text>
+<text x="730" y="247" text-anchor="middle" font-size="13">uXRCE-DDS</text>
+<text x="543" y="170" text-anchor="start" font-size="13">uORB</text>
+<text x="543" y="350" text-anchor="start" font-size="13">PWM・DShot・CAN・シリアル等</text>
+<rect x="20" y="397" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="48" y="410">PX4</text>
+<rect x="20" y="427" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="48" y="440">自作のソフトウェアの置き場所</text>
+<rect x="20" y="457" width="20" height="14" rx="3" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="48" y="470">機体の部品（ハードウェア）</text>
+</g></svg>

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 380" width="1220" height="380" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="PX4を製品に組み込むワークフロー。上の段を左から右へ、【1】要求と構成を決める、【2】基板を選ぶ、【3】機体の設定、【4】シミュレーションで確かめる。下の段を右から左へ、【5】調整（最後に行う）、【6】試験飛行とログの解析、【7】設定を固めて版を決める、【8】配って保守する。試験飛行で問題があれば、調整に戻って直す">
+<title>PX4を製品に組み込むワークフロー。上の段を左から右へ、【1】要求と構成を決める、【2】基板を選ぶ、【3】機体の設定、【4】シミュレーションで確かめる。下の段を右から左へ、【5】調整（最後に行う）、【6】試験飛行とログの解析、【7】設定を固めて版を決める、【8】配って保守する。試験飛行で問題があれば、調整に戻って直す</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1220" height="380" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M270,75 L330,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M580,75 L640,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M890,75 L950,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1075,130 L1075,200" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M950,235 L890,235" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M890,280 L950,280" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M640,255 L580,255" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M330,255 L270,255" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="20" y="20" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="330" y="20" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="640" y="20" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="950" y="20" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="950" y="200" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="640" y="200" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="330" y="200" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="200" width="250" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="145" y="59" text-anchor="middle" font-weight="bold">【1】要求と構成を決める</text>
+<text x="145" y="79" text-anchor="middle">機体の種類・積む物・運用</text>
+<text x="145" y="99" text-anchor="middle">FCだけか、コンパニオン付きか</text>
+<text x="455" y="59" text-anchor="middle" font-weight="bold">【2】基板を選ぶ</text>
+<text x="455" y="79" text-anchor="middle">Pixhawk標準・メーカー対応</text>
+<text x="455" y="99" text-anchor="middle">自作の基板なら移植する</text>
+<text x="765" y="59" text-anchor="middle" font-weight="bold">【3】機体の設定</text>
+<text x="765" y="79" text-anchor="middle">近い汎用の機体から始め</text>
+<text x="765" y="99" text-anchor="middle">形・出力・センサ・安全</text>
+<text x="1075" y="59" text-anchor="middle" font-weight="bold">【4】シミュレーション</text>
+<text x="1075" y="79" text-anchor="middle">SITLで、設定と</text>
+<text x="1075" y="99" text-anchor="middle">自作の部分を確かめる</text>
+<text x="1075" y="239" text-anchor="middle" font-weight="bold">【5】調整（最後に行う）</text>
+<text x="1075" y="259" text-anchor="middle">自動調整、または手動で</text>
+<text x="1075" y="279" text-anchor="middle">角速度→姿勢→位置の順</text>
+<text x="765" y="239" text-anchor="middle" font-weight="bold">【6】試験飛行とログ</text>
+<text x="765" y="259" text-anchor="middle">試験の手順で飛ばし</text>
+<text x="765" y="279" text-anchor="middle">ログを解析する</text>
+<text x="455" y="239" text-anchor="middle" font-weight="bold">【7】設定を固める</text>
+<text x="455" y="259" text-anchor="middle">差分を機体の設定にし</text>
+<text x="455" y="279" text-anchor="middle">版を決めてビルドする</text>
+<text x="145" y="239" text-anchor="middle" font-weight="bold">【8】配る・保守する</text>
+<text x="145" y="259" text-anchor="middle">版の更新を追い</text>
+<text x="145" y="279" text-anchor="middle">SITLで回帰の試験をする</text>
+<text x="920" y="272" text-anchor="middle" font-size="13">直す</text>
+<text x="610" y="350" text-anchor="middle" font-size="13">上の段を左から右へ、下の段を右から左へ進む。【6】で問題があれば【5】に戻る</text>
+</g></svg>

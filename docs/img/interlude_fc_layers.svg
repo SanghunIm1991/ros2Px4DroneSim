@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 592" width="850" height="592" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="PX4を調整する部分と根幹の境界を、外側から内側へ5つの層に分けた図。【A】運用の設定はパラメータで、QGCやPX4のシェルで変える。【B】機体に合わせる設定は機体の設定のファイルで、形・出力・センサの向き・調整のゲインを決める。【C】基板に合わせる設定は boards/ の設定で、入れるモジュールや起動するドライバを決める。【D】機能を足すのは自作の部品で、外付けのモジュールやROS 2のモードとして足し、自分で保守する。【E】根幹は推定・制御・配分・安全の判断で、原則として変えない。下の層ほど、変えた後の確かめと保守が重い">
+<title>PX4を調整する部分と根幹の境界を、外側から内側へ5つの層に分けた図。【A】運用の設定はパラメータで、QGCやPX4のシェルで変える。【B】機体に合わせる設定は機体の設定のファイルで、形・出力・センサの向き・調整のゲインを決める。【C】基板に合わせる設定は boards/ の設定で、入れるモジュールや起動するドライバを決める。【D】機能を足すのは自作の部品で、外付けのモジュールやROS 2のモードとして足し、自分で保守する。【E】根幹は推定・制御・配分・安全の判断で、原則として変えない。下の層ほど、変えた後の確かめと保守が重い</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="850" height="592" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M320,90 L360,90" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M320,188 L360,188" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M320,286 L360,286" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M320,384 L360,384" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M320,482 L360,482" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="20" y="50" width="300" height="80" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="360" y="50" width="470" height="80" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="20" y="148" width="300" height="80" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="360" y="148" width="470" height="80" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="20" y="246" width="300" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="360" y="246" width="470" height="80" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="344" width="300" height="80" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="360" y="344" width="470" height="80" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="20" y="442" width="300" height="80" rx="8" fill="#fdecec" stroke="#b42318" stroke-width="1.5"/>
+<rect x="360" y="442" width="470" height="80" rx="8" fill="#fdecec" stroke="#b42318" stroke-width="1.5"/>
+<text x="170" y="84" text-anchor="middle" font-weight="bold">【A】運用の設定</text>
+<text x="170" y="104" text-anchor="middle">パラメータ（運用ごと）</text>
+<text x="595" y="84" text-anchor="middle" font-weight="bold">QGC・PX4のシェルの param set</text>
+<text x="595" y="104" text-anchor="middle">例: フェイルセーフの動作・速さ・ジオフェンス</text>
+<text x="170" y="182" text-anchor="middle" font-weight="bold">【B】機体に合わせる設定</text>
+<text x="170" y="202" text-anchor="middle">機体の設定のファイル（機種ごと）</text>
+<text x="595" y="182" text-anchor="middle" font-weight="bold">機体の設定のファイル・SDカードの config.txt</text>
+<text x="595" y="202" text-anchor="middle">例: 形・出力・センサの向き・調整のゲイン</text>
+<text x="170" y="280" text-anchor="middle" font-weight="bold">【C】基板に合わせる設定</text>
+<text x="170" y="300" text-anchor="middle">boards/ の設定（基板ごと）</text>
+<text x="595" y="280" text-anchor="middle" font-weight="bold">.px4board（入れるモジュール）・rc.board</text>
+<text x="595" y="300" text-anchor="middle">例: 起動するドライバ・シリアルの割り当て</text>
+<text x="170" y="378" text-anchor="middle" font-weight="bold">【D】機能を足す</text>
+<text x="170" y="398" text-anchor="middle">自作の部品（自分で保守する）</text>
+<text x="595" y="378" text-anchor="middle" font-weight="bold">外付けのモジュール・extras.txt・ROS 2のモード</text>
+<text x="595" y="398" text-anchor="middle">例: 自作のドライバ・トピック・飛行モード</text>
+<text x="170" y="476" text-anchor="middle" font-weight="bold">【E】根幹</text>
+<text x="170" y="496" text-anchor="middle">推定・制御・配分・安全の判断</text>
+<text x="595" y="476" text-anchor="middle" font-weight="bold">原則として変えない</text>
+<text x="595" y="496" text-anchor="middle">変えるなら自分の分岐として、安全を確かめ直す</text>
+<text x="170" y="34" text-anchor="middle" font-size="13">層（上ほど外側）</text>
+<text x="595" y="34" text-anchor="middle" font-size="13">主な変え方と例</text>
+<text x="425" y="570" text-anchor="middle" font-size="13">下の層ほど、変えた後の確かめと、版の更新のときの保守が重い</text>
+</g></svg>
