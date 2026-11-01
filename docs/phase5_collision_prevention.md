@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: フェーズ4で見たLiDARの値をPX4自身が使う道（フェーズ4の2-1節の、5°ごとの区画にまとめる処理）を、実際に働かせる。ROS 2は使わない（フェーズ4のRViz2を並べて見ると、壁との距離が分かりやすい）。
 >
-> **期待する結果の出どころ**: （作成中）パラメータの名前・既定値・働きは、PX4 v1.17のソースと文書で確かめた。仮想ジョイスティックの設定の名前と既定値は、QGroundControl v5.1.5の文書と設定の定義で確かめた。起動・設定・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）パラメータの名前・既定値・働きは、PX4 v1.17のソースと文書で確かめた。仮想ジョイスティックの設定の名前と既定値は、QGroundControl v5.1.5の文書と設定の定義で確かめ、設定の場所（**Application Settings** の **Fly View** のタブ）は、筆者の環境の画面で確かめた。「つまずきやすい点」の、Gazeboのリセットのボタンで機体が消えることは、筆者の環境で、この手順書のワールドで確かめた。起動・設定・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -129,8 +129,8 @@ PX4のシミュレーションは、変えたパラメータを、PX4のソー�
 QGCで、仮想ジョイスティックを有効にする。
 
 1. 左上の **Q** のアイコンを押し、**Application Settings** を開く。
-2. **General** のタブの、**Virtual Joystick** の欄にチェックを入れる。
-3. 地図の画面（Fly View）に戻る。
+2. 左の一覧の **Fly View** のタブ（地図の画面（Fly View）の設定）を選び、**Virtual Joystick** の見出しの下の **Virtual joystick** の欄にチェックを入れる（QGCの文書の [Virtual Joystick](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/virtual_joystick.md) のページには **General** のタブと書かれているが、v5.1.5では **Fly View** のタブにある）。
+3. 設定の画面を閉じて、地図の画面（Fly View）に戻る。
 
 **期待する結果**（想定）: 地図の画面の左下と右下に、丸い操縦桿が1つずつ表示される。左の操縦桿の丸は、上下の中央にある（指を離すと中央に戻る設定が、初めから有効になっている）。
 
@@ -196,7 +196,7 @@ pxh> param set CP_DIST -1
 
 行の先頭の `+` は、設定する前の値が既定と違い、保存されていたことを示す。戻すのを忘れると、次に起動したときにも衝突防止が有効のままになる。フェーズ3のノードの飛行（オフボード制御）には影響しないが、LiDARの無い機体（`gz_x500`）でPosition modeを使うと、距離の値が届かないので水平に動けず、5秒後にHoldに切り替わる（つまずきやすい点）。
 
-QGCの **Application Settings** の **Virtual Joystick** のチェックを外す（フェーズ6では使わない。地上で外すぶんには問題ない）。QGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
+QGCの **Application Settings** の **Fly View** のタブの **Virtual joystick** のチェックを外す（フェーズ6では使わない。地上で外すぶんには問題ない）。QGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
 
 ## 9. 課題（任意）
 
@@ -219,6 +219,7 @@ rviz2
 
 ## つまずきやすい点
 
+- **Gazeboの画面から機体が消えた**: Gazeboの左下のリセットのボタン（3つのボタンの右端）を押すと、ワールドが読み込んだ直後の状態に戻り、PX4が後から足した機体が消える（フェーズ1の3節）。T1のPX4のシミュレーションを Ctrl+C で止めて、起動し直す（4節の `make px4_sitl gz_x500_lidar_2d_walls`）。4節の `param set` を済ませていれば、その値は保存されているので、起動し直した後も有効である。
 - **一覧から Position を選んでも、モードが変わらない**: 操縦の入力が届いていない。仮想ジョイスティックが表示されているか（5節）を確かめる。QGCの画面とT1に、拒まれた理由が表示される。
 - **Position modeにしたら、機体が下がっていく**: 左の操縦桿が中央にない。5節の設定で、左の操縦桿が中央に戻る設定になっているかを確かめる。
 - **前へ倒しても、まったく動かない**: 衝突防止が、距離の値を受け取れていない。PX4は、距離の値が0.5秒届かないと水平の動きを止め、T1に `No obstacle data, not moving...` を表示し、5秒続くとHoldに切り替える。フェーズ4の機体（`gz_x500_lidar_2d_walls`）で起動しているかを確かめる。
@@ -233,4 +234,4 @@ rviz2
 
 - 衝突防止の仕組みとパラメータ: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md) を読んで、自分の言葉でまとめたもの。パラメータの既定値: PX4 v1.17のソースの [`src/lib/collision_prevention/collisionprevention_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/collisionprevention_params.c)。距離の値が途切れたときの動き: 同じフォルダの [`CollisionPrevention.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/CollisionPrevention.cpp)。
 - Position modeの方式（`MPC_POS_MODE`）: PX4 v1.17のソースの [`src/modules/mc_pos_control/multicopter_position_mode_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_pos_control/multicopter_position_mode_params.c)。操縦の入力の出どころと、途切れたときの動き（`COM_RC_IN_MODE`・`COM_RC_LOSS_T`・`NAV_RCL_ACT`）: [`src/modules/commander/commander_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/commander_params.c) と、シミュレーションの起動のスクリプト [`ROMFS/px4fmu_common/init.d-posix/rcS`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/rcS)。`param set` の表示の形: [`src/systemcmds/param/param.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/systemcmds/param/param.cpp)。
-- 仮想ジョイスティックの設定: QGroundControl v5.1.5の文書の [Virtual Joystick](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/virtual_joystick.md) と、設定の定義 [`src/Settings/App.SettingsGroup.json`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/Settings/App.SettingsGroup.json)・[`src/FlyView/VirtualJoystick.qml`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/FlyView/VirtualJoystick.qml)（Apache License 2.0 / GPLv3、QGroundControlの開発者）を読んで、自分の言葉でまとめたもの。
+- 仮想ジョイスティックの設定: QGroundControl v5.1.5の文書の [Virtual Joystick](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/virtual_joystick.md)・[Fly View Settings](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/fly_view.md)（設定の場所は、筆者の環境のv5.1.5の画面で確かめた）と、設定の定義 [`src/Settings/App.SettingsGroup.json`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/Settings/App.SettingsGroup.json)・[`src/FlyView/VirtualJoystick.qml`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/FlyView/VirtualJoystick.qml)（Apache License 2.0 / GPLv3、QGroundControlの開発者）を読んで、自分の言葉でまとめたもの。

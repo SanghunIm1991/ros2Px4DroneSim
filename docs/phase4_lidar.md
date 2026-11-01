@@ -288,7 +288,7 @@ T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で�
 
 ## つまずきやすい点
 
-- **Gazeboの画面に機体が現れない**: T1に `Ready for takeoff!` が出ていても、Gazeboの画面に機体が現れないことがある。このときは、QGCで離陸させようとしても、PX4が命令に応じないことがある。機体が現れなければ、T1のPX4のシミュレーションを Ctrl+C で止めて、起動し直す（3-2節の `make px4_sitl gz_x500_lidar_2d_walls`）。初めて起動するワールドと機体の組み合わせは、読み込みに時間がかかることがある（T1に `Waiting for Gazebo world...` が何度も出る）。
+- **Gazeboの画面に機体が現れない**: T1に `Ready for takeoff!` が出ていても、Gazeboの画面に機体が現れないことがある。このときは、QGCで離陸させようとしても、PX4が命令に応じないことがある。機体が現れなければ、T1のPX4のシミュレーションを Ctrl+C で止めて、起動し直す（3-2節の `make px4_sitl gz_x500_lidar_2d_walls`）。初めて起動するワールドと機体の組み合わせは、読み込みに時間がかかることがある（T1に `Waiting for Gazebo world...` が何度も出る）。起動した後でも、Gazeboの左下のリセットのボタン（3つのボタンの右端）を押すと、機体が消える（フェーズ1の3節）。このときも、起動し直す。
 
   ![機体が現れなかったときのGazeboのウィンドウ。左の3Dの画面に、壁のワールドを引きで見た全体が写っているが、機体は無い。右下のEntity Treeには default・ground_plane・box1・box2・box3・box4・sunUTC だけが並び、x500_lidar_2d_0 が無い](img/phase4_gazebo_no_vehicle.png)
 
