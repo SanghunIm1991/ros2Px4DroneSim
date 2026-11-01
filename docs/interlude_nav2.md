@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: フェーズ6の2節（コストマップ・計画器・ライフサイクル）を、Nav2全体の中に置き直す。Nav2の使い方を網羅する章ではなく、この教材の機体（ドローン）から見て、どこまで使えて、どこから先は地面を走るロボット向けか、の見通しを付ける。
 >
-> **期待する結果の出どころ**: （作成中）Nav2の部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチのソース（2026-10-31に読んだもの）で確かめた。1-1節の表の部品が、aptで入る版（1.3.13）ですべて入ることは、導入の表示で確かめた。aptで入る版は、このブランチの最新より少し古いことがあるので、設定の名前などに違いがあるかは確かめていない。4節のコマンドの表示は想定したもので、まだ動かしていない。
+> **期待する結果の出どころ**: （作成中）Nav2の部品の一覧・プラグインの名前・設定の名前は、Nav2の `jazzy` のブランチのソース（2026-10-31に読んだもの）で確かめた。1-1節の表の部品が、aptで入る版（1.3.13）ですべて入ることは、導入の表示で確かめた。プラグインの名前・設定の名前は、導入した版（1.3.13）のファイルと、計画器を単体で起動したとき（PX4とGazeboは使わず、静的なTFを与えた）の設定の一覧で、同じであることを確かめた（2026-11-01）。4節のコマンドの表示（確かめたときの半径の値は、0.8ではなく1.5。表示の文言は値によらない）、実行中に `width` を変えても配信される地図の大きさが変わらないこと、6節の課題1・2の計画器で「設定」と計画ができることも、この単体の起動で確かめた。RViz2の見た目と、飛行中の経路の変化は想定のまま。
 
 ## 0. 学習目標と完了条件
 
@@ -199,7 +199,7 @@ ros2 param get /global_costmap/global_costmap inflation_layer.inflation_radius
 ros2 param set /global_costmap/global_costmap inflation_layer.inflation_radius 0.8
 ```
 
-**期待する結果**（想定）:
+**期待する結果**（計画器を単体で起動して確かめた表示）:
 
 ```text
 $ ros2 param get /global_costmap/global_costmap inflation_layer.inflation_radius
@@ -209,11 +209,11 @@ $ ros2 param set /global_costmap/global_costmap inflation_layer.inflation_radius
 Set parameter successful
 ```
 
-RViz2の地図（`/global_costmap/costmap`）で、壁の周りの薄い色の範囲が狭くなり、その後の経路（`/plan`）が、壁に少し近い所を通るようになる。コストマップのノードの名前が `/global_costmap/global_costmap` と2回重なるのは、フェーズ6の3-2節のとおり、地図が計画器の中に、`global_costmap` の名前空間の `global_costmap` というノードとして作られているためである。
+RViz2の地図（`/global_costmap/costmap`）で、壁の周りの薄い色の範囲が狭くなり、その後の経路（`/plan`）が、壁に少し近い所を通るようになる（想定）。コストマップのノードの名前が `/global_costmap/global_costmap` と2回重なるのは、フェーズ6の3-2節のとおり、地図が計画器の中に、`global_costmap` の名前空間の `global_costmap` というノードとして作られているためである。
 
 実行中に変えた値は、計画器を止めると消え、次に起動したときは設定ファイルの値に戻る。良い値が見つかったら、設定ファイルに書き写す。
 
-`ros2 param set` が `Set parameter successful` と表示しても、その設定が実行中に効くとは限らない。ROS 2では、宣言されている設定なら、ノードが拒まない限り、値の書き換え自体は成功と表示される。地図の範囲（`width` 等）や格子の細かさ（`resolution`）、プラグインの名前などは、書き換えても、計画器を起動し直すまで効かないことが多い。効いたかどうかは、RViz2の地図や経路の変化で確かめる。効かない設定は、設定ファイルを直し、3-1節のやり直し方で試す。
+`ros2 param set` が `Set parameter successful` と表示しても、その設定が実行中に効くとは限らない。ROS 2では、宣言されている設定なら、ノードが拒まない限り、値の書き換え自体は成功と表示される。地図の範囲（`width` 等）や格子の細かさ（`resolution`）、プラグインの名前などは、書き換えても、計画器を起動し直すまで効かないことが多い。たとえば、Nav2 1.3.13で `width` を50に書き換えると、`Set parameter successful` と表示され、`ros2 param get` も50を返すが、書き換えてから数秒後に受け取った地図（`/global_costmap/costmap`）でも、幅は350格子（35m）のままだった。効いたかどうかは、RViz2の地図や経路の変化で確かめる。効かない設定は、設定ファイルを直し、3-1節のやり直し方で試す。
 
 ## 5. まとめ
 
@@ -223,7 +223,7 @@ RViz2の地図（`/global_costmap/costmap`）で、壁の周りの薄い色の�
 
 ## 6. 課題（任意）
 
-1. 計画器を、NavFnから、Smac Planner（格子の上の探し方の一種）の2次元版に替える。`planner.yaml` の `GridBased` の `plugin` を `nav2_smac_planner::SmacPlanner2D` にし、NavFnだけの設定（`use_astar`）を消して、`tolerance` と `allow_unknown` を残す。3-1節のやり直し方で、フェーズ6の6節の経路の形を比べる。
+1. 計画器を、NavFnから、Smac Planner（格子の上の探し方の一種）の2次元版に替える。`planner.yaml` の `GridBased` の `plugin` を `nav2_smac_planner::SmacPlanner2D` にし、NavFnだけの設定（`use_astar`）を消して、`tolerance` と `allow_unknown` を残す。3-1節のやり直し方で、フェーズ6の6節の経路の形を比べる。「設定」のときに、T5に `[ERROR] ... Inflation layer either not found or inflation is not set sufficiently for optimized non-circular collision checking capabilities. ...` が出ることがある。膨らませる半径を、機体の最も大きい幅の半分以上にするよう勧める内容で、この教材の設定（膨らませる半径1.2m、機体の半径0.5m）はそれを満たしているが、Nav2 1.3.13では出た。それでも計画は成功した（計画器を単体で起動して確かめた。原因は確かめていない）。
 2. 同じく、Theta\*（`nav2_theta_star_planner::ThetaStarPlanner`）に替える。Theta\*は、見通しのきく点どうしを直線で結ぶ探し方で、格子の向きに縛られない、折れ曲がりの少ない経路を引く。Theta\*には `tolerance` の設定が無いので、`GridBased` の中身は `plugin` と `allow_unknown` だけにする（目的地の格子が塞がっていると、計画が失敗する）。課題1の経路と比べる。
 3. 4節の方法で、`inflation_layer.cost_scaling_factor` を1.0と10.0に変え、経路が壁からどれだけ離れるかを比べる。
 4. Nav2の文書の「Navigating with Keepout Zones」を読み、フェーズ6の壁のワールドに「通ってほしくない区域」を足すには、どの部品と、どんなファイル（地図の画像と、その説明のファイル）が要るかを書き出す（作るところまではしなくてよい）。

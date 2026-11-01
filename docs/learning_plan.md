@@ -121,9 +121,9 @@
 | 3 | [`docs/phase3_offboard.md`](phase3_offboard.md) | 作成済み（2026-10-31）。T5とT6の表示は確かめた。QGCとGazeboの画面の様子・T1（PX4）の表示・途中で止めたときの動きは想定のまま（[`dev/pending_checks.md`](../dev/pending_checks.md)） |
 | 4 | [`docs/phase4_lidar.md`](phase4_lidar.md) | 下書き（2026-10-31）。表示はすべて想定 |
 | 5 | [`docs/phase5_collision_prevention.md`](phase5_collision_prevention.md) | 下書き（2026-10-31）。表示はすべて想定 |
-| 6 | [`docs/phase6_replan.md`](phase6_replan.md) | 下書き（2026-10-31）。表示はすべて想定 |
+| 6 | [`docs/phase6_replan.md`](phase6_replan.md) | 下書き（2026-10-31）。3-1節のNav2の導入の表示と、計画器を単体で起動したときの表示（5-2節のT5・5-3節・7節の一部。2026-11-01）は確かめた。ほかの表示と飛行は想定 |
 | 間章 | [`docs/interlude_custom_sensor.md`](interlude_custom_sensor.md) | 下書き（2026-10-31）。模型のファイルは `gz sdf -k` の点検だけを通した。起動と飛行の表示は想定 |
-| 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。1-1節の部品がaptの版（1.3.13）ですべて入ることは確かめた。4節の表示は想定 |
+| 間章 | [`docs/interlude_nav2.md`](interlude_nav2.md) | 下書き（2026-10-31）。部品と設定の名前はNav2の `jazzy` のソースで確かめた。1-1節の部品がaptの版（1.3.13）ですべて入ること、名前が同じであること、計画器を単体で起動したときの4節の表示と6節の課題1・2の「設定」は確かめた（2026-11-01）。飛行中の動きは想定 |
 | Tips集 | `docs/tips.md` | 未作成 |
 
 ## 6. 未決事項

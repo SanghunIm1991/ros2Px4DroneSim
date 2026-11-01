@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: フェーズ3（オフボード制御）、フェーズ4（LiDARの値をROS 2へ中継する）、フェーズ5（組み込みの衝突防止にできないこと）を組み合わせる。Nav2は、本来は地面を走るロボットのためのパッケージ群で、この手順書では、その中の地図（コストマップ）と経路の計画器だけを使う。Nav2全体の使い方（自己位置の推定・走行の制御・行動の木など）は扱わない。
 >
-> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2を導入していない環境で書いたので、ほかのビルド・起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。Nav2の設定の名前と既定値、アクションの型は、Nav2の `jazzy` のブランチのソースで確かめた。3-1節のNav2の導入の表示は、筆者の環境で確かめたもの（Nav2 1.3.13）。Nav2の設定の名前・プラグインの名前・アクションの型は、導入した版でも同じであることを確かめた。5-2節のT5の表示、5-3節の表示、7節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。4-3節のビルドの表示は、フェーズ3と4節のファイルを、手順書のとおりに使い捨てのワークスペースに置いてビルドしたもの（同じ日。実行ファイル `replan_flight` ができ、Pythonでモジュールを読み込めることも確かめた）。ほかのビルド・起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -565,13 +565,13 @@ cd ~/px4_ws
 colcon build --packages-select drone_offboard
 ```
 
-**期待する結果**（想定。時間は実行ごとに変わる）:
+**期待する結果**（`<time>` は、ビルドにかかった時間で、実行ごとに変わる）:
 
 ```text
 Starting >>> drone_offboard
-Finished <<< drone_offboard [<時間>]
+Finished <<< drone_offboard [<time>]
 
-Summary: 1 package finished [<時間>]
+Summary: 1 package finished [<time>]
 ```
 
 ## 5. 起動する
@@ -642,17 +642,17 @@ ros2 run drone_offboard replan_flight
 rviz2
 ```
 
-**期待する結果**（抜粋。想定。時刻は実行ごとに変わる）:
+**期待する結果**（抜粋。T5は計画器を単体で起動して確かめた表示、T6は想定。時刻は実行ごとに変わる）:
 
 ```text
 # T5（planner_server）
-[INFO] [<時刻>] [planner_server]:
+[INFO] [1793491285.908555022] [planner_server]:
 	planner_server lifecycle node launched.
 	Waiting on external lifecycle transitions to activate
 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
 
 # T6（replan_flight）
-[INFO] [<時刻>] [replan_flight]: 最初の経路を待つ（計画器の有効化を待つ）
+[INFO] [<time>] [replan_flight]: 最初の経路を待つ（計画器の有効化を待つ）
 ```
 
 T5の計画器は、起動しただけの「未設定」の状態で、外からの切り替えを待っている（2-3節）。T6のノードは、最初の経路が届くまで、TFを送るだけで、機体には何も指示しない。
@@ -676,7 +676,7 @@ ros2 lifecycle set /planner_server configure
 ros2 lifecycle set /planner_server activate
 ```
 
-**期待する結果**（想定）:
+**期待する結果**（計画器を単体で起動して確かめた表示）:
 
 ```text
 $ ros2 lifecycle set /planner_server configure
@@ -686,7 +686,7 @@ $ ros2 lifecycle set /planner_server activate
 Transitioning successful
 ```
 
-「設定」で、計画器は設定ファイルを読み込み、中の地図とアクションの受け口を作る。この時点では、まだ頼みを断るので、T6には「計画器が頼みを断った（有効化を待つ）」が1回出る。「有効化」で、地図がLiDARの値を受け取り始め、頼みを受け付けるようになる。最初の経路が届くと、T6のノードが飛行を始める（6節）。
+「設定」で、計画器は設定ファイルを読み込み、中の地図とアクションの受け口を作る。この時点では、まだ頼みを断るので、T5には `Action server is inactive. Rejecting the goal.` が頼まれるたびに（0.5秒ごとに）出て、T6には「計画器が頼みを断った（有効化を待つ）」が1回だけ出る（T5の行の文言は確かめたもので、繰り返し出ることとT6の表示は想定）。「有効化」で、地図がLiDARの値を受け取り始め、頼みを受け付けるようになる。最初の経路が届くと、T6のノードが飛行を始める（6節）。最初の計画のときに、T5に `[WARN] ... No planners specified in action call. Server will use only plugin GridBased  in server. This warning will appear once.` が1回出る。自作のノードが、どの計画器を使うか（`planner_id`）を指定せずに頼むためで、計画器は `GridBased` の1つだけなので、問題ない。
 
 ## 6. 飛ばして、経路が変わるのを見る
 
@@ -739,7 +739,7 @@ ros2 lifecycle get /planner_server
 ros2 topic hz /plan
 ```
 
-**期待する結果**（抜粋。想定。数は実行ごとに変わる）:
+**期待する結果**（抜粋。`ros2 lifecycle get` は計画器を単体で起動して確かめた表示、`ros2 topic hz` は想定。数は実行ごとに変わる）:
 
 ```text
 $ ros2 lifecycle get /planner_server
