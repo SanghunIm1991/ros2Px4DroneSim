@@ -89,7 +89,7 @@ git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilo
 追跡しているファイルのうち、Markdown・SVG・Gitの設定・ライセンスのファイル以外のものを一覧する。
 
 ```bash
-git ls-files | grep -vE '\.(md|svg)$|^\.git(attributes|ignore)$|^LICENSE(-APACHE-2\.0)?$|^docs/img/phase1_gazebo\.png$|^docs/img/phase4_(gazebo_walls|gazebo_no_vehicle|rviz2)\.png$'
+git ls-files | grep -vE '\.(md|svg)$|^\.git(attributes|ignore)$|^LICENSE(-APACHE-2\.0)?$|^docs/img/phase1_gazebo\.png$|^docs/img/phase4_(gazebo_walls|gazebo_no_vehicle|rviz2)\.png$|^docs/img/phase6_rviz2_[1-5]\.png$'
 ```
 
 模型のファイルの形（SDF・メッシュ等）が追跡されていないかを見る。

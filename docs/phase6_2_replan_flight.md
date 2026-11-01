@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: フェーズ6-1の1-1節の図（最終ゴールの構成）の部品を、すべて同時に動かす。仕組み（コストマップ・計画器・アクション・ライフサイクル・TF・時刻）は、フェーズ6-1の2節で説明した。この手順書の中で仕組みを思い出したくなったら、フェーズ6-1の2節と、4-2節のクラス図に戻る。
 >
-> **期待する結果の出どころ**: （作成中）1-2節のT5の表示、1-3節の表示、3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。ほかの起動・飛行の表示と機体の動きは想定したもので、まだ動かしていない。実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）1-2節のT5・T6の表示、1-3節の表示、2-2節のT6の表示、3節のRViz2の画面は、筆者の環境で、すべてを動かして飛ばしたときのもの（2026-11-01。2-2節のT6の表示は1回目、3節の画面は2回目の飛行）。時刻・経路の長さ・引き直しの回数は、実行ごとに変わる。2-2節と3節の機体の動きの説明は、T6の表示とRViz2の画面から読み取ったもので、Gazeboの画面では確かめていない（壁に触れなかったかも確かめていない）。3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。1-1節のT1〜T4の表示（フェーズ4・フェーズ2と同じ）と、3節の `ros2 topic hz /plan` の表示は、想定したもの。
 
 ## 0. 学習目標と完了条件
 
@@ -143,20 +143,26 @@ ros2 run drone_offboard replan_flight
 rviz2
 ```
 
-**期待する結果**（抜粋。T5は計画器を単体で起動して確かめた表示、T6は想定。時刻は実行ごとに変わる）:
+**期待する結果**（抜粋。筆者の環境で、すべてを動かして確かめた表示。時刻は実行ごとに変わる）:
 
 ```text
 # T5（planner_server）
-[INFO] [1793491285.908555022] [planner_server]:
+[INFO] [<time>] [planner_server]:
 	planner_server lifecycle node launched.
 	Waiting on external lifecycle transitions to activate
 	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [<time>] [planner_server]: Creating
+[INFO] [<time>] [global_costmap.global_costmap]:
+	global_costmap lifecycle node launched.
+	Waiting on external lifecycle transitions to activate
+	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [<time>] [global_costmap.global_costmap]: Creating Costmap
 
 # T6（replan_flight）
 [INFO] [<time>] [replan_flight]: 最初の経路を待つ（計画器の有効化を待つ）
 ```
 
-T5の計画器は、起動しただけの「未設定」の状態で、外からの切り替えを待っている（フェーズ6-1の2-3節）。T6のノードは、最初の経路が届くまで、TFを送るだけで、機体には何も指示しない。
+T5の計画器は、起動しただけの「未設定」の状態で、外からの切り替えを待っている（フェーズ6-1の2-3節）。計画器の中の地図（`global_costmap`）も、別のライフサイクルノードとして作られ、同じく待っている。T6のノードは、最初の経路が届くまで、TFを送るだけで、機体には何も指示しない。
 
 T7のRViz2で、次の順に設定する（フェーズ4の6-2節と同じ操作）。
 
@@ -168,26 +174,51 @@ T7のRViz2で、次の順に設定する（フェーズ4の6-2節と同じ操作
 
 ### 1-3. 計画器を有効にする
 
-T8で、計画器を「設定」してから「有効化」する（フェーズ6-1の2-3節）。
+T8で、計画器を「設定」し、状態を確かめてから「有効化」する（フェーズ6-1の2-3節）。「有効化」すると、最初の経路が届いた時点で、機体がアームして離陸する。QGCとRViz2を見られる状態で実行する。
 
 ```bash
 # T8
 ros2 lifecycle set /planner_server configure
 
+ros2 lifecycle get /planner_server
+
 ros2 lifecycle set /planner_server activate
 ```
 
-**期待する結果**（計画器を単体で起動して確かめた表示）:
+**期待する結果**（T8は筆者の環境で、すべてを動かして確かめた表示。T5は抜粋で、時刻は実行ごとに変わる）:
 
 ```text
+# T8
 $ ros2 lifecycle set /planner_server configure
 Transitioning successful
 
+$ ros2 lifecycle get /planner_server
+inactive [2]
+
 $ ros2 lifecycle set /planner_server activate
 Transitioning successful
+
+# T5（planner_server）
+[INFO] [<time>] [planner_server]: Configuring
+[INFO] [<time>] [global_costmap.global_costmap]: Configuring
+[INFO] [<time>] [global_costmap.global_costmap]: Using plugin "obstacle_layer"
+[INFO] [<time>] [global_costmap.global_costmap]: Subscribed to Topics: scan
+...
+[INFO] [<time>] [planner_server]: Planner Server has GridBased  planners available.
+[INFO] [<time>] [planner_server]: Action server is inactive. Rejecting the goal.
+[INFO] [<time>] [planner_server]: Action server is inactive. Rejecting the goal.
+...
+[INFO] [<time>] [planner_server]: Activating
+[INFO] [<time>] [global_costmap.global_costmap]: Activating
+[INFO] [<time>] [global_costmap.global_costmap]: Checking transform
+[INFO] [<time>] [global_costmap.global_costmap]: start
+...
+[WARN] [<time>] [planner_server]: No planners specified in action call. Server will use only plugin GridBased  in server. This warning will appear once.
 ```
 
-「設定」で、計画器は設定ファイルを読み込み、中の地図とアクションの受け口を作る。この時点では、まだ頼みを断るので、T5には `Action server is inactive. Rejecting the goal.` が頼まれるたびに（0.5秒ごとに）出て、T6には「計画器が頼みを断った（有効化を待つ）」が1回だけ出る（T5の行の文言は確かめたもので、繰り返し出ることとT6の表示は想定）。「有効化」で、地図がLiDARの値を受け取り始め、頼みを受け付けるようになる。最初の経路が届くと、T6のノードが飛行を始める（2節）。最初の計画のときに、T5に `[WARN] ... No planners specified in action call. Server will use only plugin GridBased  in server. This warning will appear once.` が1回出る。自作のノードが、どの計画器を使うか（`planner_id`）を指定せずに頼むためで、計画器は `GridBased` の1つだけなので、問題ない。
+`configure` の `Transitioning successful` は、切り替えができたという表示である。`get` の `inactive [2]` は、「設定」が済み、「有効化」を待っている状態である。`inactive` になっていない（`unconfigured [1]` のまま）ときは、`activate` を実行しても断られる（つまずきやすい点）。
+
+「設定」で、計画器は設定ファイルを読み込み、中の地図とアクションの受け口を作る。T5の `Subscribed to Topics: scan` は、地図がLiDARの値（`/scan`）を受け取る準備ができたという表示である。この時点では、まだ頼みを断るので、T5には `Action server is inactive. Rejecting the goal.` が頼まれるたびに（0.5秒ごとに）出て、T6には「計画器が頼みを断った（有効化を待つ）」が1回だけ出る。「有効化」で、地図がLiDARの値を受け取り始め、頼みを受け付けるようになる。最初の経路が届くと、T6のノードが飛行を始める（2節）。最初の計画のときに、T5に `[WARN] ... No planners specified in action call. Server will use only plugin GridBased  in server. This warning will appear once.` が1回出る。自作のノードが、どの計画器を使うか（`planner_id`）を指定せずに頼むためで、計画器は `GridBased` の1つだけなので、問題ない。
 
 ## 2. 飛ばして、経路が変わるのを見る
 
@@ -199,24 +230,33 @@ Transitioning successful
 
 機体が壁1の西の面に沿って南へ進み、壁1の南の端の角を回ると、壁3の南の面が見え、地図の東の端までの壁3が一度に書き込まれる。南からは入れないことが分かるので、経路が引き直され、北の端を回る経路に変わる。北の端を回る経路は、壁2の東の端と壁1の間の、幅約2.5mの隙間を通る。
 
+ただし、壁は少しずつ見えてくるので、北回りに落ち着くまでに、経路が南回りと北回りの間で何度か行き来することがある。壁の一部が見えたばかりのときは、地図の書き込みが変わる間に、2つの回り道が、0.5秒ごとの計画で交互に選ばれることもあると考えられる。
+
 ### 2-2. 飛ばす
 
 1-3節で計画器を有効にすると、飛行が始まる。
 
-**期待する結果**（T6の抜粋。想定。時刻と経路の長さは実行ごとに変わる）:
+**期待する結果**（T6の抜粋。筆者の環境で確かめた表示。時刻・経路の長さ・引き直しの回数は、実行ごとに変わる）:
 
 ```text
-[INFO] [<時刻>] [replan_flight]: 計画器が頼みを断った（有効化を待つ）
-[INFO] [<時刻>] [replan_flight]: 経路を計画した: 長さ <約19> m
-[INFO] [<時刻>] [replan_flight]: Offboardへの切り替えとアームを指示した
+[INFO] [<time>] [replan_flight]: 計画器が頼みを断った（有効化を待つ）
+[INFO] [<time>] [replan_flight]: 経路を計画した: 長さ 21.4 m
+[INFO] [<time>] [replan_flight]: Offboardへの切り替えとアームを指示した
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 21.3 m → 30.5 m
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 30.4 m → 21.3 m
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 11.6 m → 16.1 m
 ...
-[INFO] [<時刻>] [replan_flight]: 経路を引き直した: 長さ <約8> m → <約45> m
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 37.1 m → 53.0 m
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 53.2 m → 28.4 m
 ...
-[INFO] [<時刻>] [replan_flight]: 目的地に着いたので、着陸を指示した
-[INFO] [<時刻>] [replan_flight]: 着陸してディスアームした。終わる
+[INFO] [<time>] [replan_flight]: 経路を引き直した: 長さ 27.3 m → 35.1 m
+[INFO] [<time>] [replan_flight]: 目的地に着いたので、着陸を指示した
+[INFO] [<time>] [replan_flight]: 着陸してディスアームした。終わる
 ```
 
-最初の経路が届くと、機体はアームして3mの高さまで上がり、最初の経路（南の端を回る経路）に沿って、南へ飛び始める。QGCの飛行モードの表示は **Offboard** になる。壁1の南の端の角を回ったところで、T6に「経路を引き直した」が出て、経路が北の端を回る長い経路に変わり、機体は向きを変えて北へ戻る。向きを変えている間は、LiDARの真後ろの90°が見えないが、地図には、それまでに見た壁が残っているので、経路はその壁を避ける。機体は、壁1の西の面に沿って北へ飛び、壁2と壁1の隙間を抜け、北の端を回って、壁1と壁4の間を南へ下り、目的地の上で着陸する。ディスアームすると、ノードは自分で終わる。
+最初の経路が届くと、機体はアームして3mの高さまで上がり、最初の経路（南の端を回る経路）に沿って、南へ飛び始める。QGCの飛行モードの表示は **Offboard** になる。壁が見えてくるにつれて、T6に「経路を引き直した」が何度か出る。0.5秒の間に長さが行き来する2行（上の表示の 21.3 m → 30.5 m と 30.4 m → 21.3 m）は、2-1節の、2つの回り道が交互に選ばれたものと考えられる。壁1の南の端の角を回り、壁3が見えると、経路は北の端を回る長い経路に落ち着き、機体は向きを変えて北へ戻る。向きを変えている間は、LiDARの真後ろの90°が見えないが、地図には、それまでに見た壁が残っているので、経路はその壁を避ける。機体は、壁1の西の面に沿って北へ飛び、壁2と壁1の隙間を抜け、北の端を回って、壁1と壁4の間を南へ下り、目的地の上で着陸する。ディスアームすると、ノードは自分で終わる。
+
+RTFが低い（シミュレーションが実時間より遅く進む。フェーズ4の5-2節）PCでは、PCの時計で測った飛行の時間は、その分だけ長くなる。
 
 ## 3. 観察する
 
@@ -229,7 +269,29 @@ Transitioning successful
 | Path（`/plan`） | 計画した経路の線。0.5秒ごとに計画し直されるので、少しずつ動く。南からは入れないと分かった時点で、大きく形が変わる |
 | TF | `map` の原点（機体が現れた地点）と、機体（`base_link`）とLiDAR（`link`）の座標系の軸 |
 
-**期待する結果**（想定）: 飛び始めは、地図に壁1の正面と左の壁2だけがあり、経路は壁1の南の端を回っている。機体が角を回ると、壁3が地図の東の端まで書き加えられ、すぐに、経路の線が、北の端を回る形に切り替わる。完了条件のとおり、経路が変わり、機体がぶつからずに回り込んで、目的地に着く。
+**期待する結果**（筆者の環境で、飛行中に撮影したRViz2の画面。2-2節のT6の表示とは別の飛行のもの。見る向きは、撮影ごとにマウスで変えてある。経路の形と、切り替わる時刻は、実行ごとに変わる）:
+
+飛び始めは、地図に壁1と壁2だけがあり、経路（緑の線）は、壁1の端を回って、まだ見ていない側へ延びている。
+
+![RViz2の画面1。灰色の地図の上に、黒い太い帯が2本ある。左上から右下へ長く延びる帯が壁1、右の短い帯が壁2で、帯の周りは段々に薄い灰色になっている。帯の中に、LiDARの点が赤い点の線で重なっている。緑の線の経路が、中央の機体の位置から左上へ延び、壁1の左上の端を回り込んで、壁1の向こう側へ下りている](img/phase6_rviz2_1.png)
+
+壁1に沿って端へ近づくと、LiDARの点が、地図の壁1の端より先まで並び始め、地図の書き込みが増えていく。経路は、形を変える途中である。
+
+![RViz2の画面2。壁1の帯の右下の部分が太くなり、新しい書き込みが加わっている。赤い点の線のLiDARの点が、壁1の帯の左上の端より先まで延びている。緑の線の経路は、壁1の左上の端の近くで途切れた形になっていて、形が変わる途中である。左上に機体の座標の軸があり、地図の原点との間を、TFの表示の線（座標系どうしをつなぐ線）が結んでいる](img/phase6_rviz2_2.png)
+
+壁1と壁3の角が地図に入ると、南からは入れないことが分かり、経路が北回りに切り替わる。
+
+![RViz2の画面3。近づいて見た画面。中央の太い帯が壁1で、その上の端から左へ、壁3の帯が折れ曲がって延び、L字の角になっている。下には壁2の帯がある。緑の線の経路が壁1の両側に見え、画面の下で壁1の端を回ってつながる1本の経路になっている。赤い点の線のLiDARの点が、壁1の帯の中と、壁2の帯の上に重なっている](img/phase6_rviz2_3.png)
+
+機体は、壁2との間の狭い隙間を抜け、壁1の北の端を回り込む。経路は、壁1の向こう側（目的地のある側）へ延びている。
+
+![RViz2の画面4。L字の太い帯（壁1と壁3）と、右の壁2の帯がある。機体の座標の軸は、L字の帯の下の端と壁2の帯の間の狭い隙間にあり、右上の地図の原点との間を、TFの表示の線が結んでいる。緑の線の経路は、機体の位置から帯の下の端を回り込み、L字の内側を上へ延びている](img/phase6_rviz2_4.png)
+
+最後に、壁1・壁3・壁4に三方を囲まれた場所に入り、目的地に着いて着陸する。
+
+![RViz2の画面5。上から見下ろした画面。縦の2本の太い帯と、その上の端をつなぐ横の帯で、下が開いたコの字の形の壁があり、横の帯は、コの字の左上の角より先の左へも延びている。右下には壁2の帯がある。コの字の内側の上の方に、機体の座標の軸と、短い緑の線の経路の端がある。コの字の帯に沿って、赤い点の線のLiDARの点が重なっている](img/phase6_rviz2_5.png)
+
+完了条件のとおり、経路が変わり、機体が回り込んで、目的地に着いて着陸する（筆者の環境では、壁に触れなかったかは、Gazeboの画面では確かめていない）。筆者の環境では、南回りと北回りの間で、経路が何度か切り替わってから、北回りに落ち着いた（2-2節のT6の表示も、別の飛行で同じ傾向だった）。
 
 T8で、計画器の状態と、経路のトピックも見られる。
 
@@ -281,9 +343,14 @@ source ~/px4_ws/install/setup.bash
 
 ## つまずきやすい点
 
+- **`ros2 lifecycle set /planner_server configure` で `Node not found` が出る**: T8のコマンドが、その時点で計画器のノードを見つけられず、切り替えは送られていない。計画器は「未設定」のままなので、そのまま `activate` を実行すると、`Unknown transition requested, available ones are:` と、`configure [1]`・`shutdown [5]` が表示されて断られる。数秒待ってから `configure` をやり直し、`ros2 lifecycle get /planner_server` が `inactive [2]` になってから `activate` を実行する（計画器を起動した直後に、ノードを見つけるのに時間がかかるためと考えられるが、確かめてはいない）。
+- **T5に `Message Filter dropping message: frame 'link' ... for reason 'the timestamp on the message is earlier than all the data in the transform cache'` が出る**: 地図が、LiDARの値を地図に置くためのTF（`map` → `link`）を、その値の時刻の分まで得られず、その値を捨てたという表示である。文言は「キャッシュの全データより前」だが、`tf2_ros` のソースでは、TFを待っても得られなかった場合（待つ時間を過ぎた場合など）も、この文言で表示される。この表示は2.5秒に1回までに間引かれるので、捨てられた数は表示の数より多いことがある。
+  - 飛行中に、間を空けて時々出る程度なら、地図への影響は小さい（筆者の環境では、十数秒〜1分余りに1回出たが、壁は書き込まれ、目的地に着いた）。
+  - ノードが終わった後に2.5秒ごとに出続けるのは、TF（`map` → `base_link`）が送られなくなったためで、問題ない。
+  - 飛行中に2.5秒ごとに出続け、地図に壁が書き込まれないときは、下の「RViz2の地図に壁が書き込まれない」の項目を確かめる。
 - **T6が「最初の経路を待つ」のまま進まない**: 1-3節の有効化をしていない。T8で `ros2 lifecycle get /planner_server` を実行し、`active` かを確かめる。
 - **有効化で止まる・失敗する（T5にTFのエラーが出る）**: 地図が、`map` → `base_link` のTFを見つけられていない。T6のノードが起動していて、T3のAgentがPX4とつながっているか（PX4の位置が届いているか）を確かめる。
-- **RViz2の地図に壁が書き込まれない**: T4の中継に `override_timestamps_with_wall_time:=true` を付けたかを確かめる（フェーズ6-1の2-4節）。T5に、時刻が合わずにLiDARの値を捨てたという警告が出ていないかを見る。設定ファイル（フェーズ6-1の3-2節）の高さの範囲（`min_obstacle_height`・`max_obstacle_height`）も確かめる。
+- **RViz2の地図に壁が書き込まれない**: T4の中継に `override_timestamps_with_wall_time:=true` を付けたかを確かめる（フェーズ6-1の2-4節）。T5に、LiDARの値を捨てたという表示（上の `Message Filter dropping message`）が、2.5秒ごとに出続けていないかを見る。設定ファイル（フェーズ6-1の3-2節）の高さの範囲（`min_obstacle_height`・`max_obstacle_height`）も確かめる。
 - **「経路が見つからない」が出続ける**: 機体のいる格子か、目的地の格子が、膨らませた範囲に入って通れなくなっている。`robot_radius` と `inflation_radius` を小さくするか、`tolerance` を大きくする。
 - **目的地の近くで、着陸せずに浮いたままになる**: 計画器は、目的地の格子が通れないと、`tolerance`（0.5m）以内の近くの格子を代わりの終点にする。経路の終点が目的地から0.5m以上ずれると、ノードの「着いた」の判定（`REACHED_DIST`）に入らない。目的地を壁から離すか、`REACHED_DIST` を少し大きくする。
 - **角を回った直後に、壁に近づきすぎる・ぶつかる**: 引き直される前の経路は、まだ見ていない壁3の中を通っている。目標の点がその上にある間に進みすぎると、壁に近づく。`LOOKAHEAD` を小さくする、`PLAN_PERIOD` を短くする、`inflation_radius` を大きくして角から離れて回らせる、のどれかを試す。
@@ -297,5 +364,6 @@ source ~/px4_ws/install/setup.bash
 - 計画器の起動とライフサイクルの切り替え（`ros2 run nav2_planner planner_server`・`ros2 lifecycle`）: [Nav2](https://github.com/ros-navigation/navigation2)（`jazzy`、Apache License 2.0）のソース（`nav2_planner`）を読んで、自分の言葉でまとめたもの。設定ファイルとノードの出典は、フェーズ6-1の出典のとおり。
 - 中継の時刻の付け替え（`override_timestamps_with_wall_time`）: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEを読んで、自分の言葉でまとめたもの。
 - 壁の配置: フェーズ4の出典のとおり、PX4 v1.17に付属する模型のファイルを読んだもの。
+- 3節の画像（`img/phase6_rviz2_1.png`〜`img/phase6_rviz2_5.png`）は、筆者の環境で撮影したRViz2（ROS 2、Apache License 2.0）の画面である（撮影の日時が写る下のTimeパネルを切り落とした）。写っている地図・経路・点は、この手順書の計画器と自作のノードが作ったもので、Gazeboの模型の形そのものは写っていない。
 - 1節のデータの流れの図（`img/phase6_dataflow.svg`）は、この教材で作ったもの。PX4がGazeboから受け取る値（IMU・磁気・気圧・GPS・LiDAR等）と、モーターへの指令は、PX4 v1.17のソース（`src/modules/simulation/gz_bridge`）を読んで確かめた。
 
