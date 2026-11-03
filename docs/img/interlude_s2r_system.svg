@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 550" width="1160" height="550" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="実機の構成の例。中央の列はフライトコントローラの側で、上の「フライトコントローラにつなぐ部品」（GPS・磁気センサ・衝突防止の距離センサ）が、シリアル・I2C・CANで、中央のフライトコントローラ（PX4。推定・制御・フェイルセーフ）につながり、PX4はPWM・DShotで、下のESC・モーターを回す。右の列はコンパニオンコンピュータの側で、上の「コンパニオンにつなぐ部品」（LiDAR・深度カメラ・VIOのカメラ）が、USB・Ethernetで、中央のコンパニオンコンピュータ（Linux・ROS 2。Agent・ドライバのノード・計画器・自作のノード）につながる。フライトコントローラとコンパニオンコンピュータは、uXRCE-DDS（シリアルかEthernet）でつながる。左の列は人の側で、地上局（QGC）は無線のMAVLinkでフライトコントローラとやり取りし、送信機は無線でフライトコントローラに操縦を送る">
+<title>実機の構成の例。中央の列はフライトコントローラの側で、上の「フライトコントローラにつなぐ部品」（GPS・磁気センサ・衝突防止の距離センサ）が、シリアル・I2C・CANで、中央のフライトコントローラ（PX4。推定・制御・フェイルセーフ）につながり、PX4はPWM・DShotで、下のESC・モーターを回す。右の列はコンパニオンコンピュータの側で、上の「コンパニオンにつなぐ部品」（LiDAR・深度カメラ・VIOのカメラ）が、USB・Ethernetで、中央のコンパニオンコンピュータ（Linux・ROS 2。Agent・ドライバのノード・計画器・自作のノード）につながる。フライトコントローラとコンパニオンコンピュータは、uXRCE-DDS（シリアルかEthernet）でつながる。左の列は人の側で、地上局（QGC）は無線のMAVLinkでフライトコントローラとやり取りし、送信機は無線でフライトコントローラに操縦を送る</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1160" height="550" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M580,130 L580,220" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1010,130 L1010,220" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M580,330 L580,420" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M710,275 L880,275" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<path d="M280,300 L450,300" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M280,75 L365,75 L365,250 L450,250" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<rect x="20" y="20" width="260" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="20" y="220" width="260" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="450" y="20" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="450" y="220" width="260" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="450" y="420" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="880" y="20" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="880" y="220" width="260" height="110" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="150" y="59" text-anchor="middle" font-weight="bold">地上局（QGC）</text>
+<text x="150" y="79" text-anchor="middle">地上のPCで、状態を</text>
+<text x="150" y="99" text-anchor="middle">見守り、モードを変える</text>
+<text x="150" y="259" text-anchor="middle" font-weight="bold">送信機</text>
+<text x="150" y="279" text-anchor="middle">人が操縦を</text>
+<text x="150" y="299" text-anchor="middle">取り戻す手段</text>
+<text x="580" y="59" text-anchor="middle" font-weight="bold">フライトコントローラにつなぐ部品</text>
+<text x="580" y="79" text-anchor="middle">GPS・磁気センサ・</text>
+<text x="580" y="99" text-anchor="middle">衝突防止の距離センサ</text>
+<text x="580" y="259" text-anchor="middle" font-weight="bold">フライトコントローラ</text>
+<text x="580" y="279" text-anchor="middle">PX4: 推定・制御・</text>
+<text x="580" y="299" text-anchor="middle">フェイルセーフ</text>
+<text x="580" y="459" text-anchor="middle" font-weight="bold">ESC・モーター</text>
+<text x="580" y="479" text-anchor="middle">PX4の指令で</text>
+<text x="580" y="499" text-anchor="middle">プロペラを回す</text>
+<text x="1010" y="59" text-anchor="middle" font-weight="bold">コンパニオンにつなぐ部品</text>
+<text x="1010" y="79" text-anchor="middle">LiDAR・深度カメラ・</text>
+<text x="1010" y="99" text-anchor="middle">VIOのカメラ</text>
+<text x="1010" y="259" text-anchor="middle" font-weight="bold">コンパニオンコンピュータ</text>
+<text x="1010" y="279" text-anchor="middle">Linux・ROS 2: Agent・</text>
+<text x="1010" y="299" text-anchor="middle">ドライバ・計画器・自作</text>
+<text x="588" y="180" text-anchor="start" font-size="13">シリアル・I2C・CAN</text>
+<text x="1018" y="180" text-anchor="start" font-size="13">USB・Ethernet</text>
+<text x="588" y="380" text-anchor="start" font-size="13">PWM・DShot</text>
+<text x="795" y="267" text-anchor="middle" font-size="13">uXRCE-DDS</text>
+<text x="795" y="297" text-anchor="middle" font-size="13">シリアル・Ethernet</text>
+<text x="365" y="292" text-anchor="middle" font-size="13">操縦（無線）</text>
+<text x="373" y="160" text-anchor="start" font-size="13">MAVLink（無線）</text>
+<rect x="20" y="432" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="48" y="445">人と地上の機材</text>
+<rect x="20" y="459" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="48" y="472">PX4（フライトコントローラ）</text>
+<rect x="20" y="486" width="20" height="14" rx="3" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="48" y="499">ROS 2で動くもの</text>
+<rect x="20" y="513" width="20" height="14" rx="3" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="48" y="526">機体の部品（ハードウェア）</text>
+</g></svg>
