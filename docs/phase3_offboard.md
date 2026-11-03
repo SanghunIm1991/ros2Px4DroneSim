@@ -72,6 +72,12 @@
 
 `param2` の6は、PX4のモードの番号（`px4_custom_mode.h` の `PX4_CUSTOM_MAIN_MODE_OFFBOARD`）である。`param1` の1は、「`param2` の番号をPX4のモードの番号として読む」という意味である。
 
+**実機に載せるときに知っておくこと**: 上の約束は、実機でも同じである。ただし、次の3つは、シミュレーションの中では気づきにくい。
+
+- **合図は、ノードが動いている証拠にすぎない**: PX4の文書の Offboard Mode のページは、この合図を、外のプログラムが健全であることの「生きている証拠」と呼ぶ。PX4が見張るのは、合図が毎秒2回より多く届くかどうかで、送られてくる目標が正しいかまでは見ない。ノードの中の計算が誤っていても、合図が届いている限り、PX4はその目標に向かって飛ぶ。
+- **オフボード制御の間は、PX4に組み込みの衝突防止が働かない**: PX4には、障害物の手前で止まる衝突防止の機能があるが、Position modeのような手動のモードの中でだけ働く（PX4の文書の Collision Prevention のページ。フェーズ5の1節と7節で説明し、6節で試す）。衝突防止を有効にしていても、オフボード制御で飛ばしている間は、ノードが壁の向こうの目標を送れば、機体は壁にぶつかる。オフボード制御では、障害物を避けるのは、目標を決める外のプログラムの役目になる（フェーズ6）。
+- **このノードは、自分でアームする**: このノードは、試験を簡単にするために、Offboardへの切り替えとアームを自分で指示する。実機では、プロペラが回り出す判断を、プログラムだけに任せないほうがよい。周りの安全を人が確かめてからアームし、いつでも送信機で操縦を取り戻せるようにしておく（この段落の考え方は、筆者の整理である）。PX4には、送信機のスティックを動かすとPosition modeに移る設定（`COM_RC_OVERRIDE`）があるが、PX4の文書によると、Offboardのモードでは既定で無効である。
+
 ## 3. ENUで考え、NEDで送る
 
 経由点は、ROS 2の慣習のENU（東・北・上）で考えたほうが分かりやすい。一方、PX4に送る `TrajectorySetpoint` の位置と向きは、NED（北・東・下）でなければならない（フェーズ0の8節）。そこで、ノードの中に、直すための関数を2つ置く。
@@ -540,3 +546,4 @@ T6の `ros2 topic echo` を Ctrl+C で止める。ノードは、着陸してデ
 - 流れの参考にしたサンプル: [`px4_ros_com`](https://github.com/PX4/px4_ros_com) の `main` のブランチの `src/examples/offboard_py/offboard_control.py`（BSD 3-Clause License、PX4 Development Team）。コードは写しておらず、同じ流れを、この教材で一から書いた。
 - サンプルのコードは、この教材で書いたもの（Apache License 2.0）。
 - 図（`img/phase3_class.svg`）は、この教材で作ったもの。
+- 2節の「実機に載せるときに知っておくこと」: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Offboard Mode](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes/offboard.md)（合図を外のプログラムが健全である証拠とする記述、`COM_RC_OVERRIDE` の既定）と [Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)（衝突防止が働くモード）を読んで、自分の言葉でまとめたもの。アームを人が判断する考え方は、筆者の整理である。

@@ -223,6 +223,8 @@ T3の行の先頭の数は、PCの時刻を、1970年1月1日からの秒数（U
 
 T1には、PX4とAgentが時刻を合わせた（`synchronized with time offset`）行と、`successfully created rt/fmu/out/... data writer` の行が、PX4が出すトピックの数だけ並ぶ。`rt/` は、ROS 2のトピックをDDSの上で表すときに付く印で、ROS 2の側では `/fmu/out/...` と見える。
 
+**実機では**: この教材では、PX4もAgentも同じPCの上で動くので、同じPCの中のUDP（相手は `127.0.0.1`）でつながる。実機では、PX4はフライトコントローラの上で、Agentはコンパニオンコンピュータ（フェーズ0の3-3節）の上で動き、2つの基板を線でつなぐ。PX4の文書によると、PX4の側が対応するつなぎ方は、シリアルとUDP（Ethernet等）の2つで、Ethernetを持つフライトコントローラなら、Ethernetが勧められている。どの口を使うかは、PX4のパラメータ `UXRCE_DDS_CFG`（`TELEM2`・`Ethernet` 等）で決め、シリアルなら、その口の速さも設定する（`TELEM2` なら `SER_TEL2_BAUD`）。シリアルでつなぐ場合は、Agentを、`udp4` の代わりに `serial` を指定し、つないだ口の名前と速さを渡して起動する（Ethernetでつなぐ場合は、`udp4` のままでよい）。時刻合わせ（T1の `synchronized with time offset`）は、実機でも既定で働き、2つの基板の時計のずれ・ずれの増え方・通信の遅れを自動で補う。合わせた結果は、`/fmu/out/timesync_status` のトピックで見られる。ROS 2の側から見たトピックの名前と型は、つなぎ方によらず同じである。
+
 T5で、ROS 2のトピックの一覧を見る。
 
 ```bash
@@ -358,6 +360,8 @@ quality: 0
 
 `q` は姿勢のクォータニオンで、4つの数は w・x・y・z の順である。xとyがほぼ0なのは、機体が水平であることを示す。wとzから、機首の向き（方位）を求めると、約96°になる（2×atan(0.743/0.669)。フェーズ1の4節のQGCの方位の95°前後と同じで、東を向いている）。`..._variance` は、それぞれの推定の値のばらつきの大きさ（分散）である。
 
+**実機では、この位置はどこから来るか**: `/fmu/out/vehicle_odometry` の位置と姿勢は、Gazeboが直接教えた値ではない。PX4の推定（フェーズ0の3-2節）が、センサの値から計算した結果である。SITLでは、そのセンサの値（加速度・角速度・磁気・気圧・GPS）を、Gazeboが計算し、PX4の中のモジュール `gz_bridge` が、PX4のセンサのドライバ（センサの信号を読んで、決まった形のデータに直すプログラム）の代わりに受け取っている。実機では、フライトコントローラの上のセンサと、つないだGPSを、PX4のドライバが読む。推定から先は同じコードなので、ROS 2の側からは、同じトピックが同じ形で届く。ただし、GPSの電波が届かない場所（屋内・橋の下等）では、GPSの代わりに位置を知る手段（カメラと慣性センサで位置を推定するVIO等。PX4の文書の Visual Inertial Odometry のページ）を用意し、PX4の推定に渡す必要がある。PX4 v1.17の `dds_topics.yaml` には、その値をROS 2から渡すトピック `/fmu/in/vehicle_visual_odometry` がある。
+
 ### 4-3. 機体の状態を見る
 
 機体のアームの状態と飛行モードは、[`px4_msgs/msg/VehicleStatus`](https://github.com/PX4/px4_msgs/blob/release/1.17/msg/VehicleStatus.msg) の型の `/fmu/out/vehicle_status_v1` に入っている。
@@ -485,3 +489,4 @@ T2のQGCのウィンドウを閉じ、T1で Ctrl+C を押してPX4のシミュ�
 - PX4 v1.17のソースと設定のファイル（作成に使った環境に取得したもの）: [`src/modules/uxrce_dds_client/dds_topics.yaml`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/dds_topics.yaml)（出すトピックの一覧）、[`src/modules/uxrce_dds_client/utilities.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/utilities.hpp)（送り手のQoSが `BEST_EFFORT`・`TRANSIENT_LOCAL` であること、名前の版の印）、[`src/modules/uxrce_dds_client/module.yaml`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/module.yaml)（`UXRCE_DDS_DOM_ID` の既定の0）、[`src/modules/uxrce_dds_client/vehicle_command_srv.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/vehicle_command_srv.cpp)（3節のT3の `replier created` のサービス）、[`src/modules/uxrce_dds_client/dds_topics.h.em`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/dds_topics.h.em) と [`Tools/msg/templates/ucdr/msg.h.em`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/Tools/msg/templates/ucdr/msg.h.em)（4-2節の、`timestamp` と `timestamp_sample` だけを、時刻のずれでPCの時刻に直すこと）
 - [PX4/px4_msgs](https://github.com/PX4/px4_msgs)（`release/1.17`、BSD 3-Clause License、PX4 Development Team）: 型の定義（`VehicleOdometry.msg`・`VehicleStatus.msg`）。2-4節の `ros2 interface show` の表示は、この定義の抜粋である。
 - [eProsima/Micro-XRCE-DDS-Agent](https://github.com/eProsima/Micro-XRCE-DDS-Agent)（v2.4.3、Apache License 2.0）: パッケージの名前（`CMakeLists.txt` の `microxrcedds_agent`）と、依存のライブラリをビルドの途中で取得する作り（`CMakeLists.txt` と `cmake/SuperBuild.cmake`）。
+- 3節と4-2節の、実機でのつなぎ方・時刻合わせ・位置の出どころ（「実機では」の段落）: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [uXRCE-DDS](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/middleware/uxrce_dds.md)（つなぎ方、`UXRCE_DDS_CFG`・`SER_TEL2_BAUD`・`UXRCE_DDS_SYNCT`）、[ROS 2 User Guide](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/ros2/user_guide.md) の「ROS, Gazebo and PX4 time synchronization」、[Companion Computers](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/companion_computer/index.md)（Ethernetを勧める記述）、[Visual Inertial Odometry](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/visual_inertial_odometry.md) と、PX4 v1.17のソースの [`src/modules/simulation/gz_bridge`](https://github.com/PX4/PX4-Autopilot/tree/release/1.17/src/modules/simulation/gz_bridge)（SITLで、Gazeboのセンサの値を読むモジュール）を読んで、自分の言葉でまとめたもの。

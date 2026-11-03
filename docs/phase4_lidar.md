@@ -4,7 +4,7 @@
 
 - 想定環境: [フェーズ3](phase3_offboard.md) を終えたWSL2のUbuntu 24.04
 - 所要の目安: 1コマ
-- 必須の範囲: 1〜8節（9節の課題は任意）
+- 必須の範囲: 1〜9節（10節の課題は任意）
 - 前提（親プロジェクト）: なし（`ros_gz_bridge` とRViz2の使い方は、この手順書で書く）
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の4節の図の「ros_gz_bridge」の道（Gazeboの値を、PX4を通さずにROS 2へ出す道）を、実際に動かす。親プロジェクトにも、`ros_gz_bridge`（[フェーズ5-4](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase5_4_gazebo_plant.md)）と、RViz2（[間章](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/interlude_urdf_rviz.md)）の説明がある。どちらも車両の文脈が中心なので、前提にはせず、さらに詳しく知りたい場合の参考にする。
@@ -19,6 +19,7 @@
 2. PX4に付属するLiDAR付きの機体を、壁のワールドで起動できる（3節）。
 3. Gazeboのトピックを `ros_gz_bridge` でROS 2へ中継し、`ros2 topic` で見られる（4節・5節）。
 4. RViz2で、LiDARの値を障害物の形として表示できる（6節）。
+5. 実機では、LiDARの値がどこから来るか（ドライバと、そのつなぐ先）と、Gazeboの値と合わせる点を説明できる（8節）。
 
 **完了条件**（すべて満たしたら完了）:
 
@@ -277,11 +278,35 @@ PX4の既定の設定では、自動のモードで目標の地点が少し離�
 
 確かめたら、QGCの **Land** で着陸させる（フェーズ1の5-3節）。
 
-## 8. 止める
+## 8. 実機では、LiDARの値はどこから来るか
+
+この手順書では、LiDARの値を、Gazeboが計算し、`ros_gz_bridge` がROS 2の `/scan` に中継した。実機の機体には、Gazeboも `ros_gz_bridge` も無い。代わりに、本物のLiDARと、そのドライバがある。
+
+LiDARの製品は、ふつう、ROS 2のメッセージを自分では出さない。測った距離を、メーカーが決めた形式のバイト列にして、USB（中身はシリアルの通信）・シリアル・Ethernetの線で送り出す。このバイト列を読み、決まった形のデータに直すプログラムを、**ドライバ**と呼ぶ。ドローンでは、LiDARをどこにつなぐかで、ドライバの置き場所が2通りに分かれる。
+
+| つなぐ先 | 読むドライバ | 値の行き先 | この教材で当たる道 |
+|---|---|---|---|
+| コンパニオンコンピュータ（フェーズ0の3-3節） | コンパニオンコンピュータの上で動く、ROS 2のドライバのノード（LiDARのメーカーや、ROS 2の利用者の集まりが公開している） | ROS 2のトピック（`sensor_msgs/msg/LaserScan` 等） | この手順書の `ros_gz_bridge` の道（フェーズ6で使う） |
+| フライトコントローラ | PX4の中のドライバ | PX4の中のトピック（uORB） | 2-1節の、PX4がLiDARの値を自分で受け取る道（実機での形は、フェーズ5の7節で扱う） |
+
+1つ目の道では、`ros_gz_bridge` が、ドライバのノードの代わりをしていたことになる。ドライバのノードも、同じ `LaserScan` の型で値を出すので、値を受け取る側（RViz2や、フェーズ6の計画器）は、型を変えずにそのまま使える。ドライバのノードの例として、SlamtecのRPLIDARの `sllidar_ros2` や、北陽電機の測域センサの `urg_node` がよく知られている（どちらも、この教材では確かめていない一般的な例である）。
+
+ただし、次の4つは、Gazeboの値と同じにはならない。実機に移すときは、ここを合わせる。
+
+- **座標系の名前**: 5-2節の `frame_id` の `link` は、Gazeboの模型の部品の名前から来ている。実機では、ドライバのノードの設定で決まる名前（例: `laser`）になる。RViz2の固定フレーム（6-1節）や、フェーズ6-1の4-3節の `send_lidar_tf` が送る、機体からLiDARへの動かないTF（`base_link` → `link`）は、この名前に合わせる。
+- **取り付けの位置と向き**: 模型では、LiDARの位置と向きが、模型のファイルに書いてある。実機では、機体に取り付けた位置と向きを測って、同じTF（フェーズ6-1の4-3節の定数 `LIDAR_OFFSET`）に書く。向きを取り違えると、壁が反対の側に見える。
+- **時刻**: 5-2節の `stamp` は、Gazeboの中の時計だった。実機のドライバのノードは、ふつう、コンパニオンコンピュータの時計で時刻を付ける（ドライバによって違うので、それぞれの説明で確かめる）。フェーズ6-1の2-4節の時刻の付け替えは、Gazeboの時計とPCの時計がずれるシミュレーションだけで要る対処である。
+- **トピックの名前と、値の質**: トピックの名前は、ドライバのノードの設定かリマップ（5-1節）で `/scan` にそろえる。実機の値には、Gazeboの値には少ない雑音や、測り損ね（光を返しにくい黒い面やガラス、強い日差し）が混じることがある（一般的な注意で、この教材では確かめていない）。
+
+7節で見た、機体が傾くとLiDARの面も傾く性質は、実機でも同じである。2DのLiDARは、センサの高さの面の上しか測らないので、加速や減速のときに、地面を壁と見たり、面より低い物を見落としたりする。
+
+シミュレーションの道は、実機に移した後も残しておく価値がある。ソフトウェアが未完成な段階の試し（PoC）や、不具合の切り分けを、機体を壊す心配なしに何度でも行えるからである。値を受け取る側を、トピックの名前・型・座標系の名前だけで作っておけば、`ros_gz_bridge` とドライバのノードを差し替えるだけで、同じプログラムをシミュレーションと実機の両方で動かせる。
+
+## 9. 止める
 
 T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で止める。T2のQGCのウィンドウを閉じ、T1のPX4のシミュレーションを Ctrl+C で止める。
 
-## 9. 課題（任意）
+## 10. 課題（任意）
 
 1. 5-2節の `ros2 topic echo` の `--no-arr` を外し、`--field ranges` を付けて、距離の並びを表示する。機体を原点に置いたまま（起動し直した直後）、並びの真ん中（540番目付近）の値が、正面の壁1までの距離（約4.4m）になっていることを確かめる。何番目が左の真横（90°）に当たるかを、`angle_min` と `angle_increment` から計算し、その値が左の壁2までの距離になっていることも確かめる。
 2. フェーズ3-0を参考にして、`/scan` を購読し、正面（角度0の付近）の距離を毎回ログに出すノードを書く。QGCで機体を壁1に向かって近づけ、ログの距離が小さくなることを確かめる（7節と同じく、地図を拡大して指し、壁の手前1.5mより近くには移動させない）。
@@ -309,3 +334,4 @@ T6のRViz2のウィンドウを閉じ、T4の `parameter_bridge` を Ctrl+C で�
 - 3節・6節と「つまずきやすい点」の画像（`img/phase4_gazebo_walls.png`・`img/phase4_rviz2.png`・`img/phase4_gazebo_no_vehicle.png`）は、筆者の環境で撮影したGazebo（Open Source Robotics Foundation、Apache License 2.0）とRViz2（ROS 2、Apache License 2.0）の画面である（`img/phase4_gazebo_no_vehicle.png` は画面の外の写り込みを除くために端を、`img/phase4_rviz2.png` は撮影の日時とPCの実測値が写る下のTimeパネルを、切り落とした）。写っている壁のワールド `walls` と、機体の模型 `x500_lidar_2d`（`x500` とLiDARの `lidar_2d_v2`）は、PX4に付属するGazeboの模型（[PX4-gazebo-models](https://github.com/PX4/PX4-gazebo-models)。リポジトリの `LICENSE` によると、Copyright (c) 2022, PX4 Autopilot for Drones、BSD 3-Clause License。機体の本体の [`models/x500_base`](https://github.com/PX4/PX4-gazebo-models/tree/main/models/x500_base) は、そのフォルダの `LICENSE` によると、Copyright (c) 2022, Rudis Laboratories、BSD 3-Clause License）で、模型のファイルそのものは、このリポジトリに含まない。
 - `parameter_bridge` の引数の書き方: [`ros_gz_bridge`](https://github.com/gazebosim/ros_gz/blob/jazzy/ros_gz_bridge/README.md)（`jazzy`、Apache License 2.0、Open Source Robotics Foundation）のREADMEと、使い方の表示を読んで、自分の言葉でまとめたもの。
 - `sensor_msgs/msg/LaserScan` の項目: ROS 2の [`common_interfaces`](https://github.com/ros2/common_interfaces)（`jazzy`、Apache License 2.0）の定義。
+- 8節の、実機のLiDARとドライバの説明は、一般に知られている情報を、筆者の言葉でまとめたもの（ドライバのノードの例と、実機の値の質の注意は、この教材では確かめていない）。フライトコントローラにつなぐ道のPX4のドライバは、フェーズ5の出典のとおり。

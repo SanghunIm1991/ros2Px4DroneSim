@@ -19,6 +19,7 @@
 2. 衝突防止のパラメータを、PX4のシェルで設定し、元に戻せる（3節・4節・8節）。
 3. QGCの仮想ジョイスティックで、機体をPosition modeで飛ばせる（5節・6節）。
 4. 組み込みの衝突防止ができることと、できないことを説明できる（6節・7節）。
+5. 実機では、衝突防止の距離がどこから来るかと、センサをフライトコントローラとコンパニオンコンピュータのどちらにつなぐかの考え方を説明できる（7節）。
 
 **完了条件**（すべて満たしたら完了）:
 
@@ -180,6 +181,14 @@ QGCで、フェーズ1の5-1節と同じように機体を離陸させる（初�
 
 そこでフェーズ6では、ROS 2のノードが、フェーズ4のLiDARの値から障害物を見つけ、壁を避ける経由点を計画し直して、オフボード制御で飛ばす。
 
+**実機では、衝突防止の距離はどこから来るか**: この手順書では、1節の表の1のとおり、PX4の中のGazeboとの中継のモジュール（`gz_bridge`）が、GazeboのLiDARの値を受け取り、区画ごとの距離（PX4の中のトピック `obstacle_distance`）にまとめた。実機では、距離センサをフライトコントローラのシリアルやI2Cの口につなぎ、PX4の中のドライバが、同じ `obstacle_distance` などのトピックを出す。たとえば、PX4の文書が衝突防止にそのまま使えるとしている回転式のLiDAR（LightWare SF45）のドライバ（PX4 v1.17のソースの `lightware_sf45_serial`）は、シリアルで値を読み、`gz_bridge` と同じ `obstacle_distance` を出す。そこから先の衝突防止は、シミュレーションと同じコードである。ほかの距離センサは、PX4の文書によると、向きと見る範囲をドライバに設定する改造が要る。
+
+シミュレーションでは、1つのLiDARの値が、PX4（この手順書）と、ROS 2（フェーズ4の `ros_gz_bridge` と、フェーズ6の計画器）の両方に配られていた。実機では、1つのセンサは、ふつうフライトコントローラとコンパニオンコンピュータのどちらか一方に直接つなぎ、もう一方へは通信で渡すことになる（下の `/fmu/in/obstacle_distance` がその例）。そのため、それぞれに別のセンサを付けることが多い（この分け方は、筆者の整理である）。たとえば、飛行を守る最低限の距離センサをフライトコントローラに直接つなぎ、計画に使うLiDARや、深度カメラ（画素ごとの距離を測るカメラ）のように計算の重いセンサを、コンパニオンコンピュータにつなぐ。PX4の文書には、コンパニオンコンピュータで処理した距離を、PX4の衝突防止に渡す方法（MAVLinkの `OBSTACLE_DISTANCE`。ROS 2では `/fmu/in/obstacle_distance` のトピックもある）も書かれているが、同じ文書で「今は試験されていない」とされている。
+
+フライトコントローラに直接つなぐ利点は、遅れの小さいことと、コンパニオンコンピュータが止まっても働くことである。PX4の文書によると、直接つないだ距離センサの遅れは0とみなせるが、外の画像の処理を通した値の遅れは、0.2秒にもなる（遅れは、パラメータ `CP_DELAY` で衝突防止に教える）。また、距離の値が0.5秒届かないと、水平の動きを止め、5秒届かないとHoldに移る（「つまずきやすい点」の、前へ倒しても動かない場合と同じ仕組み）。
+
+ただし、フライトコントローラに直接つないだ衝突防止のセンサも、上の表のとおり、手動のモードの中でしか働かない。フェーズ6のように、オフボード制御で自動で飛んでいる間の歯止めにはならない。自動で飛ぶ間に障害物を避け、危ないときに止まるのは、目標を決める外のプログラムの役目である（フェーズ6-2の5節）。
+
 ## 8. 止めて、元に戻す
 
 QGCの **Land** で着陸させる（フェーズ1の5-3節）。ディスアームしたら、T1で、衝突防止を元の無効に戻す。
@@ -235,3 +244,4 @@ rviz2
 - 衝突防止の仕組みとパラメータ: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md) を読んで、自分の言葉でまとめたもの。パラメータの既定値: PX4 v1.17のソースの [`src/lib/collision_prevention/collisionprevention_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/collisionprevention_params.c)。距離の値が途切れたときの動き: 同じフォルダの [`CollisionPrevention.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/CollisionPrevention.cpp)。
 - Position modeの方式（`MPC_POS_MODE`）: PX4 v1.17のソースの [`src/modules/mc_pos_control/multicopter_position_mode_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_pos_control/multicopter_position_mode_params.c)。操縦の入力の出どころと、途切れたときの動き（`COM_RC_IN_MODE`・`COM_RC_LOSS_T`・`NAV_RCL_ACT`）: [`src/modules/commander/commander_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/commander_params.c) と、シミュレーションの起動のスクリプト [`ROMFS/px4fmu_common/init.d-posix/rcS`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/rcS)。`param set` の表示の形: [`src/systemcmds/param/param.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/systemcmds/param/param.cpp)。
 - 仮想ジョイスティックの設定: QGroundControl v5.1.5の文書の [Virtual Joystick](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/virtual_joystick.md)・[Fly View Settings](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/fly_view.md)（設定の場所は、筆者の環境のv5.1.5の画面で確かめた）と、設定の定義 [`src/Settings/App.SettingsGroup.json`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/Settings/App.SettingsGroup.json)・[`src/FlyView/VirtualJoystick.qml`](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/src/FlyView/VirtualJoystick.qml)（Apache License 2.0 / GPLv3、QGroundControlの開発者）を読んで、自分の言葉でまとめたもの。
+- 7節の「実機では、衝突防止の距離はどこから来るか」: 上の [Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)（対応する距離センサ、遅れ、値が途絶えたときの動き、コンパニオンコンピュータから渡す方法が試験されていないこと）と、PX4 v1.17のソースの [`src/drivers/distance_sensor/lightware_sf45_serial`](https://github.com/PX4/PX4-Autopilot/tree/release/1.17/src/drivers/distance_sensor/lightware_sf45_serial) と [`src/modules/simulation/gz_bridge/GZBridge.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/simulation/gz_bridge/GZBridge.cpp)（どちらも `obstacle_distance` を出すこと）を読んで、自分の言葉でまとめたもの。センサをどちらにつなぐかの分け方は、筆者の整理である。

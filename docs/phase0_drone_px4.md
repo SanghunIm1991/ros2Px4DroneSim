@@ -172,6 +172,8 @@ flowchart LR
 
 Gazeboの中の値を、PX4を通さずに直接ROS 2へ出すこともできる。そのための中継のノードが `ros_gz_bridge` で、フェーズ4では、LiDARの値をこの道でROS 2へ出す。
 
+**実機では、何が入れ替わるか**: 実機の機体には、Gazeboが無い。代わりに、本物の機体とセンサがあり、センサの値は、センサの**ドライバ**（センサが出す信号やバイト列を読み、決まった形のデータに直すプログラム）が読む。SITLでは、PX4の中のGazeboとの中継のモジュール（`gz_bridge`）が、PX4のドライバの代わりにGazeboのセンサの値を読み、`ros_gz_bridge` が、コンパニオンコンピュータ（3-3節）の上で動くセンサのドライバのノードの代わりをしている。実機では、この2か所がドライバに入れ替わる。その先のPX4の推定と制御や、ROS 2のノードは、同じ形のデータを受け取るので、そのまま使えるように作れる。どのデータが、実機ではどこから来るかは、そのデータを使うフェーズ（フェーズ2・4・5・6-1）で見て、最後のフェーズ6-2の5節で一覧にする。SITLは、実機に移した後も、ソフトウェアが未完成な段階の試し（PoC）や、不具合の切り分けを、機体を壊す心配なしに何度でも行う場として使い続けられる。
+
 ## 5. アームと飛行モード
 
 ### 5-1. アームとディスアーム
@@ -398,6 +400,7 @@ NEDでは (1, 0, −2)、ENUでは (0, 1, 2) になる。NEDはxが北・zが下
 | 推力 | プロペラが空気を押し下げた反動で受ける、上向きの力 | 2-1 |
 | 送信機 | 手に持つ無線の操縦機。スティックで機体を操る | 1 |
 | トルク | 機体を回そうとする力 | 3-2 |
+| ドライバ | センサなどが出す信号やバイト列を読み、決まった形のデータに直すプログラム。SITLでは、Gazeboとの中継がその代わりをする | 4 |
 | ノード（ROS 2） | ROS 2の上で動く、1つの役割を持ったプログラム | 1 |
 | 配分 | 推力の合計とトルクを、各モーターの回転の速さに直す処理 | 3-2 |
 | 飛行モード | PX4が、目標をどこから受け取り、どこまで自動で飛ぶかを決める動作の状態 | 5-2 |
@@ -428,6 +431,7 @@ NEDでは (1, 0, −2)、ENUでは (0, 1, 2) になる。NEDはxが北・zが下
   - プロペラの回転の向き（2-2節）: 機体 `x500` の模型の設定（`Tools/simulation/gz/models/x500/model.sdf` の、各ロータの `turningDirection` と、`x500_base` の各ロータの位置）
   - ROS 2の側のトピックの名前と、版の印（7節）: [`src/modules/uxrce_dds_client/dds_topics.yaml`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/dds_topics.yaml)（出すトピックの一覧）と、[`src/modules/uxrce_dds_client/utilities.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/uxrce_dds_client/utilities.hpp)（型の版が0でないとき、名前の末尾に `_v` と版の数を付ける）
   - Gazeboの座標からPX4の座標への変換（8-3節）: [`src/modules/simulation/gz_bridge/GZBridge.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/simulation/gz_bridge/GZBridge.cpp)（ENUからNED、FLUからFRDへの変換）と、ワールドの設定（`Tools/simulation/gz/worlds/default.sdf` の `world_frame_orientation` が `ENU`）
+  - SITLで、Gazeboのセンサの値を読むモジュール（4節の「実機では、何が入れ替わるか」）: 上の `GZBridge.cpp`（IMU・磁気・気圧・GPS・LiDARを購読し、PX4の中のトピックとして出す）
 - ROSの座標系の規約: [REP 105: Coordinate Frames for Mobile Platforms](https://www.ros.org/reps/rep-0105.html)
 - 2節のマルチコプターの飛び方（推力・反動・傾けて進むこと）は、一般的な物理の説明を、筆者の言葉で書いたもの。
 - 図（`img/phase0_*.svg`）は、この教材で作ったもの。

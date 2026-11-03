@@ -105,6 +105,8 @@
 | 6-1の4-1節 | `tf2_ros_py` の依存で、ノードを実行できるか（ビルドとモジュールの読み込みは、使い捨てのワークスペースで確かめた） | できる |
 | 6-2のつまずきやすい点 | 時刻が合わないときのT5の警告の文言 | `Message Filter dropping message: ... the timestamp on the message is earlier than all the data in the transform cache`（2026-11-01。TFが来なくなったとき＝ノードが終わった後の表示で確かめた）。時刻を付け替えないときに同じ文言で出続けるかは未確認 |
 | 6-1のつまずきやすい点 | `package.xml` の1行目の前に空行があるときに、colconが警告を出さずに普通のPythonのパッケージとしてビルドし、`colcon list` の行の最後が `(python)` になるか（筆者の環境で起きたつまずきで見た表示。使い捨ての環境では未確認） | なる。正しいときは `(ros.ament_python)` |
+| 6-2の5-3節・6節の課題6 | 飛行中にT4の中継を止めたとき、機体が古い地図で飛び続け、PX4がフェイルセーフに移らないか | 移らない見込み（`replan_flight` が合図を送り続けるため。コードから推論し、止めて確かめてはいない） |
+| 6-2の5-3節・6節の課題6 | 飛行中にT5の計画器を止めたとき、機体が最後の経路をたどり続け、PX4がフェイルセーフに移らないか | 移らない見込み（同上） |
 
 ## 間章（[`docs/interlude_custom_sensor.md`](../docs/interlude_custom_sensor.md)）
 
