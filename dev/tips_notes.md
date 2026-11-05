@@ -67,11 +67,25 @@ Tips集（`docs/tips.md`）と、そこから分けた間章（実機向けの�
   - 時刻: `docs/en/ros2/user_guide.md` の「ROS, Gazebo and PX4 time synchronization」。PCの時計を使うやり方はRTFが1にとても近いときだけ。Gazeboの時計を使うなら `/clock` の中継、全ノードの `use_sim_time`、PX4の `UXRCE_DDS_SYNCT` を止める。`GZBridge.cpp` の `clockCallback` が、受け取るたびにPX4の時計をGazeboの時計にそろえる。`msg.h.em` の受け取りでは、`timestamp`・`timestamp_sample` からずれを引き、今より先なら今、0なら今にする。`UXRCE_DDS_SYNCT` は既定1、起動し直しが要る。
   - `HEADLESS=1` を説明した手順書は無い（申し送りの5-0だけ）。Tips集では、その場で書いた。
 - 2026-11-04: `docs/tips.md` を書き、フェーズ0の「作成予定」・フェーズ6-1の2-4節・学習計画・READMEからつないだ。申し送りの3-4に変更を注記した。外部リンクはすべて200。文脈を持たないサブエージェントのレビュー（高0・中4・低9）を受け、すべて直した（QA表）。
-- 残り: Tips集はpush待ち。4節の間章は、着手の前にユーザーに確かめる。
+- 2026-11-04: Tips集をpushした（`39afc7b`）。
+- 2026-11-05: 4節の間章に着手（ユーザー指示「ツールチェーンについて間章を作ってください。」）。4節の3点を質問し、決めた（4節）。
+- 2026-11-05: `docs/interlude_firmware_build.md` を書き、学習計画・README・環境構築の4-3節・間章「シミュレーションから実機へ」の3-3節からつないだ。文脈を持たないレビュー（高0・中5・低13）を受け、すべて直した（QA表）。導入のスクリプトには `--no-sim-tools` を付けることにした。
+- 残り: 下書きのまま。ツールチェーンを導入した環境で2節・3節を確かめれば、表示を差し替えられる（確かめるかは、ユーザーが決める）。
 
-## 4. 間章「実機向けのファームウェアのビルド」（仮。後回し）
+## 4. 間章「実機向けのファームウェアのビルド」（2026-11-05に作成。`docs/interlude_firmware_build.md`）
 
-決める必要があること（着手の前にユーザーに確かめる）:
+決めたこと（2026-11-05、ユーザー判断。QA表）: (1) ツールチェーンは導入しない（コマンドと表示は、文書とソースから想定して書く下書き）、(2) 書き込みは、QGCでの流れを読み物で、(3) `dds_topics.yaml` の例は、説明だけ。
+
+確かめた事実（PX4 v1.17の文書とソース）:
+- `ubuntu.sh` を `--no-nuttx` なしで実行すると、約40個のaptのパッケージ（`gcc-arm-none-eabi` 等）、ESP32向けのコンパイラ（GitHubから取得して `/opt` に展開、`~/.bashrc` にPATHを1行追記）、`dialout` グループへの追加が加わる。ROS 2・Gazeboを消す・置き換える処理は無い。
+- `building_px4.md`: 目標の名前、`_default` の省略、`upload`（WSL2では使えない）、`make list_config_targets`、FLASHのあふれ。試すだけならビルドは要らない。
+- `dev_env_windows_wsl.md`: WSL2からはUSBの基板を使えないので、Windows版のQGCで、Linuxの場所から `.px4` を選んで書き込む。
+- `firmware.md`: 書き込み前にUSB・電池を外す、USBハブを通さない、Advanced settings → Custom firmware file。
+- `boards/px4/fmu-v6x/`: `arm-none-eabi`・`cortex-m7`、STM32H753、FLASHは1920K、`board_id` は53。`px_uploader.py` は基板の番号が合わないと書き込まない。
+- `dds_topics.yaml`（v1.17）に `/fmu/in/obstacle_distance` はあり、`/fmu/out/obstacle_distance` は無い。
+- `HEADLESS=1` は手順書に無い（Tips集の項目と同じ）。
+
+着手の前に決める必要があったこと（記録として残す）:
 - NuttX向けのツールチェーンを、共通の環境に入れて確かめるか（`ubuntu.sh` を `--no-nuttx` なしで実行し直す。数GB。ROS 2・Gazeboが入った環境への影響を先に調べる）
 - 書き込み（実機が無いので想定のまま）をどこまで書くか
 - 間章「シミュレーションから実機へ」の3-3節（`dds_topics.yaml` を変えてビルドし直す。層【D】）の手順を、ここで見せるか
