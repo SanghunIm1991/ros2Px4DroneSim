@@ -237,7 +237,7 @@ rviz2
 
 ## 次へ
 
-学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。手順書は2つに分けてあり、[`docs/phase6_1_planner_node.md`](phase6_1_planner_node.md)（準備とノード）と [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md)（起動と飛行）である（下書き）。6-4節の「真後ろへは動けない」を、模型のファイルの側から確かめ、真後ろも見える機体を自分で作ってみたい場合は、先に任意の [間章（機体の模型を読み解き、自分でセンサを付ける）](interlude_custom_sensor.md) を読んでもよい。
+学習計画（[`docs/learning_plan.md`](learning_plan.md)）のフェーズ6（計画し直して回避する）へ進む。手順書は2つに分けてあり、[`docs/phase6_1_planner_node.md`](phase6_1_planner_node.md)（準備とノード）と [`docs/phase6_2_replan_flight.md`](phase6_2_replan_flight.md)（起動と飛行）である（下書き）。6-4節の「真後ろへは動けない」を、模型のファイルの側から確かめ、真後ろも見える機体を自分で作ってみたい場合は、先に任意の [間章（機体を定義する）](interlude_custom_sensor.md) を読んでもよい。
 
 ## 出典
 

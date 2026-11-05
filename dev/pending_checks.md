@@ -110,19 +110,19 @@
 
 ## 間章（[`docs/interlude_custom_sensor.md`](../docs/interlude_custom_sensor.md)）
 
-2026-10-31に下書き。1〜3節の模型・ワールド・起動のスクリプトの中身はPX4 v1.17のソースで確かめ、4節の模型のファイルは `gz sdf -k`（形式の点検）を通したが、Gazeboで読み込んではいない。5節の表示と機体の動きは想定である。とくに、次を確かめる。
+2026-10-31に下書き。2026-11-05に、機体を定義する方法の見通しを中心に書き直し、節を組み替えた（下の節の番号は今の版）。1〜3節の模型・ワールド・起動のスクリプト・機体の設定の中身はPX4 v1.17のソースで確かめ、5節の模型のファイルは `gz sdf -k`（形式の点検）を通したが、Gazeboで読み込んではいない。6節の表示と機体の動きは想定である。とくに、次を確かめる。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
-| 5-1節 | `PX4_SYS_AUTOSTART=4013 PX4_SIM_MODEL=gz_x500_lidar_360 ... ./build/px4_sitl_default/bin/px4` で、作った模型の機体が現れるか | 現れる。T1に `env SYS_AUTOSTART: 4013` |
-| 5-1節 | 上の円柱の見た目が、機体の上に正しい位置で出るか | 出る |
-| 5-2節 | `gz topic -l` のトピックの名前が、PX4の決め打ちの形と同じになるか | `/world/walls/model/x500_lidar_360_0/link/link/sensor/lidar_2d_v2/scan` |
-| 5-2節 | `angle_min`・`angle_max`・`angle_increment`・点の数の表示 | −3.1415929794311523・3.1372299194335938・0.004363324027508497・1440 |
-| 5-2節 | RViz2で、左の壁2の点の直線が、フェーズ4より後ろへ延びるか | 延びる |
-| 5-3節 | 衝突防止を有効にしたPosition modeで、真後ろへ動けるか | 動ける |
-| 5-3節 | 離陸してもLiDARの部品が離れないか（`<joint>` の効き） | 離れない |
-| 5-3節 | 360°にしたLiDARの光が、機体自身の部品に当たらないか（真後ろに近い向きの `ranges` に0.1〜0.4mの値が出ないか） | 当たらない |
-| 4-2節 | PX4のフォルダの `git status` の表示 | `Tools/simulation/gz (untracked content)` |
+| 5-2節 | PX4のフォルダの `git status` の表示 | `Tools/simulation/gz (untracked content)` |
+| 6-1節 | `PX4_SYS_AUTOSTART=4013 PX4_SIM_MODEL=gz_x500_lidar_360 ... ./build/px4_sitl_default/bin/px4` で、作った模型の機体が現れるか | 現れる。T1に `env SYS_AUTOSTART: 4013` |
+| 6-1節 | 上の円柱の見た目が、機体の上に正しい位置で出るか | 出る |
+| 6-2節 | `gz topic -l` のトピックの名前が、PX4の決め打ちの形と同じになるか | `/world/walls/model/x500_lidar_360_0/link/link/sensor/lidar_2d_v2/scan` |
+| 6-2節 | `angle_min`・`angle_max`・`angle_increment`・点の数の表示 | −3.1415929794311523・3.1372299194335938・0.004363324027508497・1440 |
+| 6-2節 | RViz2で、左の壁2の点の直線が、フェーズ4より後ろへ延びるか | 延びる |
+| 6-3節 | 衝突防止を有効にしたPosition modeで、真後ろへ動けるか | 動ける |
+| 6-3節 | 離陸してもLiDARの部品が離れないか（`<joint>` の効き） | 離れない |
+| 6-3節 | 360°にしたLiDARの光が、機体自身の部品に当たらないか（真後ろに近い向きの `ranges` に0.1〜0.4mの値が出ないか） | 当たらない |
 
 ## 間章（[`docs/interlude_nav2.md`](../docs/interlude_nav2.md)）
 

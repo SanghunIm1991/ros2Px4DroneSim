@@ -182,7 +182,7 @@ ros2 lifecycle set /planner_server activate
 | 注意して変える | `REACHED_DIST` | 小さすぎると、`tolerance` で経路の終点がずれたときに、着陸しなくなる |
 | 注意して変える | `RETRY_CYCLES` | Offboardへの切り替え・アーム・着陸の指令を送り直す間隔。合図の周期とは別で、フェイルセーフには関係しないが、短すぎると指令が多く流れる |
 | 注意して変える | `choose_target` の機首の向き（`self.yaw = math.atan2(...)`） | 機首を目標の向きに向けるのは、LiDARが前を中心に270°しか測らず、進む向きを見ながら飛ぶためである。向きを固定すると、進む先が見えないまま飛ぶことがある |
-| 変えてはいけない | `LIDAR_OFFSET` | 模型のLiDARの位置（[間章（センサ）](interlude_custom_sensor.md) の2-1節）。模型を変えない限り、変える理由がない |
+| 変えてはいけない | `LIDAR_OFFSET` | 模型のLiDARの位置（[間章（機体を定義する）](interlude_custom_sensor.md) の2-2節）。模型を変えない限り、変える理由がない |
 | 変えてはいけない | `PERIOD`・`send_setpoint`・`engaged`・`on_timer` の切り替えの流れ | オフボード制御の約束（フェーズ3の2節）を守るための部分。合図が毎秒2回より遅くなる（`COM_OF_LOSS_T`）と、PX4がフェイルセーフに移る。送る順を変えると、切り替えが受け付けられなくなる |
 | 変えてはいけない | `enu_to_ned`・`enu_yaw_to_ned`・`enu_position`・`on_position` の座標の変換 | ENUとNEDの変換（フェーズ0の8節）。取り違えると、機体が思わぬ向きへ飛ぶ |
 | 変えてはいけない | `now_us`・TFの時刻 | 時刻の扱い（フェーズ6-1の2-4節）。フェーズ3の4-2節と同じ形を保つ。TFの時刻を変えると、地図にLiDARの点が載らなくなる |

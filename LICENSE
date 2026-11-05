@@ -81,18 +81,18 @@ the author (SanghunIm1991) and the license are credited.
    - docs/img/phase6_rviz2_1.png〜docs/img/phase6_rviz2_5.png
      （docs/phase6_2_replan_flight.md の3節）のRViz2の画面の撮影画像:
      RViz2（ROS 2）, Apache License 2.0
-   - docs/interlude_custom_sensor.md の2-1節で抜粋した模型のファイル
+   - docs/interlude_custom_sensor.md の2-2節で抜粋した模型のファイル
      （x500_lidar_2d の model.sdf）:
      PX4-gazebo-models, Copyright (c) 2022, PX4 Autopilot for Drones,
      BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/LICENSE）
-   - docs/interlude_custom_sensor.md の2-1節で抜粋した模型のファイル
+   - docs/interlude_custom_sensor.md の2-2節で抜粋した模型のファイル
      （x500 の model.sdf）:
      PX4-gazebo-models, Copyright (c) 2022, Rudis Laboratories,
      BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/models/x500/LICENSE）
-   - docs/interlude_custom_sensor.md の2-3節で抜粋した機体の設定のファイル
-     （4013_gz_x500_lidar_2d）:
+   - docs/interlude_custom_sensor.md の3-1節で抜粋した機体の設定のファイル
+     （4013_gz_x500_lidar_2d・4001_gz_x500）:
      PX4-Autopilot, Copyright (c) 2012 - 2023, PX4 Development Team,
      BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）

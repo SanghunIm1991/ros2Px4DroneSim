@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 550" width="1240" height="550" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="機体を定義する部品と、つなぐ名前。中央の列の上の「起動のときの指定」（make の対象の名前か環境変数）が、ワールドの名前で左の列の上のワールドのファイル（地面・壁・光）を、模型の名前で左の列の中段の機体の模型（形・重さ・モーター）を、機体の設定の番号で右の列の上のPX4の機体の設定（airframes/4001 など。CA_ の機体の形、SIM_GZ_EC_ の出力の割り当て）を選ぶ。左の列はGazeboの側で、下段のセンサの部品の模型（lidar_2d_v2 など）を、機体の模型が include で取り込み、機体の模型は起動のときにワールドへ置かれる。右の列はPX4の側で、機体の設定のパラメータを、中段のPX4の飛行のコード（推定・制御・配分）が使う。中央の列の中段の中継（gz_bridge。PX4の中にある）が、機体の模型からセンサの値を受け取り、モーターの指令を送り返す。どちらも決まった名前のトピックでやり取りする。中継とPX4の飛行のコードは uORB でつながる">
+<title>機体を定義する部品と、つなぐ名前。中央の列の上の「起動のときの指定」（make の対象の名前か環境変数）が、ワールドの名前で左の列の上のワールドのファイル（地面・壁・光）を、模型の名前で左の列の中段の機体の模型（形・重さ・モーター）を、機体の設定の番号で右の列の上のPX4の機体の設定（airframes/4001 など。CA_ の機体の形、SIM_GZ_EC_ の出力の割り当て）を選ぶ。左の列はGazeboの側で、下段のセンサの部品の模型（lidar_2d_v2 など）を、機体の模型が include で取り込み、機体の模型は起動のときにワールドへ置かれる。右の列はPX4の側で、機体の設定のパラメータを、中段のPX4の飛行のコード（推定・制御・配分）が使う。中央の列の中段の中継（gz_bridge。PX4の中にある）が、機体の模型からセンサの値を受け取り、モーターの指令を送り返す。どちらも決まった名前のトピックでやり取りする。中継とPX4の飛行のコードは uORB でつながる</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1240" height="550" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M490,75 L280,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M750,75 L960,75" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M530,130 L530,165 L250,165 L250,220" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M150,220 L150,130" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M150,420 L150,330" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1090,130 L1090,220" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M280,255 L490,255" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M490,300 L280,300" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M750,275 L960,275" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<rect x="20" y="20" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="490" y="20" width="260" height="110" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<rect x="960" y="20" width="260" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="220" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<rect x="490" y="220" width="260" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="960" y="220" width="260" height="110" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="420" width="260" height="110" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="150" y="59" text-anchor="middle" font-weight="bold">ワールドのファイル</text>
+<text x="150" y="79" text-anchor="middle">worlds/walls.sdf</text>
+<text x="150" y="99" text-anchor="middle">地面・壁・光</text>
+<text x="620" y="59" text-anchor="middle" font-weight="bold">起動のときの指定</text>
+<text x="620" y="79" text-anchor="middle">make の対象の名前</text>
+<text x="620" y="99" text-anchor="middle">または環境変数</text>
+<text x="1090" y="59" text-anchor="middle" font-weight="bold">PX4の機体の設定</text>
+<text x="1090" y="79" text-anchor="middle">airframes/4001 など</text>
+<text x="1090" y="99" text-anchor="middle">CA_・SIM_GZ_EC_</text>
+<text x="150" y="259" text-anchor="middle" font-weight="bold">機体の模型</text>
+<text x="150" y="279" text-anchor="middle">models/&lt;名前&gt;/model.sdf</text>
+<text x="150" y="299" text-anchor="middle">形・重さ・モーター</text>
+<text x="620" y="259" text-anchor="middle" font-weight="bold">中継（gz_bridge）</text>
+<text x="620" y="279" text-anchor="middle">PX4の中にあり、</text>
+<text x="620" y="299" text-anchor="middle">名前で値をやり取り</text>
+<text x="1090" y="259" text-anchor="middle" font-weight="bold">PX4の飛行のコード</text>
+<text x="1090" y="279" text-anchor="middle">推定・制御・配分</text>
+<text x="1090" y="299" text-anchor="middle">パラメータを使う</text>
+<text x="150" y="459" text-anchor="middle" font-weight="bold">センサの部品の模型</text>
+<text x="150" y="479" text-anchor="middle">models/lidar_2d_v2</text>
+<text x="150" y="499" text-anchor="middle">など</text>
+<text x="385" y="67" text-anchor="middle" font-size="13">ワールドの名前</text>
+<text x="855" y="67" text-anchor="middle" font-size="13">機体の設定の番号</text>
+<text x="390" y="157" text-anchor="middle" font-size="13">模型の名前</text>
+<text x="20" y="180" text-anchor="start" font-size="13">ワールドに置く</text>
+<text x="158" y="380" text-anchor="start" font-size="13">include で取り込む</text>
+<text x="1098" y="180" text-anchor="start" font-size="13">パラメータ</text>
+<text x="385" y="247" text-anchor="middle" font-size="13">センサの値</text>
+<text x="385" y="292" text-anchor="middle" font-size="13">モーターの指令</text>
+<text x="385" y="322" text-anchor="middle" font-size="13">（どちらも決まった名前）</text>
+<text x="855" y="267" text-anchor="middle" font-size="13">uORB</text>
+<rect x="490" y="437" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="518" y="450">起動のときの指定</text>
+<rect x="490" y="467" width="20" height="14" rx="3" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="518" y="480">Gazeboの側（SDFのファイル）</text>
+<rect x="490" y="497" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="518" y="510">PX4の側</text>
+</g></svg>
