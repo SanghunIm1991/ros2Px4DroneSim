@@ -8,7 +8,7 @@
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の、5節（アームと飛行モード）・6節（地上局とMAVLink）・8節（座標系）を、実際に動かして確かめる。用語の意味は、フェーズ0で確かめる。
 >
-> **期待する結果の出どころ**: 2節・5節・6節のT1（PX4のシミュレーション）の表示（`commander status` と `listener` の表示を含む）、7節の止めたときの表示、2節のQGCの警告とメッセージ、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。3節の、リセットのボタンで機体が消えることは、筆者の環境で、フェーズ5のワールド（壁のワールド）で確かめた。5節・6節の、飛んでいる間のQGCとGazeboの様子は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。時刻・位置の値・ログのファイル名とバイト数は、実行ごとに変わる。
+> **期待する結果の出どころ**: 2節・5節・6節のT1（PX4のシミュレーション）の表示（`commander status` と `listener` の表示を含む）、7節の止めたときの表示、2節のQGCの警告とメッセージ、3節のGazeboの右クリックのメニュー、4節のQGCの起動した直後の表示（状態・飛行モード・方位）、5-1節の離陸の高さの初めの値は、筆者の環境で確かめたもの。3節の、リセットのボタンで機体が消えることは、筆者の環境で、フェーズ5のワールド（壁のワールド）で確かめた。5節・6節の、飛んでいる間のQGCとGazeboの様子は、PX4 v1.17のソースと、PX4・Gazebo・QGroundControlの公式の文書から想定したもの（実際の表示と違っていたら直す）。3節の画面なしの起動（`HEADLESS=1`）のT1の表示は、PX4の起動のスクリプトから想定したもの（画面なしで起動でき、LiDARの値が出ることは、フェーズ4の機体で、筆者の環境で確かめた）。時刻・位置の値・ログのファイル名とバイト数は、実行ごとに変わる。
 
 ## 0. 学習目標と完了条件
 
@@ -119,6 +119,31 @@ Gazeboのウィンドウは、3Dの画面（シーン）と、右の一覧（エ
 PX4のシミュレーションでは、Gazeboは再生の状態で始まる（PX4がGazeboを起動するときに、すぐに再生する指定をしているため）。下の再生のボタンで一時停止すると、PX4もGazeboの時計で動いているので（フェーズ0の4節のロックステップ）、PX4の時間も止まる。リセットのボタン（3つのボタンの右端）を押すと、ワールドが読み込んだ直後の状態に戻り、PX4が後から足した機体（環境構築の6節の表示の、`Spawning Gazebo model` の行で足したもの）が消える。この手順書では、一時停止もリセットも使わない。リセットを押して機体が消えたら、T1を止めて起動し直す。
 
 機体は、Gazeboの世界のxの向きを向いて現れる。フェーズ0の8-3節のとおり、Gazeboの世界はENUなので、xの向きは東である。つまり、機体は東を向いて現れる。
+
+**画面なしで起動する（任意）**: Gazeboのウィンドウ（3Dの画面の描画）は、PCの負荷の大きな部分を占める。機体の様子をQGCとPX4のシェルで見れば足りるときは、PX4の起動のコマンドの前に `HEADLESS=1` を付けると、Gazeboを画面なし（ウィンドウを開かない形）で起動できる。PX4の文書は、この形を、使う資源が少なく、読み込みも動きも速くなるとしている。Gazeboの計算（機体の物理とセンサ）は、画面があるときと同じように進み、QGCもこれまでどおりつながる。PCが重く、3Dの画面の右下のRTFが100 %から大きく下がるときに試すとよい（RTFが下がると困る理由は、[Tips集](tips.md) の2-4節）。
+
+```bash
+# T1
+source ~/px4-venv/bin/activate
+
+cd ~/PX4-Autopilot
+
+HEADLESS=1 make px4_sitl gz_x500
+```
+
+**期待する結果**（T1の抜粋。想定。`<username>` はUbuntuのユーザー名）:
+
+```text
+...
+INFO  [init] Starting gazebo with world: /home/<username>/PX4-Autopilot/Tools/simulation/gz/worlds/default.sdf
+INFO  [init] Waiting for Gazebo world...
+...
+INFO  [init] Spawning Gazebo model
+```
+
+Gazeboのウィンドウは開かない。画面ありの起動（2節。環境構築の6節の表示）で `Starting gazebo with world` の次に出る `INFO  [init] Starting gz gui` の行が、出なくなる（PX4の起動のスクリプト `px4-rc.gzsim` は、`HEADLESS` が空のときだけ、Gazeboの画面を起動する）。そのほかの表示と、QGCでの飛ばし方（5節）、止め方（7節）は、画面ありのときと同じである。
+
+この教材には、この節の画面の見方や、フェーズ4・5で壁と機体を見るときのように、Gazeboの画面で確かめる手順がある。その手順では、`HEADLESS=1` を付けずに起動する。
 
 ## 4. QGCの画面の見方
 
@@ -379,13 +404,13 @@ make: *** [Makefile:227: px4_sitl] Interrupt
 
 この手順書の技術的な記述は、次の文書とファイルを読んで、自分の言葉でまとめたもの（逐語の転載ではない）。
 
-- PX4 User Guide（v1.17。[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）: [Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)、[Flight Modes (Multicopter)](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/index.md)、[Takeoff](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/takeoff.md)、[Land](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/land.md)、[Return](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/return.md)
+- PX4 User Guide（v1.17。[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）: [Gazebo Simulation](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/sim_gazebo_gz/index.md)（3節の画面なしの起動〈Headless Mode〉を含む）、[Flight Modes (Multicopter)](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/index.md)、[Takeoff](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/takeoff.md)、[Land](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/land.md)、[Return](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes_mc/return.md)
 - PX4 v1.17のソース（作成に使った環境に取得したもの）
   - `commander` のコマンドの一覧と、離陸・着陸の扱い、状態の表示: [`src/modules/commander/Commander.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/Commander.cpp)（`takeoff` はTakeoffのモードに切り替えてからアームする。地点への移動の指示（`VEHICLE_CMD_DO_REPOSITION`）は、Holdのモードへの切り替えとして扱う。アーム・ディスアーム・離陸と着陸の検知の表示）
   - Returnの高さ（6-3節）: [`src/modules/navigator/rtl.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/rtl.cpp)（`calculate_return_alt_from_cone_half_angle`）と [`src/modules/navigator/rtl_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/rtl_params.c)（`RTL_RETURN_ALT` は60m、`RTL_DESCEND_ALT` は30m、`RTL_MIN_DIST` は10m、`RTL_CONE_ANG` は45°）
   - 位置の原点（6-2節）: [`msg/versioned/VehicleLocalPosition.msg`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/msg/versioned/VehicleLocalPosition.msg)。Landの後に前のモードに戻すこと（6-1節）: [`src/modules/commander/UserModeIntention.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/UserModeIntention.cpp)
   - 離陸の高さの既定: [`src/modules/navigator/mission_params.c`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/navigator/mission_params.c)（`MIS_TAKEOFF_ALT` は2.5m）
-  - Gazeboの起動（すぐに再生する指定と、機体の名前 `x500_0`）: [`ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim)
+  - Gazeboの起動（すぐに再生する指定と、機体の名前 `x500_0`、3節の画面なしの起動で `HEADLESS` が空のときだけ画面を起動すること）: [`ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/px4-rc.gzsim)
 - Gazeboの画面の操作: Gazebo Harmonicの文書の [Understanding the GUI](https://github.com/gazebosim/docs/blob/master/harmonic/GUI_tutorial.md)（Open Robotics）
 - QGCの画面と操作: QGroundControl v5.1.5の文書の [General Settings](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/settings_view/general.md)（単位の設定）・[Fly View](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_view.md)・[Fly View Toolbar](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_view_toolbar.md)・[Fly Tools](https://github.com/mavlink/qgroundcontrol/blob/v5.1.5/docs/en/qgc-user-guide/fly_view/fly_tools.md)
 - 図（`img/phase1_modes.svg`）は、この教材で作ったもの。

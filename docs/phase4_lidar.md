@@ -136,6 +136,8 @@ INFO  [commander] Ready for takeoff!
 
 上の画像は、起動した直後のGazeboのウィンドウである。右下の **Entity Tree** の `box1`〜`box4` がワールドの壁で、`x500_lidar_2d_0` が機体である。機体は小さいので、3Dの画面では、左の壁の右、奥の壁の手前の小さな点に見える（マウスのホイールで拡大すると、形が分かる）。3Dの画面の右下のRTFは、フェーズ1の3節と同じく、PCの速さや負荷で実行ごとに変わる。
 
+PCが重く、RTFが大きく下がるときは、`HEADLESS=1 make px4_sitl gz_x500_lidar_2d_walls` のように、Gazeboを画面なしで起動してもよい（フェーズ1の3節）。画面なしでも、LiDARの値はGazeboの中で計算され、5節の中継でROS 2に出る（筆者の環境で確かめた）。ただし、この節と7節の、Gazeboの画面で壁と機体を見る手順はできなくなる。
+
 ## 4. Gazeboのトピックを見る
 
 ROS 2へ中継する前に、Gazeboの側で、LiDARのトピックが出ていることを確かめる。Gazeboのトピックは、Gazebo自身の通信の仕組み（Gazebo Transport）で流れていて、`ros2 topic` では見えない。見るには、Gazeboのコマンド `gz topic` を使う。
