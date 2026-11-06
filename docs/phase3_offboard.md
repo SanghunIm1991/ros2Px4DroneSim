@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: PX4の公式のサンプル（[`px4_ros_com`](https://github.com/PX4/px4_ros_com) のオフボード制御の例）と同じ流れ（合図を送り続け、1秒たったらOffboardに切り替えてアームする）を、この教材で一から書いた。公式のPythonの例は、`px4_ros_com` の `main` のブランチにだけあり、v1.17では名前に `_v1` が付く位置と状態のトピック（フェーズ0の7節）を、印の無い名前で購読しているので、v1.17ではそのまま使えない。
 >
-> **期待する結果の出どころ**: サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。型の項目と定数は、`px4_msgs`（`release/1.17`）とPX4 v1.17のソースで確かめた。4-2節のクラス図（SVG）は、生成スクリプトの機械点検（はみ出し・重なり・線の交差）を通したもので、見た目は未確認。4-1節のパッケージの作成、5節のビルドとノードのログ、6節の `ros2 topic hz` と `ros2 topic echo` の表示は、筆者の環境で動かして確かめたもの。5節の、QGCとGazeboの画面の様子とT1の表示、QGCのLandやCtrl+Cで途中で止めたときの動きは、PX4 v1.17のソースと公式の文書から想定したもの。時刻は実行ごとに変わる。ビルドの時間はPCによって変わるので `<time>` と書いた。
+> **期待する結果の出どころ**: サンプルのコードは、ROS 2のリンタ（`ament_flake8`）と、Pythonの文法の点検を通したもの。型の項目と定数は、`px4_msgs`（`release/1.17`）とPX4 v1.17のソースで確かめた。4-2節のクラス図（SVG）は、生成スクリプトの機械点検（はみ出し・重なり・線の交差）を通したもので、見た目は未確認。4-1節のパッケージの作成、5節のビルドとノードのログ、6節の `ros2 topic hz` と `ros2 topic echo` の表示は、筆者の環境で動かして確かめたもの。5節の、Landで途中で止めたときのノードの動きと、Ctrl+Cで途中で止めたときのPX4の動き・T1の表示・ノードの例外は、2026-11-06に、画面なしで起動したPX4で確かめた（ほかのシミュレーションと混ざらないように作業フォルダ・Agentのポート等を変え、QGCの代わりにPX4のコマンド `commander land` で着陸を指示し、地上局なしでアームできるように作業フォルダのパラメータ `NAV_DLL_ACT` を0にした）。そのほかの、5節のQGCとGazeboの画面の様子とT1の表示は、PX4 v1.17のソースと公式の文書から想定したもの。時刻は実行ごとに変わる。ビルドの時間はPCによって変わるので `<time>` と書いた。
 
 ## 0. 学習目標と完了条件
 
@@ -469,7 +469,17 @@ ros2 run drone_offboard waypoint_flight
 
 途中で止めたいときは、QGCの左の **Land** のボタンで着陸を指示する。飛行モードがLandに変わると、ノードは「Offboardから別のモードに移った。終わる」と出して終わり、機体はその場に着陸する。
 
-T5でノードを Ctrl+C で止めると、合図が途切れるので、PX4はフェイルセーフ（フェーズ0の9-2節）に移り、Offboardのモードから抜ける。PX4 v1.17の既定の設定では、少しの間Holdで止まった後、送信機がつながっていないので、Returnで離陸した地点へ戻って着陸する（何をするかは、パラメータ `COM_OBL_RC_ACT`・`NAV_RCL_ACT` と、送信機の有無で決まる）。
+T5でノードを Ctrl+C で止めると、合図が途切れるので、PX4はフェイルセーフ（フェーズ0の9-2節）に移り、Offboardのモードから抜ける。PX4 v1.17の既定の設定では、合図が1秒（パラメータ `COM_OF_LOSS_T`）途切れると、送信機がつながっていないので、Returnで離陸した地点へ戻って着陸する（何をするかは、パラメータ `COM_OBL_RC_ACT`・`NAV_RCL_ACT` と、送信機の有無で決まる）。フェーズ0の9-2節の、多くのフェイルセーフが最初に挟むHoldは、オフボード制御の合図が途切れたときには挟まれず、すぐにReturnになる（PX4 v1.17のソースの `failsafe.cpp` の `checkModeFallback` と `framework.cpp`）。T1には、次のように表示される。
+
+**期待する結果**（T1の抜粋。止めた位置によって、高さの数は変わる）:
+
+```text
+WARN  [failsafe] Failsafe activated
+INFO  [navigator] RTL: start return at 6 m (5 m above destination)
+INFO  [navigator] RTL: land at destination
+INFO  [commander] Landing detected
+INFO  [commander] Disarmed by landing
+```
 
 ## 6. 観察する
 
@@ -532,6 +542,7 @@ T6の `ros2 topic echo` を Ctrl+C で止める。ノードは、着陸してデ
 - **ノードを起動しても、機体がアームしない（「Offboardへの切り替えとアームを指示した」が1秒ごとに繰り返される）**: 指令が拒まれているか、届いていない。拒まれた理由は、QGCの画面とT1に表示される。QGCがつながっているか（T1に `Ready for takeoff!` が出たか）を確かめる。T3のAgentとT1のPX4がつながっていないと、指令がPX4に届かない（フェーズ2の3節）。
 - **アームしたが、すぐに降りる・Offboardにならない**: 合図が届いていない。T6で `ros2 topic hz /fmu/in/offboard_control_mode` を見る。
 - **「経由点 0 に着いた」が出ない**: 位置と状態が届いていない。トピックの名前（`_v1`）と、受け手のQoS（`qos_profile_sensor_data`）を確かめる（フェーズ3-0の5節）。
+- **Ctrl+Cで止めたときに、`RCLError: failed to initialize wait set: the given context is not valid, either rcl_init() was not called or rcl_shutdown() was called.` で終わる**: `rclpy.spin` の中で出る例外である。Ctrl+Cを受けたrclpyが先にROS 2の通信を終え、その後に `spin` が次の待ちの準備（wait set）を作ろうとして、通信がもう終わっていた、というエラーと考えられる（ROS 2 Jazzyの `rclpy` の `executors.py`）。フェーズ3-0の5節の `rcl_shutdown already called` と同じく、処理の順番しだいで出たり出なかったりし、終わるときにだけ出る表示なので、PX4の側の動き（5節のReturn）には影響しない。
 - **機体が思わぬ方向へ飛ぶ**: ENUとNEDの取り違えを疑う。`enu_to_ned` を通しているかを確かめる。前の飛行で別の地点に降りたまま使うと、機体が原点から離れているので、最初の経由点へ斜めに飛ぶ。PX4のシミュレーションを起動し直して、機体を原点に戻す（3節）。
 
 ## 次へ

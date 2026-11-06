@@ -160,6 +160,8 @@ PX4の安定版の文書（PX4-Autopilotのリポジトリの `release/1.17` の
 - **QGCなしで飛ばす**: 作業フォルダのパラメータで `NAV_DLL_ACT` を0にすると、地上局がつながっていなくてもアームでき、`px4-commander --instance <番号> takeoff`・`land` で離陸・着陸できる（`rcAndDataLinkCheck.cpp`）。手順書の条件（QGCをつなぐ）とは違うので、確かめた記録にその旨を書く。
 - **作った模型を、PX4のフォルダを書き換えずに試す**: `-w` で作業フォルダを別にすると、起動のスクリプトがPX4の `gz_env.sh` を読まないので、先に読み込んだ後で `PX4_GZ_MODELS` と `GZ_SIM_RESOURCE_PATH` を、PX4の模型へのシンボリックリンクと作った模型を並べた使い捨てのフォルダに向けられる（間章（機体を定義する）の5節の模型を、2026-11-06にこの方法で確かめた）。手順書の方法（`~/PX4-Autopilot` で起動する）では、`gz_env.sh` が読まれて決め打ちになる。
 - **開く受け口**: Agent（`udp4 -p <ポート>`）とPX4のMAVLinkの受け口は、PCのすべてのネットワークで待ち受ける（既定の動き）。確かめる時間は短くし、終わったらすぐ止める。`GZ_IP` を付けないGazeboのコマンドは、発見の通信をPCの外のネットワークへも出すことがあるので、付けて使う。止めた後、PX4のロックのファイル（`/tmp/px4_lock-<番号>`・`/tmp/px4-sock-<番号>`）が残る。
+- **自作のノードを使うときはインスタンス0**: 教材のノードは、PX4への指令の宛先の機体の番号を1に決め打ちしている（`target_system = 1`）。PX4は、インスタンスの番号に1を足した値を `MAV_SYS_ID` にし、commanderは起動のときにだけ読むので、インスタンス0でないと指令が拒まれる。インスタンス0で起動するときは、ほかのPX4が動いていないこと（`pgrep -x px4`）と、`/tmp/px4_lock-0`・`/tmp/px4-sock-0` が無いことを確かめ、終わったら消す。作業フォルダ・`GZ_PARTITION`・Agentのポート・`ROS_DOMAIN_ID` は、ほかと同じく分ける。
+- **ライフサイクルの切り替え**: スクリプトの中で最初に `ros2 lifecycle set` を呼ぶと、デーモンの起動の直後で、ノードが見つからない（`Node not found`）ことがある。先に `ros2 daemon start` をして待ち、成功するまでやり直す。
 - **中継の止め方**: `ros2 run ros_gz_bridge parameter_bridge` を止めても、子の `parameter_bridge` が残ることがあった。確かめるときは、`/opt/ros/jazzy/lib/ros_gz_bridge/parameter_bridge` を直接起動し、そのPIDを止める。
 
 ## 6. 親プロジェクトで得た知見（引き継ぐもの）
