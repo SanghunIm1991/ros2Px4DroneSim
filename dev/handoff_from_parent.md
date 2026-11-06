@@ -151,6 +151,13 @@ PX4の安定版の文書（PX4-Autopilotのリポジトリの `release/1.17` の
 
 親プロジェクトでは、Claudeが確かめるとき、Gazeboは `GZ_IP=127.0.0.1`・`GZ_PARTITION=<別の名前>`、ROS 2は `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST`・`ROS_DOMAIN_ID=<別の番号>` で分けた。PX4のSITLは、これに加えて、MAVLinkとuXRCE-DDSのUDPのポートを使う。ユーザーが同時に練習で動かしているPX4・Agentとポートがぶつからない分け方（PX4のインスタンスの番号・Agentのポート・`ROS_DOMAIN_ID` とPX4の設定の関係）を確かめてから、起動する。
 
+**確かめた分け方（2026-11-06、v1.17.0の起動のスクリプトと `main.cpp` を読み、画面なしで起動して確かめた）**: `make` を使わず、ビルド済みの `build/px4_sitl_default/bin/px4` を直接起動する。
+
+- **PX4**: `-i <番号>`（例: 7）でインスタンスを分ける（MAVLinkのローカルのポート、`MAV_SYS_ID`、`UXRCE_DDS_KEY`、Gazeboの模型の名前 `<模型>_<番号>` が変わる）。`-w <使い捨てのフォルダ>` と、データの場所 `build/px4_sitl_default/etc` を渡すと、パラメータ（`parameters.bson`）とログがそのフォルダに書かれ、ユーザーの `rootfs` には触れない。`-d` でシェルを開かずに起動し、コマンドは `bin/px4-commander --instance <番号> ...` 等のクライアントで送る。
+- **Gazebo**: 起動のスクリプトは `./gz_env.sh` か `../gz_env.sh` を探すので、作業フォルダが別のときは、先に `build/px4_sitl_default/rootfs/gz_env.sh` を読み込んでおく（模型・ワールド・プラグインの場所）。`GZ_IP=127.0.0.1`・`GZ_PARTITION=<別の名前>`・`HEADLESS=1`・`PX4_SYS_AUTOSTART`・`PX4_SIM_MODEL`・`PX4_GZ_WORLD` を付ける。Gazeboのサーバーは、PX4を止めても残ることがあるので、その `GZ_PARTITION` を環境に持つ `gz sim` のPIDだけを止める。
+- **uXRCE-DDS**: `PX4_UXRCE_DDS_PORT=<別のポート>` で、Agentのポートを分ける。インスタンスの番号が0でないと、トピックに名前空間 `px4_<番号>` が付くので、教材と同じ名前にするときは `PX4_UXRCE_DDS_NS=""`（空）にする。`ROS_DOMAIN_ID` を付けると、PX4の `UXRCE_DDS_DOM_ID` がそれに合わせられる。
+- **残る注意**: 地上局向けのMAVLinkの送り先は、インスタンスによらず14550番なので、ユーザーのQGCが開いていると、機体が1台見えてしまう。確かめている間は、QGCを閉じてもらう。
+
 ## 6. 親プロジェクトで得た知見（引き継ぐもの）
 
 Claudeの作業メモにあった知見のうち、このプロジェクトでも効くものを、一般的な書き方にして写す。

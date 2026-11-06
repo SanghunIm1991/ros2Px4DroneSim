@@ -17,16 +17,14 @@
 | 5-2節 | 移動の間のQGCの飛行モードの表示 | **Hold** のまま | PX4のソース（`VEHICLE_CMD_DO_REPOSITION` はHoldへの切り替え） |
 | 5-3節 | 着陸のときのQGCの表示の変化 | 飛行モードが **Land**、機体の状態が **Landing** → **Ready** | QGC v5.1.5の文書 |
 | 6-3節 | `commander mode auto:rtl` の後の、QGCの表示と機体の動き | 飛行モードが **Return** になり、10m以内の地点からなら少し上がってから、離陸した地点へ戻って着陸する（T1の表示は確かめた） | PX4のソース（`rtl.cpp`・`rtl_params.c`） |
-| 6-3節 | `commander` とだけ打ったときの使い方の説明 | `mode` に渡せる名前（`auto:loiter`・`auto:land`・`auto:takeoff`・`auto:rtl`・`posctl`・`offboard` 等）が並ぶ | PX4のソース（`Commander.cpp` の使い方の一覧） |
 | 8節 | 課題2: QGCの飛行モードの一覧から **Land** を選べるか | 選べて、左のボタンと同じことが起きる | QGC v5.1.5の文書 |
 
 ## フェーズ2（[`docs/phase2_ros2_observe.md`](../docs/phase2_ros2_observe.md)）
 
-2026-10-31に下書き。2節（AgentがROS 2 Jazzyの環境でビルドできること、`px4_msgs` のビルド、`ros2 interface show` の表示）は、同じ日に確かめて差し替えた。同じ日に、3節のT3（Agent）とT5（`ros2 topic list`）、4節の `ros2 topic info -v`・`echo`、5節のQoSが合わないときの警告、6節の地面にいるときの表示も確かめて差し替えた。残りは、3節のT1（PX4の側の `uxrce_dds_client` の表示）と、6節の、機体を飛ばしたときの位置の値の変化で、まだ確かめていない。親プロジェクトのフェーズ1の1-3節で設定する `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかは、この設定のある環境で、フェーズ2〜3のトピックが見え、指令も届いたので、見えると確かめた（2026-10-31）。残りの項目は、次のとおりである。
+2026-10-31に下書き。2節（AgentがROS 2 Jazzyの環境でビルドできること、`px4_msgs` のビルド、`ros2 interface show` の表示）は、同じ日に確かめて差し替えた。同じ日に、3節のT3（Agent）とT5（`ros2 topic list`）、4節の `ros2 topic info -v`・`echo`、5節のQoSが合わないときの警告、6節の地面にいるときの表示も確かめて差し替えた。3節のT1（PX4の側の `uxrce_dds_client` の表示）は、2026-11-06に、画面なしで起動したPX4で確かめた。残りは、6節の、機体を飛ばしたときの位置の値の変化で、まだ確かめていない。親プロジェクトのフェーズ1の1-3節で設定する `ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST` のままでPX4のトピックが見えるかは、この設定のある環境で、フェーズ2〜3のトピックが見え、指令も届いたので、見えると確かめた（2026-10-31）。残りの項目は、次のとおりである。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
-| 3節 | T1（PX4）の `uxrce_dds_client` の表示 | `synchronized with time offset ...us` と、`successfully created rt/fmu/out/... data writer` の行が、出すトピックの数（27）だけ並ぶ |
 | 4-3節 | QGCが機体につながっているときの `gcs_connection_lost` と `pre_flight_checks_pass` の値（確かめた表示では `true`・`false` だったので、そのときQGCがつながっていたかを確かめる。本文には載せていない） | つながっていれば `false`・`true` |
 | 6節 | 機体を飛ばしたときの、`--field position` の値の変化 | 離陸で3つ目が約−3、Go to locationで北・東の値が変わり、着陸で0に近づく |
 
@@ -69,8 +67,6 @@
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
-| 4節 | `param set CP_DIST 2` の表示 | `  CP_DIST: curr: -1.0000 -> new: 2.0000` |
-| 4節 | SITLで、変えたパラメータが起動し直しても残るか | 残る（`parameters.bson` に保存） |
 | 4節 | QGCのパラメータの画面の場所 | **Q** → **Vehicle Configuration** → **Parameters** |
 | 5節 | 仮想ジョイスティックの設定の場所と、表示の位置・割り当て | 設定の場所は確かめた（2026-11-01。**Application Settings** → **Fly View** → **Virtual Joystick**。QGCの文書のページの **General** とは違う）。表示の位置・割り当て（左右に操縦桿、左がスロットルと向きで中央に戻る）は想定のまま |
 | 6-1節 | 仮想ジョイスティックを表示していれば、Positionを選べるか | 選べる |
@@ -78,7 +74,6 @@
 | 6-2節 | 左下・右下へ斜めに倒すと、壁から離れる向きに動けるか | 動ける |
 | 6-3節 | 右上へ倒したとき、壁に沿って右へ動くか | 動く |
 | 6-4節 | 真後ろへは動かないか | ほとんど動かない |
-| 8節 | 戻すときの `param set` の表示の先頭の記号 | `+` |
 | 2-2節 | 自動のモードの間に操縦桿を動かすと、Positionに切り替わるか（`COM_RC_OVERRIDE`） | 切り替わる |
 | つまずきやすい点 | 距離の値が届かないときのT1の表示 | `No obstacle data, not moving...` |
 | 9節 | 課題3: `CP_GUIDE_ANG` を0にしたときの、壁に沿う動き | 沿って動くが、速さが落ちる |
@@ -132,5 +127,5 @@
 |---|---|---|
 | 4節 | 実行中に `inflation_layer.inflation_radius` を変えたとき、RViz2の地図の膨らませた範囲と経路が変わるか（表示の文言は確かめた） | 膨らませた範囲が狭くなり、経路が壁に近づく |
 | 6節 | 課題1・2: `SmacPlanner2D`・`ThetaStarPlanner` に替えたときの、飛行中の経路の形（「設定」と計画ができることは確かめた） | 未確認 |
-| 3-1節 | `ros-jazzy-nav2-bringup` を入れたときの、既定の設定ファイルの場所 | `/opt/ros/jazzy/share/nav2_bringup/params/nav2_params.yaml` |
+| 3-1節 | `ros-jazzy-nav2-bringup` を入れたときの、既定の設定ファイルの場所 | `/opt/ros/jazzy/share/nav2_bringup/params/nav2_params.yaml`（2026-11-06に、`jazzy` のブランチのソースで、`params` のフォルダが `share/nav2_bringup` へ入る指定と、このファイルがあることを確かめた。導入した環境では未確認） |
 | 3-1節 | 飛行中に計画器だけを起動し直したときの、自作のノードの動き | 前の経路をたどり続ける（だから、やり直しは5-1節から） |
