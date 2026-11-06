@@ -370,7 +370,7 @@ Copyright (C) 2018 Open Source Robotics Foundation.
 Released under the Apache 2.0 License.
 ```
 
-`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。`which -a gz` の先頭にROS 2のパッケージの `gz` が残り、4-3のaptの集計が `0 to remove` だったので、4-3の導入で、ROS 2のパッケージのGazeboは削除も置き換えもされていない。`gz sim --version` は3節と同じ8.15.0で、Gazebo公式のパッケージの中身（`libgz-sim8`）も同じ8.15.0である。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く見込みである（実際につながるかは、フェーズ4で確かめる）。
+`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。`which -a gz` の先頭にROS 2のパッケージの `gz` が残り、4-3のaptの集計が `0 to remove` だったので、4-3の導入で、ROS 2のパッケージのGazeboは削除も置き換えもされていない。`gz sim --version` は3節と同じ8.15.0で、Gazebo公式のパッケージの中身（`libgz-sim8`）も同じ8.15.0である。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く（フェーズ4の5節で、PX4が起動したGazeboのLiDARの値が、ROS 2のパッケージの中継でROS 2に出ることを確かめた）。
 
 ### 4-5. PX4のビルド
 

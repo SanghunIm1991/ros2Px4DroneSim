@@ -9,7 +9,7 @@
 
 > **この手順書の位置づけ**: [フェーズ0](phase0_drone_px4.md) の4節の図の「ros_gz_bridge」の道（Gazeboの値を、PX4を通さずにROS 2へ出す道）を、実際に動かす。親プロジェクトにも、`ros_gz_bridge`（[フェーズ5-4](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/phase5_4_gazebo_plant.md)）と、RViz2（[間章](https://github.com/SanghunIm1991/ros2MinimalPhysicalAi/blob/main/docs/interlude_urdf_rviz.md)）の説明がある。どちらも車両の文脈が中心なので、前提にはせず、さらに詳しく知りたい場合の参考にする。
 >
-> **期待する結果の出どころ**: （作成中）機体・センサ・ワールドの中身と、Gazeboのトピックの名前は、PX4 v1.17のソースの模型のファイル（SDF）と起動のスクリプトで確かめた。`parameter_bridge` の引数の書き方は、ROS 2 Jazzyの `ros_gz_bridge` の使い方の表示で確かめた。3節・6節と「つまずきやすい点」の画像は、筆者の環境で撮影した。4節の `gz topic` の表示、5-2節の `ros2 topic list` と `ros2 topic echo` の表示、6-2節の壁1と壁2の見え方は、筆者の環境で動かした表示と照らして確かめた（`ros2 topic hz` の数は、5-2節に書いたとおり環境によって変わる）。そのほかの起動・トピックの表示と、7節の見え方は想定したもので、実際に動かした表示に差し替える予定。
+> **期待する結果の出どころ**: （作成中）機体・センサ・ワールドの中身と、Gazeboのトピックの名前は、PX4 v1.17のソースの模型のファイル（SDF）と起動のスクリプトで確かめた。`parameter_bridge` の引数の書き方は、ROS 2 Jazzyの `ros_gz_bridge` の使い方の表示で確かめた。3節・6節と「つまずきやすい点」の画像は、筆者の環境で撮影した。4節の `gz topic` の表示、5-2節の `ros2 topic list` と `ros2 topic echo` の表示、6-2節の壁1と壁2の見え方は、筆者の環境で動かした表示と照らして確かめた。5-1節の中継の起動の表示は、2026-11-06に、画面なしで起動したPX4で確かめた（ほかのシミュレーションと混ざらないように、インスタンスの番号・作業フォルダ等を変えて起動したので、機体の名前の末尾の番号だけが違った）（`ros2 topic hz` の数は、5-2節に書いたとおり環境によって変わる）。そのほかの起動・トピックの表示と、7節の見え方は想定したもので、実際に動かした表示に差し替える予定。
 
 ## 0. 学習目標と完了条件
 
@@ -158,7 +158,7 @@ gz topic -l | grep lidar_2d_v2
 
 1行目が2-1節の表のトピックで、1回の走査の値（Gazeboの型 `gz.msgs.LaserScan`）が流れる。2行目は、同じ値を3次元の点の集まり（点群）にしたもので、この手順書では使わない。`grep` で絞る語を `lidar` にすると、機体の名前（`x500_lidar_2d_0`）にも `lidar` が含まれるので、機体のほかのトピック（モーター・IMU等）もすべて表示される。
 
-`export GZ_IP=127.0.0.1` は、Gazeboの通信に使うネットワークの場所を、このPCの中だけ（127.0.0.1）にする設定である。PX4の `make` の対象（3-2節）は、Gazeboを `GZ_IP=127.0.0.1` で起動するので、Gazeboのトピックを見る・中継するターミナルでも同じ値にそろえる。`export` した値は、そのターミナルを閉じるまで有効である。
+`export GZ_IP=127.0.0.1` は、Gazeboの通信に使うネットワークの場所を、このPCの中だけ（127.0.0.1）にする設定である。PX4の `make` の対象（3-2節）は、Gazeboを `GZ_IP=127.0.0.1` で起動するので、Gazeboのトピックを見る・中継するターミナルでも同じ値にそろえる。筆者の環境では、付けなくてもトピックが見え、中継もできたが、PX4の側と同じ値にそろえておくと確実である。`export` した値は、そのターミナルを閉じるまで有効である。
 
 ## 5. `ros_gz_bridge` でROS 2へ中継する
 
@@ -179,7 +179,7 @@ ros2 run ros_gz_bridge parameter_bridge \
 
 ROS 2のトピックの名前は、何もしなければGazeboのトピックと同じ長い名前になる。`--ros-args -r <元の名前>:=<新しい名前>` は、ROS 2の名前の付け替え（リマップ）の書き方で、ここでは `/scan` という短い名前にしている。
 
-**期待する結果**（想定。時刻は実行ごとに変わる）:
+**期待する結果**（時刻は実行ごとに変わる）:
 
 ```text
 [INFO] [<時刻>] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan (gz.msgs.LaserScan) -> /world/walls/model/x500_lidar_2d_0/link/link/sensor/lidar_2d_v2/scan (sensor_msgs/msg/LaserScan)] (Lazy 0)

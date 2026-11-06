@@ -157,6 +157,9 @@ PX4の安定版の文書（PX4-Autopilotのリポジトリの `release/1.17` の
 - **Gazebo**: 起動のスクリプトは `./gz_env.sh` か `../gz_env.sh` を探すので、作業フォルダが別のときは、先に `build/px4_sitl_default/rootfs/gz_env.sh` を読み込んでおく（模型・ワールド・プラグインの場所）。`GZ_IP=127.0.0.1`・`GZ_PARTITION=<別の名前>`・`HEADLESS=1`・`PX4_SYS_AUTOSTART`・`PX4_SIM_MODEL`・`PX4_GZ_WORLD` を付ける。Gazeboのサーバーは、PX4を止めても残ることがあるので、その `GZ_PARTITION` を環境に持つ `gz sim` のPIDだけを止める。
 - **uXRCE-DDS**: `PX4_UXRCE_DDS_PORT=<別のポート>` で、Agentのポートを分ける。インスタンスの番号が0でないと、トピックに名前空間 `px4_<番号>` が付くので、教材と同じ名前にするときは `PX4_UXRCE_DDS_NS=""`（空）にする。`ROS_DOMAIN_ID` を付けると、PX4の `UXRCE_DDS_DOM_ID` がそれに合わせられる。
 - **残る注意**: 地上局向けのMAVLinkの送り先は、インスタンスによらず14550番なので、ユーザーのQGCが開いていると、機体が1台見えてしまう。確かめている間は、QGCを閉じてもらう。
+- **QGCなしで飛ばす**: 作業フォルダのパラメータで `NAV_DLL_ACT` を0にすると、地上局がつながっていなくてもアームでき、`px4-commander --instance <番号> takeoff`・`land` で離陸・着陸できる（`rcAndDataLinkCheck.cpp`）。手順書の条件（QGCをつなぐ）とは違うので、確かめた記録にその旨を書く。
+- **作った模型を、PX4のフォルダを書き換えずに試す**: `-w` で作業フォルダを別にすると、起動のスクリプトがPX4の `gz_env.sh` を読まないので、先に読み込んだ後で `PX4_GZ_MODELS` と `GZ_SIM_RESOURCE_PATH` を、PX4の模型へのシンボリックリンクと作った模型を並べた使い捨てのフォルダに向けられる（間章（機体を定義する）の5節の模型を、2026-11-06にこの方法で確かめた）。手順書の方法（`~/PX4-Autopilot` で起動する）では、`gz_env.sh` が読まれて決め打ちになる。
+- **中継の止め方**: `ros2 run ros_gz_bridge parameter_bridge` を止めても、子の `parameter_bridge` が残ることがあった。確かめるときは、`/opt/ros/jazzy/lib/ros_gz_bridge/parameter_bridge` を直接起動し、そのPIDを止める。
 
 ## 6. 親プロジェクトで得た知見（引き継ぐもの）
 
