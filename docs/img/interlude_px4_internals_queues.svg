@@ -36,7 +36,7 @@
 <text x="1030" y="379" text-anchor="middle">mavlink</text>
 <text x="1030" y="399" text-anchor="middle">uxrce_dds_client</text>
 <text x="1030" y="419" text-anchor="middle">logger</text>
-<text x="620" y="30" text-anchor="middle" font-size="13">ワークキュー（左上から右へ、上の段から下の段へと、優先度が低くなる。1つのキューの中では、1つずつ順に動く）</text>
+<text x="620" y="30" text-anchor="middle" font-size="13">ワークキューは、wq:rate_ctrl → wq:nav_and_controllers → wq:INS0 → wq:hp_default → wq:lp_default の順に、優先度が低くなる</text>
 <rect x="20" y="487" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
 <text x="48" y="500">ワークキュー（スレッド1つを、複数のモジュールで共有する）</text>
 <rect x="590" y="487" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>

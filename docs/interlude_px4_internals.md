@@ -9,7 +9,7 @@
 
 > **この章の位置づけ**: PX4を改造するための手順書ではない。PX4の中で何が起きているかの見通しを付けるための読み物で、観察もPX4の設定やソースを変えない。PX4についての事実は、この教材で使うPX4 v1.17の公式の文書とソース（v1.17.0）に基づく。PX4のソースは、短い抜粋を載せて読む（出典と、`LICENSE` の3節の第三者の一覧に記載した）。抜粋の後の説明は、筆者がソースを読んでまとめたもので、細部が最新の公式の情報と食い違う場合は、公式を優先する。
 >
-> **期待する結果の出どころ**: 2-4節・3-2節・4-4節・6-2節のT1（PX4のシミュレーション）の表示は、筆者の環境で、画面なしで起動したPX4（`gz_x500`）で確かめたもの（2026-11-08）。ほかのシミュレーションと混ざらないように、インスタンスの番号・作業フォルダ等を変え、QGCをつながずに、PX4の外から送るコマンド（`px4-uorb` 等）で表示を取った。この章の手順（`make px4_sitl gz_x500` で起動し、QGCをつなぎ、`pxh>` のシェルで打つ）とは、起動の仕方が違う。起動の表示のうち、インスタンスの番号に依る部分（模型の名前・ポートの番号）は、この章の手順のとおりに起動したときの値に直して載せた。時刻（`timestamp`）・位置・推力の値・購読の数（`#SUB`）は、実行ごとに変わる。頻度（`RATE`）と間隔は、PX4の中の時計で数える。SITLでは、その時計がシミュレーションの時刻に従うので（4-1節）、PCの速さには左右されにくいが、細かな値は実行ごとに変わることがある。
+> **期待する結果の出どころ**: 2-4節・3-2節・4-4節・6-2節のT1（PX4のシミュレーション）の表示は、筆者の環境で、画面なしで起動したPX4（`gz_x500`）で確かめたもの（2026-11-08）。ほかのシミュレーションと混ざらないように、インスタンスの番号・作業フォルダ等を変え、QGCをつながずに、PX4の外から送るコマンド（`px4-uorb` 等）で表示を取った。この章の手順（`make px4_sitl gz_x500` で起動し、QGCをつなぎ、`pxh>` のシェルで打つ）とは、起動の仕方が違う。起動の表示のうち、インスタンスの番号に依る部分（模型の名前・MAVLinkのポートの番号）と、分けるために変えた設定に依る部分（uXRCE-DDSのAgentのポートの番号）は、この章の手順のとおりに起動したときの値に直して載せた。`uorb top` の表示からは、画面を消すための制御の文字を取り除いた。時刻（`timestamp`）・位置・推力の値・購読の数（`#SUB`）は、実行ごとに変わる。頻度（`RATE`）と間隔は、PX4の中の時計で数える。SITLでは、その時計がシミュレーションの時刻に従うので（4-1節）、PCの速さには左右されにくいが、細かな値は実行ごとに変わることがある。
 
 この章では、[フェーズ1](phase1_first_flight.md) と同じく、T1でPX4のシミュレーションを起動し、T2でQGCを起動する（観察する場合だけ）。ターミナルの番号は、[READMEの「ターミナルの番号」](../README.md#ターミナルの番号)のとおり、T1〜T4がどの手順書でも同じプログラムで、T5以降がそのページの作業用である。この章では、T1とT2だけを使う。打つコマンドの前に `pxh> ` を付けて書くが、`pxh>` はPX4のシェルのプロンプトなので打たない。
 
@@ -288,7 +288,7 @@ PX4の文書によると、モジュールの動かし方は2通りある。
 
 ```mermaid
 flowchart LR
-    subgraph WQ["ワークキュー（左上から、優先度が低くなる）"]
+    subgraph WQ["ワークキュー（wq:rate_ctrl から wq:lp_default の順に、優先度が低くなる）"]
         Q1["wq:rate_ctrl<br/>vehicle_angular_velocity<br/>mc_rate_control<br/>control_allocator<br/>gz_bridge（SITLだけ）"]
         Q2["wq:nav_and_controllers<br/>sensors<br/>mc_att_control<br/>mc_pos_control<br/>flight_mode_manager<br/>land_detector 等"]
         Q3["wq:INS0<br/>vehicle_imu<br/>ekf2"]
@@ -315,31 +315,34 @@ SITLでは、PX4の時計（`hrt_absolute_time()` が返す時刻）が、シミ
 
 角速度の制御のモジュール（`mc_rate_control`）を例に、ここまでの部品がソースのどこに現れるかを見る。まず、クラスの宣言の抜粋である。
 
-ファイル（PX4のソース）: `~/PX4-Autopilot/src/modules/mc_rate_control/MulticopterRateControl.hpp`（抜粋。途中の行を省いた）
+ファイル（PX4のソース）: `~/PX4-Autopilot/src/modules/mc_rate_control/MulticopterRateControl.hpp`（抜粋。途中の行を省き、省いた箇所に `// （省略）` の行を足した）
 
 ```cpp
 class MulticopterRateControl : public ModuleBase<MulticopterRateControl>, public ModuleParams, public px4::WorkItem
-
+{
+// （省略）
 	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _vehicle_rates_setpoint_sub{ORB_ID(vehicle_rates_setpoint)};
-
+// （省略）
 	uORB::SubscriptionCallbackWorkItem _vehicle_angular_velocity_sub{this, ORB_ID(vehicle_angular_velocity)};
-
+// （省略）
 	uORB::Publication<vehicle_rates_setpoint_s>	_vehicle_rates_setpoint_pub{ORB_ID(vehicle_rates_setpoint)};
 	uORB::Publication<vehicle_thrust_setpoint_s>	_vehicle_thrust_setpoint_pub;
 	uORB::Publication<vehicle_torque_setpoint_s>	_vehicle_torque_setpoint_pub;
+// （省略）
 ```
 
 1行目のクラスは、3つの土台を受け継いでいる。`ModuleBase` は、PX4のシェルの `mc_rate_control start`・`stop`・`status` のコマンドを受ける部分、`ModuleParams` は、パラメータ（`MC_ROLLRATE_P` 等）を読む部分、`px4::WorkItem` は、ワークキューで動く部分である。その下に、購読（`Subscription`）・データが届いたら起こしてもらう購読（`SubscriptionCallbackWorkItem`）・出版（`Publication`）が並ぶ。このモジュールを起こすのは、角速度（`vehicle_angular_velocity`）だけである。目標（`vehicle_rates_setpoint`）や `vehicle_control_mode` は、起きたときに最新の値を読むだけである。`vehicle_rates_setpoint` を出版もしているのは、手動で角速度を指令するモード（Acro）では、このモジュール自身がスティックの入力から目標を作るからである。
 
 次は、ソースのファイルの抜粋である。
 
-ファイル（PX4のソース）: `~/PX4-Autopilot/src/modules/mc_rate_control/MulticopterRateControl.cpp`（抜粋。途中の行を省いた）
+ファイル（PX4のソース）: `~/PX4-Autopilot/src/modules/mc_rate_control/MulticopterRateControl.cpp`（抜粋。途中の行を省き、省いた箇所に `// （省略）` の行を足した）
 
 ```cpp
 MulticopterRateControl::MulticopterRateControl(bool vtol) :
 	ModuleParams(nullptr),
 	WorkItem(MODULE_NAME, px4::wq_configurations::rate_ctrl),
+// （省略）
 
 bool
 MulticopterRateControl::init()
@@ -355,14 +358,16 @@ MulticopterRateControl::init()
 void
 MulticopterRateControl::Run()
 {
+// （省略）
 	/* run controller on gyro changes */
 	vehicle_angular_velocity_s angular_velocity;
 
 	if (_vehicle_angular_velocity_sub.update(&angular_velocity)) {
-
+// （省略）
 			_vehicle_thrust_setpoint_pub.publish(vehicle_thrust_setpoint);
 
 			_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
+// （省略）
 ```
 
 上から順に、次のことをしている。
@@ -407,11 +412,11 @@ Work Queue: 5  threads                          RATE        INTERVAL
     |__ 2) load_mon                           2.0 Hz       498571 us (500000 us)
 ```
 
-ワークキューが5つあり、その下に、各キューで動くモジュールと、1秒に動いた回数（`RATE`）・平均の間隔（`INTERVAL`）が並ぶ。間隔の後ろの括弧は、時間で動くモジュールが予約した間隔である（`load_mon` の0.5秒。4-2節）。括弧が無いモジュールは、データが届いたら動く。
+ワークキューが5つあり、その下に、各キューで動くモジュールと、1秒に動いた回数（`RATE`）・平均の間隔（`INTERVAL`）が並ぶ。間隔の後ろの括弧は、決まった間隔の予約（`ScheduleOnInterval()`。4-2節）をしたモジュールに付き、予約した間隔を示す（`load_mon` の0.5秒）。括弧が無いモジュールの多くはデータが届いたら動くが、一度だけの予約（`ScheduleDelayed()`）で動くものもある。たとえば `manual_control` は、送信機の入力が届かない間は、0.2秒後に自分を予約し直して動く（約5回）。
 
 角速度（`vehicle_angular_velocity`）・角速度の制御・配分が、同じ `wq:rate_ctrl` で、同じ約250回（4ms間隔）で動いている。4-3節の連鎖が、同じ頻度で回っていることが分かる。`gz_bridge-actuators-esc` は、`actuator_motors` を受けてGazeboのモーターへ送る部分で、これも配分と同じ頻度である。自分のスレッドで動く `commander` 等は、この一覧には出ない。
 
-PX4の文書は、実機（NuttX）では `top` のコマンドで、スレッドごとのCPUの使用率を見られるとしている。このコマンドはNuttXのシェルのもので、SITLのPX4のシェルには無い。
+PX4の文書は、実機（NuttX）では `top` のコマンドで、スレッドごとのCPUの使用率を見られるとし、このコマンドはNuttXのシェルのものとしている。v1.17のSITLのビルドの設定（`boards/px4/sitl/default.px4board`）にも `top` は入っておらず、SITLのPX4のシェルでは使えない。
 
 ## 5. 状態の管理と飛行モード
 
@@ -566,6 +571,6 @@ Offboardの合図が途切れたかを判断するのは `commander` のフェ�
 この章の技術的な記述は、次の文書とファイルを読んで、自分の言葉でまとめたもの（逐語の転載は、下の抜粋だけ）。
 
 - PX4 User Guide（v1.17。[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）: [PX4 Architectural Overview](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/concept/architecture.md)（反応型の作り、モジュールの差し替え、1つのアドレス空間と共有のメモリ、タスクとワークキューの違いと待ってはいけないこと、頻度がドライバで決まること、`top` がNuttXのシェルのものであること）、[uORB Messaging](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/middleware/uorb.md)（定義のファイルからトピックとヘッダを作ること、`timestamp` が必須であること、既定で1つの値だけを持つことと `ORB_QUEUE_LENGTH`、`uorb top`）、[System Startup](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/concept/system_startup.md)（起動のスクリプト）、[Flight Tasks](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/concept/flight_tasks.md)（FlightTaskの役割）
-- PX4 v1.17のソース（作成に使った環境に取得したv1.17.0）: [`platforms/common/include/px4_platform_common/px4_work_queue/WorkQueueManager.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/common/include/px4_platform_common/px4_work_queue/WorkQueueManager.hpp) と [`platforms/common/px4_work_queue/Kconfig`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/common/px4_work_queue/Kconfig)（ワークキューの名前と優先度）、[`platforms/posix/src/px4/common/px4_init.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/posix/src/px4/common/px4_init.cpp)（ワークキュー・uORB・パラメータを始める順）、[`ROMFS/px4fmu_common/init.d-posix/rcS`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/rcS) と [`ROMFS/px4fmu_common/init.d/rc.mc_apps`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d/rc.mc_apps)（起動の順番）、各モジュールのソース（`src/modules/` の `mc_rate_control`・`mc_att_control`・`mc_pos_control`・`control_allocator`・`flight_mode_manager`・`sensors`・`ekf2`・`commander`・`navigator`・`land_detector`・`load_mon`・`simulation/gz_bridge`。使うワークキュー、データが届いたら動くか時間で動くか、出版と購読するトピック）、[`src/modules/flight_mode_manager/FlightModeManager.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/flight_mode_manager/FlightModeManager.cpp)（合うタスクが無いときにタスクを無しにすること）、[`src/modules/commander/failsafe/failsafe.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/failsafe/failsafe.cpp)（Offboardの合図が途切れたときの判断）、[`src/lib/collision_prevention/CollisionPrevention.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/CollisionPrevention.hpp) と `src/modules/flight_mode_manager/tasks/ManualPosition/FlightTaskManualPosition.hpp`（衝突防止がPosition modeのFlightTaskの中にあること）、`platforms/posix/src/px4/common/drv_hrt.cpp`（SITLのロックステップの時計）
-- 2-1節・4-3節の抜粋: PX4-Autopilot（v1.17.0）の [`msg/versioned/VehicleRatesSetpoint.msg`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/msg/versioned/VehicleRatesSetpoint.msg)、[`src/modules/mc_rate_control/MulticopterRateControl.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_rate_control/MulticopterRateControl.hpp)、[`src/modules/mc_rate_control/MulticopterRateControl.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_rate_control/MulticopterRateControl.cpp)。Copyright (c) 2012 - 2023, PX4 Development Team, BSD 3-Clause License（[全文](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE)）。途中の行を省いた（改変あり）
+- PX4 v1.17のソース（作成に使った環境に取得したv1.17.0）: [`platforms/common/include/px4_platform_common/px4_work_queue/WorkQueueManager.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/common/include/px4_platform_common/px4_work_queue/WorkQueueManager.hpp) と [`platforms/common/px4_work_queue/Kconfig`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/common/px4_work_queue/Kconfig)（ワークキューの名前と優先度）、[`platforms/posix/src/px4/common/px4_init.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/platforms/posix/src/px4/common/px4_init.cpp)（ワークキュー・uORB・パラメータを始める順）、[`ROMFS/px4fmu_common/init.d-posix/rcS`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d-posix/rcS) と [`ROMFS/px4fmu_common/init.d/rc.mc_apps`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/ROMFS/px4fmu_common/init.d/rc.mc_apps)（起動の順番）、各モジュールのソース（`src/modules/` の `mc_rate_control`・`mc_att_control`・`mc_pos_control`・`control_allocator`・`flight_mode_manager`・`sensors`・`ekf2`・`commander`・`navigator`・`land_detector`・`load_mon`・`simulation/gz_bridge`。使うワークキュー、データが届いたら動くか時間で動くか、出版と購読するトピック）、[`src/modules/flight_mode_manager/FlightModeManager.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/flight_mode_manager/FlightModeManager.cpp)（合うタスクが無いときにタスクを無しにすること）、[`src/modules/commander/failsafe/failsafe.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/commander/failsafe/failsafe.cpp)（Offboardの合図が途切れたときの判断）、[`src/lib/collision_prevention/CollisionPrevention.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/lib/collision_prevention/CollisionPrevention.hpp) と `src/modules/flight_mode_manager/tasks/ManualPosition/FlightTaskManualPosition.hpp`（衝突防止がPosition modeのFlightTaskの中にあること）、`platforms/posix/src/px4/common/drv_hrt.cpp`（SITLのロックステップの時計）、`platforms/common/px4_work_queue/ScheduledWorkItem.cpp`（`work_queue status` の括弧が、決まった間隔の予約のときだけ付くこと）、`src/modules/manual_control/ManualControl.cpp`（一度だけの予約で動くこと）、`boards/px4/sitl/default.px4board`（SITLのビルドに `top` が入っていないこと）
+- 2-1節・4-3節の抜粋: PX4-Autopilot（v1.17.0）の [`msg/versioned/VehicleRatesSetpoint.msg`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/msg/versioned/VehicleRatesSetpoint.msg)、[`src/modules/mc_rate_control/MulticopterRateControl.hpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_rate_control/MulticopterRateControl.hpp)、[`src/modules/mc_rate_control/MulticopterRateControl.cpp`](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/src/modules/mc_rate_control/MulticopterRateControl.cpp)。リポジトリは Copyright (c) 2012 - 2023, PX4 Development Team、`MulticopterRateControl.hpp`・`.cpp` のファイルの冒頭の表示は Copyright (c) 2013-2019 PX4 Development Team、BSD 3-Clause License（[全文](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE)）。途中の行を省き、省いた箇所に `// （省略）` の行を足した（改変あり）
 - 「期待する結果」のPX4のシェルの表示: PX4-Autopilot（BSD 3-Clause License）の表示。Gazeboの版の行は、Gazebo（Open Source Robotics Foundation、Apache License 2.0）の版
