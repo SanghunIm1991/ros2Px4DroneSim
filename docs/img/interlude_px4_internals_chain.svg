@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 830" width="1260" height="830" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="マルチコプターの制御の連鎖を、uORBのトピックの名前で追う図。navigator が position_setpoint_triplet を flight_mode_manager に渡し、flight_mode_manager が trajectory_setpoint を mc_pos_control に渡す。Offboardのときは、ROS 2のノードの目標が uXRCE-DDS で uxrce_dds_client に届き、uxrce_dds_client が trajectory_setpoint を出す。ekf2 は vehicle_local_position を mc_pos_control に、vehicle_attitude を mc_att_control に渡す。mc_pos_control は vehicle_attitude_setpoint を mc_att_control に、mc_att_control は vehicle_rates_setpoint を mc_rate_control に渡す。sensors は vehicle_angular_velocity を mc_rate_control に、vehicle_imu 等を ekf2 に渡す。mc_rate_control は vehicle_torque_setpoint と vehicle_thrust_setpoint を control_allocator に渡し、control_allocator は actuator_motors を gz_bridge に渡す。gz_bridge は Gazebo とやり取りし、sensor_gyro・sensor_accel 等を sensors に渡す">
+<title>マルチコプターの制御の連鎖を、uORBのトピックの名前で追う図。navigator が position_setpoint_triplet を flight_mode_manager に渡し、flight_mode_manager が trajectory_setpoint を mc_pos_control に渡す。Offboardのときは、ROS 2のノードの目標が uXRCE-DDS で uxrce_dds_client に届き、uxrce_dds_client が trajectory_setpoint を出す。ekf2 は vehicle_local_position を mc_pos_control に、vehicle_attitude を mc_att_control に渡す。mc_pos_control は vehicle_attitude_setpoint を mc_att_control に、mc_att_control は vehicle_rates_setpoint を mc_rate_control に渡す。sensors は vehicle_angular_velocity を mc_rate_control に、vehicle_imu 等を ekf2 に渡す。mc_rate_control は vehicle_torque_setpoint と vehicle_thrust_setpoint を control_allocator に渡し、control_allocator は actuator_motors を gz_bridge に渡す。gz_bridge は Gazebo とやり取りし、sensor_gyro・sensor_accel 等を sensors に渡す</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1260" height="830" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<path d="M280,55 L500,55" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M280,185 L500,185" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M980,185 L760,185" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M280,445 L500,445" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M500,575 L280,575" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M630,90 L630,150" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M630,220 L630,280" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M630,350 L630,410" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M630,480 L630,540" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1110,90 L1110,150" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M240,220 L240,315 L500,315" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M80,410 L80,220" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M150,540 L150,480" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M150,610 L150,670" fill="none" stroke="#333333" stroke-width="1.6" marker-end="url(#a)" marker-start="url(#s)"/>
+<rect x="20" y="20" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="500" y="20" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="980" y="20" width="260" height="70" rx="8" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<rect x="20" y="150" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="500" y="150" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="980" y="150" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="500" y="280" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="410" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="500" y="410" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="540" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="500" y="540" width="260" height="70" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="670" width="260" height="70" rx="8" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="150" y="49" text-anchor="middle" font-weight="bold">navigator</text>
+<text x="150" y="69" text-anchor="middle">自動のモードの目標</text>
+<text x="630" y="49" text-anchor="middle" font-weight="bold">flight_mode_manager</text>
+<text x="630" y="69" text-anchor="middle">飛行モードの目標（FlightTask）</text>
+<text x="1110" y="49" text-anchor="middle" font-weight="bold">ROS 2のノード</text>
+<text x="1110" y="69" text-anchor="middle">Offboardのときの目標</text>
+<text x="150" y="179" text-anchor="middle" font-weight="bold">ekf2</text>
+<text x="150" y="199" text-anchor="middle">位置・速度・姿勢の推定</text>
+<text x="630" y="179" text-anchor="middle" font-weight="bold">mc_pos_control</text>
+<text x="630" y="199" text-anchor="middle">位置と速度の制御</text>
+<text x="1110" y="179" text-anchor="middle" font-weight="bold">uxrce_dds_client</text>
+<text x="1110" y="199" text-anchor="middle">uORBの外との出入口</text>
+<text x="630" y="309" text-anchor="middle" font-weight="bold">mc_att_control</text>
+<text x="630" y="329" text-anchor="middle">姿勢の制御</text>
+<text x="150" y="439" text-anchor="middle" font-weight="bold">sensors</text>
+<text x="150" y="459" text-anchor="middle">センサの値を整える</text>
+<text x="630" y="439" text-anchor="middle" font-weight="bold">mc_rate_control</text>
+<text x="630" y="459" text-anchor="middle">角速度の制御</text>
+<text x="150" y="569" text-anchor="middle" font-weight="bold">gz_bridge</text>
+<text x="150" y="589" text-anchor="middle">Gazeboとの中継（SITL）</text>
+<text x="630" y="569" text-anchor="middle" font-weight="bold">control_allocator</text>
+<text x="630" y="589" text-anchor="middle">各モーターへの配分</text>
+<text x="150" y="699" text-anchor="middle" font-weight="bold">Gazebo</text>
+<text x="150" y="719" text-anchor="middle">機体とセンサの計算</text>
+<text x="390" y="47" text-anchor="middle" font-size="13">position_setpoint_triplet</text>
+<text x="390" y="177" text-anchor="middle" font-size="13">vehicle_local_position</text>
+<text x="870" y="177" text-anchor="middle" font-size="13">trajectory_setpoint</text>
+<text x="390" y="437" text-anchor="middle" font-size="13">vehicle_angular_velocity</text>
+<text x="390" y="567" text-anchor="middle" font-size="13">actuator_motors</text>
+<text x="638" y="125" text-anchor="start" font-size="13">trajectory_setpoint</text>
+<text x="638" y="255" text-anchor="start" font-size="13">vehicle_attitude_setpoint</text>
+<text x="638" y="385" text-anchor="start" font-size="13">vehicle_rates_setpoint</text>
+<text x="638" y="507" text-anchor="start" font-size="13">vehicle_torque_setpoint</text>
+<text x="638" y="525" text-anchor="start" font-size="13">vehicle_thrust_setpoint</text>
+<text x="1118" y="125" text-anchor="start" font-size="13">uXRCE-DDS</text>
+<text x="390" y="307" text-anchor="middle" font-size="13">vehicle_attitude</text>
+<text x="88" y="305" text-anchor="start" font-size="13">vehicle_imu 等</text>
+<text x="158" y="515" text-anchor="start" font-size="13">sensor_gyro・sensor_accel 等</text>
+<text x="158" y="645" text-anchor="start" font-size="13">Gazeboの通信</text>
+<text x="630" y="790" text-anchor="middle" font-size="13">矢印のラベルは、uORBのトピックの名前（「Gazeboの通信」と「uXRCE-DDS」を除く）</text>
+<text x="630" y="812" text-anchor="middle" font-size="13">Offboardのときは、flight_mode_manager の代わりに uxrce_dds_client が trajectory_setpoint を出す</text>
+<rect x="500" y="677" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="528" y="690">PX4のモジュール</text>
+<rect x="500" y="707" width="20" height="14" rx="3" fill="#f3eefa" stroke="#7a5aa6" stroke-width="1.5"/>
+<text x="528" y="720">ROS 2のノード（PX4の外）</text>
+<rect x="980" y="677" width="20" height="14" rx="3" fill="#eef7ee" stroke="#3a8a3a" stroke-width="1.5"/>
+<text x="1008" y="690">Gazebo（PX4の外）</text>
+</g></svg>

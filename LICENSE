@@ -96,6 +96,13 @@ the author (SanghunIm1991) and the license are credited.
      PX4-Autopilot, Copyright (c) 2012 - 2023, PX4 Development Team,
      BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）
+   - docs/interlude_px4_internals.md の2-1節・4-3節で抜粋したPX4のソース
+     （msg/versioned/VehicleRatesSetpoint.msg、
+     src/modules/mc_rate_control/MulticopterRateControl.hpp・.cpp）と、
+     2-4節・3-2節・4-4節・6-2節に載せたPX4のシェルの表示:
+     PX4-Autopilot, Copyright (c) 2012 - 2023, PX4 Development Team,
+     BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）
 
    このリポジトリは、PX4・Gazebo・ROS 2・Micro XRCE-DDS Agent等のソフトウェアと、
    PX4に付属するGazeboの機体・ワールドの模型を同梱していない。読者は、各自で

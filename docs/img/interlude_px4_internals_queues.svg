@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 520" width="1240" height="520" font-family="'Noto Sans CJK JP','Noto Sans JP','Hiragino Sans','Yu Gothic',Meiryo,sans-serif" font-size="14" role="img" aria-label="PX4のSITLで、モジュールがどのスレッドで動くかを示した図。ワークキュー wq:rate_ctrl（優先度がいちばん高い）では、vehicle_angular_velocity・mc_rate_control・control_allocator・gz_bridge が動く。wq:nav_and_controllers では、sensors・mc_att_control・mc_pos_control・flight_mode_manager・land_detector が動く。wq:INS0 では、vehicle_imu と ekf2 が動く。wq:hp_default では、rc_update・manual_control 等が、wq:lp_default では、load_mon 等が動く。commander・navigator・mavlink・uxrce_dds_client・logger は、ワークキューを使わず、それぞれ自分のスレッドで動く">
+<title>PX4のSITLで、モジュールがどのスレッドで動くかを示した図。ワークキュー wq:rate_ctrl（優先度がいちばん高い）では、vehicle_angular_velocity・mc_rate_control・control_allocator・gz_bridge が動く。wq:nav_and_controllers では、sensors・mc_att_control・mc_pos_control・flight_mode_manager・land_detector が動く。wq:INS0 では、vehicle_imu と ekf2 が動く。wq:hp_default では、rc_update・manual_control 等が、wq:lp_default では、load_mon 等が動く。commander・navigator・mavlink・uxrce_dds_client・logger は、ワークキューを使わず、それぞれ自分のスレッドで動く</title>
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#333333"/></marker><marker id="s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#333333"/></marker></defs>
+<rect x="0" y="0" width="1240" height="520" fill="#ffffff"/>
+<g fill="#1a1a1a">
+<rect x="20" y="50" width="380" height="190" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="430" y="50" width="380" height="190" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="840" y="50" width="380" height="190" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="20" y="270" width="380" height="190" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="430" y="270" width="380" height="190" rx="8" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<rect x="840" y="270" width="380" height="190" rx="8" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="210" y="109" text-anchor="middle" font-weight="bold">wq:rate_ctrl</text>
+<text x="210" y="129" text-anchor="middle">vehicle_angular_velocity</text>
+<text x="210" y="149" text-anchor="middle">mc_rate_control</text>
+<text x="210" y="169" text-anchor="middle">control_allocator</text>
+<text x="210" y="189" text-anchor="middle">gz_bridge（SITLだけ）</text>
+<text x="620" y="99" text-anchor="middle" font-weight="bold">wq:nav_and_controllers</text>
+<text x="620" y="119" text-anchor="middle">sensors</text>
+<text x="620" y="139" text-anchor="middle">mc_att_control</text>
+<text x="620" y="159" text-anchor="middle">mc_pos_control</text>
+<text x="620" y="179" text-anchor="middle">flight_mode_manager</text>
+<text x="620" y="199" text-anchor="middle">land_detector 等</text>
+<text x="1030" y="129" text-anchor="middle" font-weight="bold">wq:INS0</text>
+<text x="1030" y="149" text-anchor="middle">vehicle_imu</text>
+<text x="1030" y="169" text-anchor="middle">ekf2</text>
+<text x="210" y="339" text-anchor="middle" font-weight="bold">wq:hp_default</text>
+<text x="210" y="359" text-anchor="middle">rc_update</text>
+<text x="210" y="379" text-anchor="middle">manual_control</text>
+<text x="210" y="399" text-anchor="middle">電池・電源の模擬 等</text>
+<text x="620" y="349" text-anchor="middle" font-weight="bold">wq:lp_default</text>
+<text x="620" y="369" text-anchor="middle">load_mon</text>
+<text x="620" y="389" text-anchor="middle">payload_deliverer 等</text>
+<text x="1030" y="319" text-anchor="middle" font-weight="bold">自分のスレッドで動く（タスク）</text>
+<text x="1030" y="339" text-anchor="middle">commander</text>
+<text x="1030" y="359" text-anchor="middle">navigator</text>
+<text x="1030" y="379" text-anchor="middle">mavlink</text>
+<text x="1030" y="399" text-anchor="middle">uxrce_dds_client</text>
+<text x="1030" y="419" text-anchor="middle">logger</text>
+<text x="620" y="30" text-anchor="middle" font-size="13">ワークキュー（左上から右へ、上の段から下の段へと、優先度が低くなる。1つのキューの中では、1つずつ順に動く）</text>
+<rect x="20" y="487" width="20" height="14" rx="3" fill="#eaf2ff" stroke="#3b6fb6" stroke-width="1.5"/>
+<text x="48" y="500">ワークキュー（スレッド1つを、複数のモジュールで共有する）</text>
+<rect x="590" y="487" width="20" height="14" rx="3" fill="#fff4e5" stroke="#c77d1a" stroke-width="1.5"/>
+<text x="618" y="500">モジュールごとに、自分のスレッドを持つ</text>
+</g></svg>

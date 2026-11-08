@@ -116,3 +116,13 @@
 | 6節 | 課題1・2: `SmacPlanner2D`・`ThetaStarPlanner` に替えたときの、飛行中の経路の形（「設定」と計画ができることは確かめた） | 未確認 |
 | 3-1節 | `ros-jazzy-nav2-bringup` を入れたときの、既定の設定ファイルの場所 | `/opt/ros/jazzy/share/nav2_bringup/params/nav2_params.yaml`（2026-11-06に、`jazzy` のブランチのソースで、`params` のフォルダが `share/nav2_bringup` へ入る指定と、このファイルがあることを確かめた。導入した環境では未確認） |
 | 3-1節 | 飛行中に計画器だけを起動し直したときの、自作のノードの動き | 前の経路をたどり続ける（だから、やり直しは5-1節から） |
+
+## 間章（[`docs/interlude_px4_internals.md`](../docs/interlude_px4_internals.md)）
+
+2026-11-08に作成。2-4節・3-2節・4-4節・6-2節のPX4のシェルの表示は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0）で、PX4の外から送るコマンド（`px4-uorb` 等）で確かめた。残りは、次のとおりである。
+
+| 節 | 確かめること | 今の記述（想定） |
+|---|---|---|
+| 2-4節・3-2節・4-4節 | 章の手順のとおり（`make px4_sitl gz_x500` で起動し、QGCをつなぎ、`pxh>` のシェルで打つ）にしたとき、表示の形が同じか（`uorb top -1` の表示に、画面を消す制御の文字が混ざらないか、`#SUB` の数が変わるか） | 同じ形で表示される（`#SUB` の数は変わりうる） |
+| 6-2節 | インスタンス0で起動したときの、`gz_bridge` の模型の名前と、uXRCE-DDS・MAVLinkのポートの行 | `model: x500_0`、`port:8888`、`udp port 18570`（インスタンス7の表示から、起動のスクリプトの決め方で直した） |
+| 3-1節・4-1節 | 図（`docs/img/interlude_px4_internals_chain.svg`・`docs/img/interlude_px4_internals_queues.svg`）とmermaid版の見た目 | 機械点検は通した。目視は未確認 |
