@@ -266,7 +266,7 @@ v1.17.0
 
 ### 4-3. PX4の導入のスクリプト
 
-4-1の仮想環境が有効なターミナルで、PX4に付属する導入のスクリプト `Tools/setup/ubuntu.sh` を実行する。`--no-nuttx` は、実機のフライトコントローラ（マイコン）に書き込むための道具を省く指定で、シミュレーションだけを使うこの教材では要らない（入れるときに何が入るかと、実機向けのビルドは、[間章（実機向けのファームウェアのビルド）](interlude_firmware_build.md) で扱う）。
+4-1の仮想環境が有効なターミナルで、PX4に付属する導入のスクリプト `Tools/setup/ubuntu.sh` を実行する。`--no-nuttx` は、実機のフライトコントローラ（マイコン）に書き込むための道具を省く指定で、シミュレーションだけを使うこの教材では要らない（入れるときに何が入るかと、実機向けのビルドは、[間章（実機向けのファームウェアのビルド）](interlude_firmware_build.md)（下書き）で扱う）。
 
 ```bash
 source ~/px4-venv/bin/activate
@@ -328,7 +328,11 @@ Processing triggers for hicolor-icon-theme (0.17-2) ...
 表示は長く、3つの段階（`[ubuntu.sh] Installing ...` の行で区切られる）に分かれる。
 
 - **ビルドの道具（apt）**: 既に入っているものは `is already the newest version` と表示され、足りないもの（`ninja-build`・`ccache`・`gdb` 等）が入る。
-- **Pythonのパッケージ（pip）**: `Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment .../px4-venv` は、aptで入れたnumpy（ROS 2が使うもの）には手を付けず、仮想環境の中に新しい版を入れた、という意味である。仮想環境を使った狙いどおりの動きである。続く `ERROR: ... scipy ... requires numpy<1.28.0 ...` は、仮想環境の中で、aptで入れたscipyと、新しく入れたnumpyの版が合わないことを知らせる表示で、導入の失敗ではない（直後に `Successfully installed` が出る）。この食い違いは仮想環境の中だけのものなので、仮想環境を有効にしていないターミナル（ROS 2のノードを動かすターミナル）には影響しない。4-1の「`~/.bashrc` に有効にする行を書かない」は、このためでもある。逆に、仮想環境を有効にしたターミナルでは、ROS 2のノードやツールを動かさない（新しいnumpyが読み込まれ、ROS 2のPythonのパッケージと合わないおそれがある）。
+- **Pythonのパッケージ（pip）**: 次の2つの表示が出るが、どちらも問題ない。
+  - `Not uninstalling numpy at /usr/lib/python3/dist-packages, outside environment .../px4-venv` は、aptで入れたnumpy（ROS 2が使うもの）には手を付けず、仮想環境の中に新しい版を入れた、という意味である。仮想環境を使った狙いどおりの動きである。
+  - `ERROR: ... scipy ... requires numpy<1.28.0 ...` は、仮想環境の中で、aptで入れたscipyと、新しく入れたnumpyの版が合わないことを知らせる表示で、導入の失敗ではない（直後に `Successfully installed` が出る）。
+
+  この食い違いは仮想環境の中だけのものなので、仮想環境を有効にしていないターミナル（ROS 2のノードを動かすターミナル）には影響しない。4-1の「`~/.bashrc` に有効にする行を書かない」は、このためでもある。逆に、仮想環境を有効にしたターミナルでは、ROS 2のノードやツールを動かさない（新しいnumpyが読み込まれ、ROS 2のPythonのパッケージと合わないおそれがある）。
 - **シミュレーションの道具（apt）**: Gazebo公式の取得元の鍵（`/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg`）を保存し、取得元（`packages.osrfoundation.org`）を追加して、`gz-harmonic` と、その部品（`libgz-sim8` 等。200個ほど）を入れる。「Earlier versions will be removed」と表示されるが、aptの集計は `0 to remove` で、何も削除されない。
 
 最後の行は `Processing triggers ...` のようなaptの表示で、スクリプトは終わりの案内を出さずにプロンプトへ戻る。途中で止まらず、エラー（`E:` で始まるaptの行や、Pythonの `Traceback`）が出ずにプロンプトへ戻れば成功である。
@@ -370,7 +374,13 @@ Copyright (C) 2018 Open Source Robotics Foundation.
 Released under the Apache 2.0 License.
 ```
 
-`dpkg -l` の行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。`which -a gz` は、`gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。`which -a gz` の先頭にROS 2のパッケージの `gz` が残り、4-3のaptの集計が `0 to remove` だったので、4-3の導入で、ROS 2のパッケージのGazeboは削除も置き換えもされていない。`gz sim --version` は3節と同じ8.15.0で、Gazebo公式のパッケージの中身（`libgz-sim8`）も同じ8.15.0である。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く（フェーズ4の5節で、ROS 2を読み込んだターミナルでPX4を起動したとき、そのGazeboのLiDARの値が、ROS 2のパッケージの中継でROS 2に出ることを確かめた。ROS 2を読み込まないターミナルで起動して、Gazebo公式のパッケージの `gz` が使われる場合は、確かめていない）。
+表示は、次のように読む。
+
+- **`dpkg -l`**: 行が `ii` で始まれば、Gazebo公式のパッケージが入っている（`1.0.0` は、Harmonicの部品をまとめるパッケージの版で、Gazebo Simの版ではない）。
+- **`which -a gz`**: `gz` の候補を、使われる順に表示する。ROS 2を読み込んだターミナルでは、ROS 2のパッケージの `gz`（`/opt/ros/jazzy/...`）が先に使われる。`/usr/bin/gz` と `/bin/gz` は同じファイルである（Ubuntu 24.04では `/bin` が `/usr/bin` を指しているため、2回表示される）。
+- **`gz sim --version`**: 3節と同じ8.15.0である。Gazebo公式のパッケージの中身（`libgz-sim8`）も同じ8.15.0である。
+
+`which -a gz` の先頭にROS 2のパッケージの `gz` が残り、4-3のaptの集計が `0 to remove` だったので、4-3の導入で、ROS 2のパッケージのGazeboは削除も置き換えもされていない。どちらもHarmonic（8番台）なので、PX4のシミュレーションと、フェーズ4のROS 2との中継は、同じ系列のGazeboの間で動く（フェーズ4の5節で、ROS 2を読み込んだターミナルでPX4を起動したとき、そのGazeboのLiDARの値が、ROS 2のパッケージの中継でROS 2に出ることを確かめた。ROS 2を読み込まないターミナルで起動して、Gazebo公式のパッケージの `gz` が使われる場合は、確かめていない）。
 
 ### 4-5. PX4のビルド
 

@@ -9,7 +9,13 @@
 
 > **この手順書の位置づけ**: フェーズ6-1の1-1節の図（最終ゴールの構成）の部品を、すべて同時に動かす。仕組み（コストマップ・計画器・アクション・ライフサイクル・TF・時刻）は、フェーズ6-1の2節で説明した。この手順書の中で仕組みを思い出したくなったら、フェーズ6-1の2節と、4-2節のクラス図に戻る。
 >
-> **期待する結果の出どころ**: （作成中）1-2節のT5・T6の表示、1-3節の表示、2-2節のT6の表示、3節のRViz2の画面は、筆者の環境で、すべてを動かして飛ばしたときのもの（2026-11-01。2-2節のT6の表示は1回目、3節の画面は2回目の飛行）。時刻・経路の長さ・引き直しの回数は、実行ごとに変わる。2-2節と3節の機体の動きの説明は、T6の表示とRViz2の画面から読み取ったもので、Gazeboの画面では確かめていない（壁に触れなかったかも確かめていない）。3節の `ros2 lifecycle get` の表示は、計画器を単体で起動して（PX4とGazeboは使わず、静的なTFを与えて）確かめたもの（2026-11-01）。3節の `ros2 topic hz /plan` の表示と、5-3節の、中継や計画器を止めてもPX4がフェイルセーフに移らないことは、2026-11-07に、画面なしで起動したPX4で確かめた（ほかのシミュレーションと混ざらないように作業フォルダ・Agentのポート等を変え、QGCの代わりに作業フォルダのパラメータ `NAV_DLL_ACT` を0にした）。1-1節のT1〜T4の表示（フェーズ4・フェーズ2と同じ）は、想定したもの。
+> **期待する結果の出どころ**: （作成中）
+>
+> - **筆者の環境で、すべてを動かして飛ばしたときのもの**（2026-11-01。2-2節のT6の表示は1回目、3節の画面は2回目の飛行）: 1-2節のT5・T6の表示、1-3節の表示、2-2節のT6の表示、3節のRViz2の画面。2-2節と3節の機体の動きの説明は、T6の表示とRViz2の画面から読み取ったもので、Gazeboの画面では確かめていない（壁に触れなかったかも確かめていない）。
+> - **計画器を単体で起動して確かめたもの**（2026-11-01。PX4とGazeboは使わず、静的なTFを与えた）: 3節の `ros2 lifecycle get` の表示。
+> - **画面なしで起動したPX4で確かめたもの**（2026-11-07。ほかのシミュレーションと混ざらないように作業フォルダ・Agentのポート等を変え、QGCの代わりに作業フォルダのパラメータ `NAV_DLL_ACT` を0にした）: 3節の `ros2 topic hz /plan` の表示と、5-3節の、中継や計画器を止めてもPX4がフェイルセーフに移らないこと。
+> - **想定したもの**: 1-1節のT1〜T4の表示（フェーズ4・フェーズ2と同じ）。
+> - **実行ごとに変わる部分**: 時刻・経路の長さ・引き直しの回数。
 
 ## 0. 学習目標と完了条件
 
@@ -175,7 +181,7 @@ T7のRViz2で、次の順に設定する（フェーズ4の6-2節と同じ操作
 
 ### 1-3. 計画器を有効にする
 
-T8で、計画器を「設定」し、状態を確かめてから「有効化」する（フェーズ6-1の2-3節）。「有効化」すると、最初の経路が届いた時点で、機体がアームして離陸する。QGCとRViz2を見られる状態で実行する。
+T8で、計画器を「設定」し、状態を確かめてから「有効化」する（フェーズ6-1の2-3節）。「有効化」すると、最初の経路が届いた時点で、機体がアームして離陸する。QGCとRViz2を見られる状態で実行する。有効化すると、すぐに飛行が始まるので、先に2-1節（機体がどう飛ぶ見込みか）を読んでおく。
 
 ```bash
 # T8
@@ -366,7 +372,7 @@ average rate: 2.000
 - **T5の計画器が止まった場合**: 新しい経路が届かなくなるが、`replan_flight` は、最後に受け取った経路を持ったまま、それをたどり続ける。その経路が、まだ見ていない壁の中を通っていれば、機体は壁に近づく。
 - **T4の中継（実機ではLiDARのドライバのノード）が止まった場合**: 地図に新しい壁が書き込まれなくなる。計画器は、古い地図で経路を引き続けるので、新しい壁を避けない。
 
-そのうえ、1節の図の読み方の後の段落で見たとおり、PX4に組み込みの衝突防止は、オフボード制御の間は働かない（フェーズ5の7節）。自動で飛んでいる間、障害物を避け、危ないときに止まる役目は、すべて外のプログラムが負っている。
+そのうえ、1節の、図の読み方の3つの要点の後の段落（PX4もGazeboからLiDARの値を受け取っているが、フェーズ6では使っていない、という段落）で見たとおり、PX4に組み込みの衝突防止は、オフボード制御の間は働かない（フェーズ5の7節）。自動で飛んでいる間、障害物を避け、危ないときに止まる役目は、すべて外のプログラムが負っている。
 
 そのため、実機に移すときは、外のプログラムが、自分の入力が新しいかを見張る必要がある。たとえば、`replan_flight` に、最後に `/scan` や経路やPX4の位置を受け取った時刻を覚えさせ、決めた時間より古くなったら、その場で止まり、PX4に着陸を指示する（フェーズ3の2節の `VEHICLE_CMD_NAV_LAND`）作りが考えられる（この見張りの作りは、筆者の整理である。Nav2の地図にも、センサの値が届く間隔を見張る設定（`expected_update_rate`）があるが、この教材では使っておらず、動きを確かめていない）。
 
@@ -414,7 +420,7 @@ source ~/px4_ws/install/setup.bash
 
 ## 次へ
 
-ここまでで、この教材の最終ゴール（障害物を見つけたら経路を計画し直して回避する）に着いた。Nav2のほかの部品と、フェーズ6の設定のうち変えて試してよいところは、[間章（Nav2）](interlude_nav2.md) にまとめた。この構成を実機に載せるときの、センサの置き場所・安全の層・試験の進め方の考え方は、任意の [間章（シミュレーションから実機へ）](interlude_sim_to_real.md) にまとめた。学習計画（[`docs/learning_plan.md`](learning_plan.md)）に戻り、全体を振り返る。
+ここまでで、この教材の最終ゴール（障害物を見つけたら経路を計画し直して回避する）に着いた。Nav2のほかの部品と、フェーズ6の設定のうち変えて試してよいところは、[間章（Nav2）](interlude_nav2.md)（下書き）にまとめた。この構成を実機に載せるときの、センサの置き場所・安全の層・試験の進め方の考え方は、任意の [間章（シミュレーションから実機へ）](interlude_sim_to_real.md) にまとめた。学習計画（[`docs/learning_plan.md`](learning_plan.md)）に戻り、全体を振り返る。
 
 ## 出典
 
@@ -423,4 +429,4 @@ source ~/px4_ws/install/setup.bash
 - 壁の配置: フェーズ4の出典のとおり、PX4 v1.17に付属する模型のファイルを読んだもの。
 - 3節の画像（`img/phase6_rviz2_1.png`〜`img/phase6_rviz2_5.png`）は、筆者の環境で撮影したRViz2（ROS 2、Apache License 2.0）の画面である（撮影の日時が写る下のTimeパネルを切り落とした）。写っている地図・経路・点は、この手順書の計画器と自作のノードが作ったもので、Gazeboの模型の形そのものは写っていない。
 - 1節のデータの流れの図（`img/phase6_dataflow.svg`）は、この教材で作ったもの。PX4がGazeboから受け取る値（IMU・磁気・気圧・GPS・LiDAR等）と、モーターへの指令は、PX4 v1.17のソース（`src/modules/simulation/gz_bridge`）を読んで確かめた。
-- 5節（実機に移すとき）: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Offboard Mode](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes/offboard.md)、[Safety Configuration](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/config/safety.md)（キルスイッチ・ジオフェンス）、[Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)、[uXRCE-DDS](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/middleware/uxrce_dds.md)、[Companion Computers](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/companion_computer/index.md) と、PX4 v1.17のソースの [`src/modules/simulation/gz_bridge`](https://github.com/PX4/PX4-Autopilot/tree/release/1.17/src/modules/simulation/gz_bridge) を読んで、自分の言葉でまとめたもの。Nav2の `expected_update_rate` は、Nav2（`jazzy`）の `nav2_costmap_2d` の `observation_buffer.hpp` で名前を確かめた。5-3節の止まり方は、フェーズ6-1のコードを読んで言えることで、止めて確かめてはいない。見張りの作りと、実機での起動の仕方は、筆者の整理である。
+- 5節（実機に移すとき）: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の [Offboard Mode](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/flight_modes/offboard.md)、[Safety Configuration](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/config/safety.md)（キルスイッチ・ジオフェンス）、[Collision Prevention](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/computer_vision/collision_prevention.md)、[uXRCE-DDS](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/middleware/uxrce_dds.md)、[Companion Computers](https://github.com/PX4/PX4-Autopilot/blob/release/1.17/docs/en/companion_computer/index.md) と、PX4 v1.17のソースの [`src/modules/simulation/gz_bridge`](https://github.com/PX4/PX4-Autopilot/tree/release/1.17/src/modules/simulation/gz_bridge) を読んで、自分の言葉でまとめたもの。Nav2の `expected_update_rate` は、Nav2（`jazzy`）の `nav2_costmap_2d` の `observation_buffer.hpp` で名前を確かめた。5-3節の止まり方のうち、機体がどう動くかは、フェーズ6-1のコードを読んで言えることで、確かめていない（中継と計画器を止めてもPX4がフェイルセーフに移らないことは、冒頭の注記のとおり、2026-11-07に確かめた）。見張りの作りと、実機での起動の仕方は、筆者の整理である。
