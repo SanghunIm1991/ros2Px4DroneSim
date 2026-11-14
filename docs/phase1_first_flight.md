@@ -283,7 +283,7 @@ TOPIC: vehicle_local_position
 
 `commander` のコマンドには、地図の上の地点を指して移動させる指示が無い。そこで、移動は5-2節と同じようにQGCの **Go to location** で行い、帰還（Return）をシェルで指示する。
 
-1. QGCの **Go to location** で、離陸した地点から**10m以内**の地点へ移動させる（下の注意）。
+1. QGCの **Go to location** で、離陸した地点から**10m以内**の地点へ移動させる（理由は、コマンドの下の段落）。
 2. 止まったら、T1で、帰還を指示する。
 
 ```text

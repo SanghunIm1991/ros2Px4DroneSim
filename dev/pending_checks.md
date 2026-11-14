@@ -17,7 +17,8 @@
 | 5-2節 | 移動の間のQGCの飛行モードの表示 | **Hold** のまま | PX4のソース（`VEHICLE_CMD_DO_REPOSITION` はHoldへの切り替え） |
 | 5-3節 | 着陸のときのQGCの表示の変化 | 飛行モードが **Land**、機体の状態が **Landing** → **Ready** | QGC v5.1.5の文書 |
 | 6-3節 | `commander mode auto:rtl` の後の、QGCの表示と機体の動き | 飛行モードが **Return** になり、10m以内の地点からなら少し上がってから、離陸した地点へ戻って着陸する（T1の表示は確かめた） | PX4のソース（`rtl.cpp`・`rtl_params.c`） |
-| 8節 | 課題2: QGCの飛行モードの一覧から **Land** を選べるか | 選べて、左のボタンと同じことが起きる | QGC v5.1.5の文書 |
+| 8節 | 画面なしの起動（`HEADLESS=1 make px4_sitl gz_x500`）のT1の表示 | `Starting gz gui` の行が出ず、ほかは画面ありと同じ（画面なしで起動でき、LiDARの値が出ることは、フェーズ4の機体で確かめた） | PX4の起動のスクリプト（`px4-rc.gzsim`） |
+| 9節 | 課題2: QGCの飛行モードの一覧から **Land** を選べるか | 選べて、左のボタンと同じことが起きる | QGC v5.1.5の文書 |
 
 ## フェーズ2（[`docs/phase2_ros2_observe.md`](../docs/phase2_ros2_observe.md)）
 
