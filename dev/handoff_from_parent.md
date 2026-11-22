@@ -164,6 +164,16 @@ PX4の安定版の文書（PX4-Autopilotのリポジトリの `release/1.17` の
 - **ライフサイクルの切り替え**: スクリプトの中で最初に `ros2 lifecycle set` を呼ぶと、デーモンの起動の直後で、ノードが見つからない（`Node not found`）ことがある。先に `ros2 daemon start` をして待ち、成功するまでやり直す。
 - **中継の止め方**: `ros2 run ros_gz_bridge parameter_bridge` を止めても、子の `parameter_bridge` が残ることがあった。確かめるときは、`/opt/ros/jazzy/lib/ros_gz_bridge/parameter_bridge` を直接起動し、そのPIDを止める。
 
+### 5-3. PX4のシミュレーションで確かめた罠（2026-11-22）
+
+画面なしの起動とPX4 v1.17.0のソースで確かめた。作業の前に、使う機能の周りの値の既定を、ここと公式の文書・ソースで確かめる（経緯は [`dev/interlude_px4_defaults_notes.md`](interlude_px4_defaults_notes.md) の8節）。
+
+- **値が既定に戻る条件**: 機体の設定の番号（`SYS_AUTOSTART`）が前回と違うと、番号・校正・飛行モードの割り当て等（`RC*`・`CAL_*`・`COM_FLTMODE*`・`LND_FLIGHT*`・`TC_*`・`COM_FLIGHT*`）を除いて、パラメータを既定に戻す（`rcS` の108〜125行）。模型やワールドが違っても、番号が同じなら値は残る（`gz_x500_lidar_2d_walls` と `gz_x500_lidar_2d` はどちらも4013番、`gz_x500` は4001番）。
+- **保存の遅れ**: `param set` の値は自動で保存されるが、0.3〜2秒遅れる（`src/lib/parameters/autosave.cpp`）。`param show` の `*` は未保存、`+` は既定と違う値が保存済み。すぐ止めるときは `param save` を打つ。
+- **故障の注入**: `failure` のコマンドは `SYS_FAILURE_EN=1` が要る。モーターを止める注入（`failure motor off -i <1から数える番号>`）は、`CA_FAILURE_MODE` が既定の0だと配分が無視する（`ControlAllocator.cpp` の715〜726行）。止めるには1にする。
+- **環境変数でパラメータを渡す**: 起動のスクリプトは、環境変数 `PX4_PARAM_<名前>=<値>` を、番号の判定（上の1点目）の後に `param set` する（`rcS` の129〜135行）。`export` したまま同じターミナルで別の機体を起動すると、その機体にも設定される。
+- **機体の設定のファイルを足すとき**: PX4のフォルダの `ROMFS/px4fmu_common/init.d-posix/airframes/` に新しい番号のファイルを足すには、同じフォルダの `CMakeLists.txt` の一覧（`px4_add_romfs_files`）の書き換えと、ビルドのし直しが要る（ビルドのフォルダの `etc` は写し）。PX4の追跡されているファイルを書き換えずに済ませるなら、既存の番号を借り、値は上の環境変数で渡す。
+
 ## 6. 親プロジェクトで得た知見（引き継ぐもの）
 
 Claudeの作業メモにあった知見のうち、このプロジェクトでも効くものを、一般的な書き方にして写す。

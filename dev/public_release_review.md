@@ -26,39 +26,17 @@
 
 ### 1-2. 機械点検
 
-コミットの名義を一覧する（全ブランチ・全履歴）。
+コマンドは [`dev/check_before_push.sh`](check_before_push.sh) にまとめた（2026-11-22。1-2・2-2・3-2節の点検を1回で行う。読み取りだけ）。リポジトリの最上位で `bash dev/check_before_push.sh` を実行し、見出しごとの表示を、下の見方で読む。この節の点検の対象は、次のとおりである。
 
-```bash
-git log --all --format='%an <%ae> | %cn <%ce>' | sort | uniq -c
-```
+コミットの名義を一覧する（全ブランチ・全履歴）。
 
 **見方**: 各行の左が件数、`|` の左がauthor、右がcommitter。どちらもnoreplyアドレスになっていれば問題ない。Claudeの関与はコミットメッセージの `Co-Authored-By` トレーラーで示す規約なので、名義の欄に `noreply@anthropic.com` が出ることは無い想定。noreply以外のアドレスが1件でもあれば、該当コミットを調べる。
 
 追跡中のファイルと全履歴から、メールアドレスの形の文字列を拾い、想定済みのもの（noreply・ダミーの `example.com`）を除く。
 
-```bash
-git grep -nIE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' | grep -vE 'users\.noreply\.github\.com|noreply@anthropic\.com|@example\.(com|org)|git@github\.com'
-
-git log --all -p | grep -oE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' | grep -vE 'users\.noreply\.github\.com|noreply@anthropic\.com|@example\.(com|org)|git@github\.com' | sort | uniq -c
-```
-
-認証情報らしい語と、ユーザー名を含むパスを、今の版と全履歴（過去の版で足した行）から拾う。
-
-```bash
-git grep -nIiE 'api[_-]?key|secret|token|passw(or)?d|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]|github_pat_|sk-[A-Za-z0-9]{10}'
-
-git log --all -p | grep -E '^\+' | grep -iE 'api[_-]?key|secret|token|passw(or)?d|BEGIN [A-Z ]*PRIVATE KEY|ghp_[A-Za-z0-9]|github_pat_|sk-[A-Za-z0-9]{10}' | sort | uniq -c
-
-git grep -nIE '/home/[a-z][a-z0-9_-]*|[A-Za-z]:\\+Users\\+|/mnt/c/Users/'
-
-git log --all -p | grep -E '^\+' | grep -E '/home/[a-z][a-z0-9_-]*|[A-Za-z]:\\+Users\\+|/mnt/c/Users/' | sort | uniq -c
-```
+認証情報らしい語、ユーザー名を含むパス、作業用フォルダのパス（`/tmp/claude`）、GitHubのアカウント名を、未pushのコミットの追加行から拾う（それより前の行は、前回までの点検で確かめてある。公開範囲を変えるときなど、全履歴を見直すときは、スクリプトの `RANGE` を全履歴にして実行する）。
 
 追跡してはいけないものが入っていないかを見る（`.gitignore` の項目とそろえている。`.gitignore` を変えたら、ここも変える）。
-
-```bash
-git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilot|Micro-XRCE-DDS-Agent|\.vscode|\.idea)/|^\.claude/settings\.local\.json$|(^|/)(Thumbs\.db|Desktop\.ini|\.DS_Store)$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
-```
 
 **見方**: メールアドレスの2つのコマンドと、追跡してはいけないもののコマンドは、何も表示されなければ問題ない。認証情報とパスのコマンドは、説明文の中の一般的な語（「パスワード」、`/home/<ユーザー名>` のような伏せ字、この文書のコマンドそのもの）にも当たるので、1件ずつ読んで、実際の値や実在のユーザー名が書かれていないかを判断する。GitHubのアカウント名は、上の正規表現では拾えないので、アカウント名そのもので `git grep -n` して、出てきた箇所を目視で判断する（著作権者の表示とリポジトリのURLは問題ない）。
 
@@ -86,25 +64,17 @@ git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilo
 
 ### 2-2. 機械点検
 
-追跡しているファイルのうち、Markdown・SVG・Gitの設定・ライセンスのファイル以外のものを一覧する。
+コマンドは [`dev/check_before_push.sh`](check_before_push.sh) にまとめた（2026-11-22。1-2・2-2・3-2節の点検を1回で行う。読み取りだけ）。リポジトリの最上位で `bash dev/check_before_push.sh` を実行し、見出しごとの表示を、下の見方で読む。この節の点検の対象は、次のとおりである。
 
-```bash
-git ls-files | grep -vE '\.(md|svg)$|^\.git(attributes|ignore)$|^LICENSE(-APACHE-2\.0)?$|^docs/img/phase1_gazebo\.png$|^docs/img/phase4_(gazebo_walls|gazebo_no_vehicle|rviz2)\.png$|^docs/img/phase6_rviz2_[1-5]\.png$'
-```
+追跡しているファイルのうち、Markdown・SVG・Gitの設定・ライセンスのファイル以外のものを一覧する。
 
 模型のファイルの形（SDF・メッシュ等）が追跡されていないかを見る。
 
-```bash
-git ls-files | grep -iE '\.(sdf|world|dae|stl|obj|fbx|glb|gltf|urdf|xacro)$'
-```
-
 SVGに、外部の画像や外部へのリンクが埋め込まれていないかを見る（`docs/img/` を作ってから）。
 
-```bash
-git grep -nE '<image|href="https?:' -- 'docs/img/*.svg'
-```
-
 **見方**: 1つ目と2つ目は、何も表示されなければ問題ない。自作のサンプルのファイル（自作のワールド等）や、中身を確かめた画像を足したら、確かめた上で、名前を指定して除外に加える（拡張子ごと除外しない）。3つ目も、何も表示されなければ問題ない。出典の注記の有無は、手順書ができたら、親プロジェクトの同名の文書の2-2節と同じ形のコマンドをここに足す。
+
+未pushのコミットの追加行から、40文字以上続く英文を拾う（2026-11-22に足した）。公式の文書やソースの逐語の抜粋が混ざっていないかを、2-3節の目視点検の材料にする。PX4のシェルの表示や、パラメータ名の並びにも当たるので、1件ずつ読む。このスクリプト自体（`dev/check_before_push.sh`）は、その他のファイルの一覧から除いている。
 
 ### 2-3. 目視点検
 
@@ -127,30 +97,11 @@ git grep -nE '<image|href="https?:' -- 'docs/img/*.svg'
 
 ### 3-2. 機械点検
 
+コマンドは [`dev/check_before_push.sh`](check_before_push.sh) にまとめた（2026-11-22。1-2・2-2・3-2節の点検を1回で行う。読み取りだけ）。リポジトリの最上位で `bash dev/check_before_push.sh` を実行し、見出しごとの表示を、下の見方で読む。この節の点検の対象は、次のとおりである。
+
 文書間のリンクの先が実在するかを確かめる（`README.md`・`CLAUDE.md` と `docs/`・`dev/` の文書の、リンクの `(...)` の中の、`http` で始まらないものを対象にする。読者向けでない文書も、GitHubで開いたときにリンクが切れないように対象にする）。
 
-```bash
-python3 - <<'PY'
-import pathlib, re
-bad = 0
-for md in [pathlib.Path('README.md'), pathlib.Path('CLAUDE.md'), *sorted(pathlib.Path('docs').glob('*.md')), *sorted(pathlib.Path('dev').glob('*.md'))]:
-    for n, line in enumerate(md.read_text(encoding='utf-8').splitlines(), 1):
-        for target in re.findall(r'\]\(([^)\s]+)\)', line):
-            if re.match(r'[a-z]+:', target):
-                continue
-            path = (md.parent / target.split('#')[0]).resolve()
-            if not path.exists():
-                bad += 1
-                print(f'{md}:{n}: {target}')
-print(f'リンク切れ: {bad}件')
-PY
-```
-
 外部リンクの実在は、この環境から外部へアクセスして確かめる必要がある。アクセスする前に、対象のドメインの一覧（下のコマンド）を見て、見慣れないドメインが無いかを確かめる。
-
-```bash
-grep -ohE '\]\(https?://[^/)]+' docs/*.md dev/*.md README.md | sort | uniq -c | sort -rn
-```
 
 **見方**: 1つ目は `リンク切れ: 0件` だけが表示されれば問題ない。2つ目は、件数の多い順にドメインが並ぶ。docs.ros.orgはボット対策でコマンドやツールからの取得に失敗するため、Web検索か、文書の原稿のリポジトリで実在を確かめる。GitHubの `blob` のリンクは、同じパスを `raw.githubusercontent.com` で開いて200が返るかで確かめる。
 
