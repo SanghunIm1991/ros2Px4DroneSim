@@ -127,3 +127,15 @@
 | 2-4節・3-2節・4-4節 | 章の手順のとおり（`make px4_sitl gz_x500` で起動し、QGCをつなぎ、`pxh>` のシェルで打つ）にしたとき、表示の形が同じか（`uorb top -1` の表示に、画面を消す制御の文字が混ざらないか、`#SUB` の数が変わるか） | 同じ形で表示される（`#SUB` の数は変わりうる） |
 | 6-2節 | インスタンス0で起動したときの、`gz_bridge` の模型の名前と、uXRCE-DDS・MAVLinkのポートの行 | `model: x500_0`、`port:8888`、`udp port 18570`（インスタンス7で、Agentのポートを8899に変えて起動したときの表示から、起動のスクリプトの既定の値と決め方で直した） |
 | 3-1節・4-1節 | 図（`docs/img/interlude_px4_internals_chain.svg`・`docs/img/interlude_px4_internals_queues.svg`）とmermaid版の見た目 | 機械点検は通した。目視は未確認 |
+
+## 間章（[`docs/interlude_px4_defaults.md`](../docs/interlude_px4_defaults.md)）
+
+2026-11-22に作成。2-3節・3節・4-1節・5-1節・5-2節・7-2節のPX4のシェルの表示は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0）で確かめた（2-3節・5-2節は、壁ではなく故障の注入で墜落させ、モードはHold）。4-2節の `grep` の表示は、PX4 v1.17.0のファイルで確かめた。画面の表示を確かめないまま、READMEの「読む順番」に加えた（2026-11-22、ユーザー判断）。残りは、次のとおりである。
+
+| 節 | 確かめること | 今の記述（想定） |
+|---|---|---|
+| 1-2節 | フェーズ5の9節の課題1の操作（Position modeで壁1へ）で墜落させたときの様子 | 壁にぶつかって逆さまに落ち、プロペラが回り続ける。QGCの飛行の状態の表示は **Flying** のまま |
+| 3節 | 逆さまで起動したときの、QGCの飛行の状態の表示 | **Not Ready** |
+| 5-2節 | `CBRK_FLIGHTTERM=0` で壁にぶつけたときの様子 | 大きく傾いた時点で打ち切られ、プロペラが止まる（T1の表示は、故障の注入で確かめた） |
+| 5-3節 | 元に戻すときの `param set` の表示 | `+ CBRK_FLIGHTTERM: curr: 0 -> new: 121212`（画面なしの起動でも確かめられる） |
+| 7-1節 | QGCの Flight Status の一覧の **Emergency Stop** の出方（標準のQGCで出るか）と確認の操作、止めた後のT1の表示 | 一覧に **Emergency Stop** があり、確認のボタンを押し続けると止まる。T1に `INFO  [commander] Disarmed by external command` |
