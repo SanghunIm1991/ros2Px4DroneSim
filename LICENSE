@@ -104,6 +104,14 @@ the author (SanghunIm1991) and the license are credited.
      （MulticopterRateControl.hpp・.cpp のファイルの冒頭の表示は
      Copyright (c) 2013-2019 PX4 Development Team）, BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）
+   - docs/interlude_px4_defaults.md の6-1節で訳して載せた、PX4の文書
+     （Flight Termination Configuration）の文:
+     PX4 User Guide（Dronecode/PX4）, CC BY 4.0（筆者が日本語に訳した。改変あり）
+   - docs/interlude_px4_defaults.md の「期待する結果」に載せたPX4のシェルの表示と、
+     4-2節の `grep` が表示する機体の設定のファイルの行:
+     PX4-Autopilot, Copyright (c) 2012 - 2023, PX4 Development Team,
+     BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）
 
    このリポジトリは、PX4・Gazebo・ROS 2・Micro XRCE-DDS Agent等のソフトウェアと、
    PX4に付属するGazeboの機体・ワールドの模型を同梱していない。読者は、各自で
