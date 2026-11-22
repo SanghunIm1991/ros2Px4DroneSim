@@ -31,7 +31,8 @@ echo "== 1-2 ユーザー名入りのパス・作業用フォルダのパス（�
 added | grep -E "$PATHS" | cut -c1-200
 
 echo "== 1-2 アカウント名（未pushの追加行。著作権者の表示とリポジトリのURLは問題ない）"
-added | grep -iE "SanghunIm1991" | cut -c1-200
+ACCOUNT=$(git config user.name)
+[ -n "$ACCOUNT" ] && added | grep -iF "$ACCOUNT" | cut -c1-200
 
 echo "== 1-2 追跡してはいけないもの"
 git ls-files | grep -E '^(notes|ws|ros2_ws|px4_ws|build|install|log|PX4-Autopilot|Micro-XRCE-DDS-Agent|\.vscode|\.idea)/|^\.claude/settings\.local\.json$|(^|/)(Thumbs\.db|Desktop\.ini|\.DS_Store)$|\.(env|pem|key|tar|vhdx|ulg)$|rosbag2_'
@@ -45,7 +46,7 @@ git ls-files | grep -iE '\.(sdf|world|dae|stl|obj|fbx|glb|gltf|urdf|xacro)$'
 echo "== 2-2 SVGの外部の画像・リンク"
 git grep -nE '<image|href="https?:' -- 'docs/img/*.svg'
 
-echo "== 2-3 40文字以上続く英文（未pushの追加行。公式の文書の逐語の抜粋でないかを読む）"
+echo "== 2-2 40文字以上続く英文（未pushの追加行。公式の文書の逐語の抜粋でないかを読む）"
 added | grep -oE '[A-Za-z][A-Za-z ,.!-]{40,}' | sort -u
 
 echo "== 改行がLFでないファイル"
