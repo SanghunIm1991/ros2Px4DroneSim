@@ -68,4 +68,4 @@ print(f'リンク切れ: {bad}件')
 PY
 
 echo "== 3-2 新しい外部のURL（未pushの追加行。実在を確かめる。GitHubの blob は raw.githubusercontent.com の同じパスで）"
-added | grep -oE 'https?://[^ )>|`]+' | sort -u
+added | grep -oP 'https?://[^ )>|`）、。]+' | sort -u
