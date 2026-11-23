@@ -149,5 +149,5 @@
 | 4-2節 | 手順のとおり（PX4の模型のフォルダに書き出す）に実行したときの表示 | スクリプトの4行の表示と `Valid.`（出力先を変えた写しで確かめた） |
 | 6-1節 | QGCをつないだときのT1の表示と、Gazeboの画面の機体の見え方 | `Ready for takeoff!`。細い十字のアームと小さな箱の機体 |
 | 6-2節・7-2節 | 章の手順のとおり（QGCで離陸させ、`pxh>` で打つ）にしたときの `listener actuator_outputs`・`listener hover_thrust_estimate` の表示の形と、最初に表示されるインスタンスがモーターの指令か | 既定のままでは4つの値が大きくばらつき、フィルタを直すと約990〜995にそろう |
-| 7-1節 | `pxh> param reset MC_ROLLRATE_P MC_PITCHRATE_P` の表示と、その後の `param show` の表示 | `x   MC_ROLLRATE_P [551,1004] : 0.1500`（`param reset` 自体の表示は書いていない） |
+| 7-2節 | `pxh> param reset MC_ROLLRATE_P MC_PITCHRATE_P` の表示と、その後の `param show` の表示 | `x   MC_ROLLRATE_P [551,1004] : 0.1500`（`param reset` 自体の表示は書いていない） |
 | 10節 | 模型のフォルダを消した後の `git status`、`make px4_sitl gz_x500` での `+ SYS_AUTOSTART: curr: 4005 -> new: 4001` と、値が既定に戻ること | `nothing to commit, working tree clean`（直接の起動では、値が既定に戻ることを確かめた） |

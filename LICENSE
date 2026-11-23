@@ -112,6 +112,17 @@ the author (SanghunIm1991) and the license are credited.
      PX4-Autopilot, Copyright (c) 2012 - 2023, PX4 Development Team,
      BSD 3-Clause License
      （全文: https://github.com/PX4/PX4-Autopilot/blob/release/1.17/LICENSE）
+   - docs/interlude_custom_sensor.md の5-4節の模型のファイル（model.sdf）のうち、
+     LiDARのセンサの要素の並びと仕様の値（lidar_2d_v2 の模型に倣った部分）:
+     PX4-gazebo-models, Copyright (c) 2022, PX4 Autopilot for Drones,
+     BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/LICENSE）
+   - docs/interlude_airframe_from_spec.md の4-1節のスクリプトのうち、モーターの
+     プラグインの要素の並びと、x500 の模型から借りた値（応答の時間・反トルクの
+     係数・空気抵抗の元の値）:
+     PX4-gazebo-models, Copyright (c) 2022, Rudis Laboratories,
+     BSD 3-Clause License
+     （全文: https://github.com/PX4/PX4-gazebo-models/blob/main/models/x500/LICENSE）
 
    このリポジトリは、PX4・Gazebo・ROS 2・Micro XRCE-DDS Agent等のソフトウェアと、
    PX4に付属するGazeboの機体・ワールドの模型を同梱していない。読者は、各自で
