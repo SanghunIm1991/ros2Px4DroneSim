@@ -139,3 +139,15 @@
 | 5-2節 | `CBRK_FLIGHTTERM=0` で壁にぶつけたときの様子 | 大きく傾いた時点で打ち切られ、プロペラが止まる（T1の表示は、故障の注入で確かめた） |
 | 5-3節 | 元に戻すときの `param set` の表示 | `+ CBRK_FLIGHTTERM: curr: 0 -> new: 121212`（画面なしの起動でも確かめられる） |
 | 7-1節 | QGCの Flight Status の一覧の **Emergency Stop** の出方（標準のQGCで出るか）と確認の操作、止めた後のT1の表示 | 一覧に **Emergency Stop** があり、確認のボタンを押し続けると止まる。T1に `INFO  [commander] Disarmed by external command` |
+
+## 間章（[`docs/interlude_airframe_from_spec.md`](../docs/interlude_airframe_from_spec.md)）
+
+2026-11-23に下書きを作成。6節・7節のT1の表示と `listener` の値、7-3節の表、10節の「値が既定に戻る」は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0・模型はPX4のフォルダの外・MAVLinkで飛ばした）で確かめた。経緯は [`dev/interlude_airframe_from_spec_notes.md`](interlude_airframe_from_spec_notes.md) の4-4節。
+
+| 節 | 確かめること | 今の記述（想定） |
+|---|---|---|
+| 4-2節 | 手順のとおり（PX4の模型のフォルダに書き出す）に実行したときの表示 | スクリプトの4行の表示と `Valid.`（出力先を変えた写しで確かめた） |
+| 6-1節 | QGCをつないだときのT1の表示と、Gazeboの画面の機体の見え方 | `Ready for takeoff!`。細い十字のアームと小さな箱の機体 |
+| 6-2節・7-2節 | 章の手順のとおり（QGCで離陸させ、`pxh>` で打つ）にしたときの `listener actuator_outputs`・`listener hover_thrust_estimate` の表示の形と、最初に表示されるインスタンスがモーターの指令か | 既定のままでは4つの値が大きくばらつき、フィルタを直すと約990〜995にそろう |
+| 7-1節 | `pxh> param reset MC_ROLLRATE_P MC_PITCHRATE_P` の表示と、その後の `param show` の表示 | `x   MC_ROLLRATE_P [551,1004] : 0.1500`（`param reset` 自体の表示は書いていない） |
+| 10節 | 模型のフォルダを消した後の `git status`、`make px4_sitl gz_x500` での `+ SYS_AUTOSTART: curr: 4005 -> new: 4001` と、値が既定に戻ること | `nothing to commit, working tree clean`（直接の起動では、値が既定に戻ることを確かめた） |
