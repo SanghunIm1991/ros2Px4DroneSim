@@ -69,3 +69,42 @@ PY
 
 echo "== 3-2 新しい外部のURL（未pushの追加行。実在を確かめる。GitHubの blob は raw.githubusercontent.com の同じパスで）"
 added | grep -oP 'https?://[^ )>|`）、。]+' | sort -u
+
+echo "== 3-4 読む順番と書き方（今の版。表示があれば直す。見方は点検の文書の3-2節）"
+python3 -I - <<'PY'
+import pathlib, re
+readme = pathlib.Path('README.md')
+order = set()
+for line in readme.read_text(encoding='utf-8').splitlines():
+    if line.startswith('|'):
+        order.update(pathlib.Path(t).resolve() for t in re.findall(r'\]\((docs/[^)#\s]+\.md)', line))
+docs = [readme, *sorted(pathlib.Path('docs').glob('*.md'))]
+# 読む順番の章の冒頭の「- 前提:」の行が、表に無い文書を指していないか
+for md in sorted(order):
+    for n, line in enumerate(md.read_text(encoding='utf-8').splitlines()[:30], 1):
+        if line.startswith('- 前提:'):
+            for t in re.findall(r'\]\(([^)#\s]+\.md)', line):
+                p = (md.parent / t).resolve()
+                if p.parent == pathlib.Path('docs').resolve() and p not in order:
+                    print(f'前提が表に無い: {md.relative_to(pathlib.Path.cwd())}:{n}: {t}')
+for md in docs:
+    lines = md.read_text(encoding='utf-8').splitlines()
+    fence = None
+    for n, line in enumerate(lines, 1):
+        m = re.match(r'\s*```(\w*)', line)
+        if m:
+            fence = None if fence is not None else m.group(1)
+            continue
+        # PX4のシェルのコマンドは text のブロックに書く（QA表 2026-10-31）
+        if fence == 'bash' and line.lstrip().startswith('pxh>'):
+            print(f'bashのブロックにpxh>: {md}:{n}')
+        if fence is not None:
+            continue
+        # 読む順番にある章へのリンクに残った「（下書き）」
+        for t in re.findall(r'\]\(([^)#\s]+\.md)\)（下書き）', line):
+            if (md.parent / t).resolve() in order:
+                print(f'掲載済みの章に（下書き）: {md}:{n}: {t}')
+        # 表の中の位置で章を指す語（並びが変わると誤りになる。名前で書く）
+        for w in re.findall(r'次の行の|前の行の|1つ上の(?:行|間章|章)|1つ下の(?:行|間章|章)|表の(?:上|下)の(?:行|間章|章)', line):
+            print(f'位置で指す語「{w}」: {md}:{n}')
+PY
