@@ -130,24 +130,22 @@
 
 ## 間章（[`docs/interlude_px4_defaults.md`](../docs/interlude_px4_defaults.md)）
 
-2026-11-22に作成。2-3節・3節・4-1節・5-1節・5-2節・7-2節のPX4のシェルの表示は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0）で確かめた（2-3節・5-2節は、壁ではなく故障の注入で墜落させ、モードはHold）。4-2節の `grep` の表示は、PX4 v1.17.0のファイルで確かめた。画面の表示を確かめないまま、READMEの「読む順番」に加えた（2026-11-22、ユーザー判断）。残りは、次のとおりである。
+2026-11-22に作成。2-3節・3節・4-1節・5-1節・5-2節・7-2節のPX4のシェルの表示は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0）で確かめた（2-3節・5-2節は、壁ではなく故障の注入で墜落させ、モードはHold）。4-2節の `grep` の表示は、PX4 v1.17.0のファイルで確かめた。画面の表示を確かめないまま、READMEの「読む順番」に加えた（2026-11-22、ユーザー判断）。5-3節の `param set` の表示（`+ CBRK_FLIGHTTERM: curr: 0 -> new: 121212`。`param save` は表示なし）と、次の起動で `+` が消えることは、2026-11-27に、同じ方法で、4013番で起動し直して確かめた（想定のとおりだった。手順書の `pxh>` ではなく、PX4の外から送るコマンドで打った）。残りは、次のとおりである。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
 | 1-2節 | フェーズ5の9節の課題1の操作（Position modeで壁1へ）で墜落させたときの様子 | 壁にぶつかって逆さまに落ち、プロペラが回り続ける。QGCの飛行の状態の表示は **Flying** のまま |
 | 3節 | 逆さまで起動したときの、QGCの飛行の状態の表示 | **Not Ready** |
 | 5-2節 | `CBRK_FLIGHTTERM=0` で壁にぶつけたときの様子 | 大きく傾いた時点で打ち切られ、プロペラが止まる（T1の表示は、故障の注入で確かめた） |
-| 5-3節 | 元に戻すときの `param set` の表示 | `+ CBRK_FLIGHTTERM: curr: 0 -> new: 121212`（画面なしの起動でも確かめられる） |
 | 7-1節 | QGCの Flight Status の一覧の **Emergency Stop** の出方（標準のQGCで出るか）と確認の操作、止めた後のT1の表示 | 一覧に **Emergency Stop** があり、確認のボタンを押し続けると止まる。T1に `INFO  [commander] Disarmed by external command` |
 
 ## 間章（[`docs/interlude_airframe_from_spec.md`](../docs/interlude_airframe_from_spec.md)）
 
-2026-11-23に下書きを作成。6節・7節のT1の表示と `listener` の値、7-3節の表、10節の「値が既定に戻る」は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0・模型はPX4のフォルダの外・MAVLinkで飛ばした）で確かめた。経緯は [`dev/interlude_airframe_from_spec_notes.md`](interlude_airframe_from_spec_notes.md) の4-4節。
+2026-11-23に下書きを作成。6節・7節のT1の表示と `listener` の値、7-3節の表、10節の「値が既定に戻る」は、同じ日に、画面なしで起動したPX4（インスタンス7・QGCなし・`NAV_DLL_ACT` を0・模型はPX4のフォルダの外・MAVLinkで飛ばした）で確かめた。経緯は [`dev/interlude_airframe_from_spec_notes.md`](interlude_airframe_from_spec_notes.md) の4-4節。7-2節の `param reset` の表示（何も表示しない）と、その後の `param show`（`MC_ROLLRATE_P`・`MC_PITCHRATE_P` とも0.1500）は、2026-11-27に、同じ方法で、7-1節の値の一覧で起動し、手順書と同じく `param save` を打たずに `shutdown` で止めた後に、7-2節の一覧で起動し直して確かめた（想定のとおりだった。7-1節の値〈0.0760・0.0820〉が残っていたので、5-1節・7-1節の「保存されて残る」も確かめた。手順書の `pxh>` ではなく、PX4の外から送るコマンドで打った）。
 
 | 節 | 確かめること | 今の記述（想定） |
 |---|---|---|
 | 4-2節 | 手順のとおり（PX4の模型のフォルダに書き出す）に実行したときの表示 | スクリプトの4行の表示と `Valid.`（出力先を変えた写しで確かめた） |
 | 6-1節 | QGCをつないだときのT1の表示と、Gazeboの画面の機体の見え方 | `Ready for takeoff!`。細い十字のアームと小さな箱の機体 |
 | 6-2節・7-2節 | 章の手順のとおり（QGCで離陸させ、`pxh>` で打つ）にしたときの `listener actuator_outputs`・`listener hover_thrust_estimate` の表示の形と、最初に表示されるインスタンスがモーターの指令か | 既定のままでは4つの値が大きくばらつき、フィルタを直すと約990〜995にそろう |
-| 7-2節 | `pxh> param reset MC_ROLLRATE_P MC_PITCHRATE_P` の表示と、その後の `param show` の表示 | `x   MC_ROLLRATE_P [551,1004] : 0.1500`（`param reset` 自体の表示は書いていない） |
 | 10節 | 模型のフォルダを消した後の `git status`、`make px4_sitl gz_x500` での `+ SYS_AUTOSTART: curr: 4005 -> new: 4001` と、値が既定に戻ること | `nothing to commit, working tree clean`（直接の起動では、値が既定に戻ることを確かめた） |

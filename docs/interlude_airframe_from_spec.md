@@ -14,9 +14,9 @@
 >
 > **期待する結果の出どころ**:
 >
-> - **筆者が画面なしで起動したPX4で確かめたもの**（2026-11-23）: 6節・7節のT1の表示と、`listener` の値、7-3節の表の値。`listener actuator_outputs` の表示は、4つあるインスタンスのうち、`listener` が最初に表示したもの（4つの値が、モーターの指令の範囲〈150〜2146〉に入っていた）で、どのインスタンスがGazeboへの指令かを、別の方法では確かめていない。7-3節の傾きは、手順のとおりに飛ばしても表示されない、筆者の測定の値である。ほかのシミュレーションと混ざらないように、インスタンスの番号・作業フォルダ・Gazeboの区切りを変え、模型をPX4のフォルダの外に置き、QGCをつながずに（そのために `NAV_DLL_ACT` を0にした）、MAVLinkで離陸・30秒のホバリング・北へ5mの移動・着陸の指示を送って測った。そのため、起動の表示には、この章の手順では出ない行（インスタンスの番号による `MAV_SYS_ID` 等）があり、それは省いた。傾きとずれは、PX4の推定の値（MAVLinkの `ATTITUDE`・`LOCAL_POSITION_NED`）で測った。
-> - **筆者が確かめたもの（ファイル）**: 4節のスクリプトが書き出す模型は、Gazeboのコマンド `gz sdf -k` で形式を点検し、上の起動で使った模型と、物理に関わる値がすべて同じであることを確かめた。10節の「値が既定に戻る」も、上と同じ方法（使い捨ての作業フォルダで、4005番 → 4001番の順にPX4を直接起動）で確かめた。手順の `make px4_sitl gz_x500` でも同じパラメータのファイルが使われると想定したが、`make` では確かめていない。
-> - **想定したもの**: QGCの画面の様子と、QGCをつないだときのT1の `Ready for takeoff!` 等（フェーズ1と同じと想定した）。10節の `git status` の表示（前提の間章の5-2節と同じと想定した）。7節の `param reset` の後の `param show` の表示（筆者の起動で見た `param show` の表示の形から想定した）。
+> - **筆者が画面なしで起動したPX4で確かめたもの**（2026-11-23）: 6節・7節のT1の表示と、`listener` の値、7-3節の表の値。`listener actuator_outputs` の表示は、4つあるインスタンスのうち、`listener` が最初に表示したもの（4つの値が、モーターの指令の範囲〈150〜2146〉に入っていた）で、どのインスタンスがGazeboへの指令かを、別の方法では確かめていない。7-3節の傾きは、手順のとおりに飛ばしても表示されない、筆者の測定の値である。ほかのシミュレーションと混ざらないように、インスタンスの番号・作業フォルダ・Gazeboの区切りを変え、模型をPX4のフォルダの外に置き、QGCをつながずに（そのために `NAV_DLL_ACT` を0にした）、MAVLinkで離陸・30秒のホバリング・北へ5mの移動・着陸の指示を送って測った。そのため、起動の表示には、この章の手順では出ない行（インスタンスの番号による `MAV_SYS_ID` 等）があり、それは省いた。傾きとずれは、PX4の推定の値（MAVLinkの `ATTITUDE`・`LOCAL_POSITION_NED`）で測った。7-2節の `param reset` と、その後の `param show` の表示は、2026-11-27に、同じ分け方で確かめた（7-1節の値の一覧で起動し、`param save` を打たずに止め、7-2節の値の一覧で起動し直した。7-1節の値は残っていた。飛ばさず、PX4の外から送るコマンドで打った）。
+> - **筆者が確かめたもの（ファイル）**: 4節のスクリプトが書き出す模型は、Gazeboのコマンド `gz sdf -k` で形式を点検し、上の起動で使った模型と、物理に関わる値がすべて同じであることを確かめた。10節の「値が既定に戻る」も、上と同じ方法（使い捨ての作業フォルダで、4005番 → 4001番の順にPX4を直接起動）で確かめた。10節の手順の `make px4_sitl gz_x500` でも同じパラメータのファイルが使われると想定したが、`make` では確かめていない。
+> - **想定したもの**: QGCの画面の様子と、QGCをつないだときのT1の `Ready for takeoff!` 等（フェーズ1と同じと想定した）。10節の `git status` の表示（前提の間章の5-2節と同じと想定した）。
 > - **実行ごとに変わる部分**: `listener` のモーターの指令の値（1回ごとに変わる。揺れているときは大きくばらつく）、ずれと傾きの細かな値、`param show` の角括弧の中の番号。
 
 この章で使うターミナルは、次のとおりである。
@@ -338,7 +338,7 @@ PX4_PARAM_SIM_GZ_EC_MAX4=2146
 
 **ローターの位置**（`CA_ROTOR<n>_PX`・`_PY`）は、模型の位置と同じ値にする。PX4の座標は前・右・下（FRD）、Gazeboの模型は前・左・上なので、左右の符号が逆になる（模型の `rotor_0` の y が −0.0884 なら、PX4の `CA_ROTOR0_PY` は +0.0884）。番号と回る向きは、x500と同じ並びにしたので、回る向きの値（`CA_ROTOR<n>_KM`）は4001番のままでよい。
 
-**モーターの指令の上限**（`SIM_GZ_EC_MAX<n>`）は、見落としやすい。PX4は、モーターへの出力（0〜1）を、`SIM_GZ_EC_MIN`〜`SIM_GZ_EC_MAX` の値に直線で写し、その値を**回転の速さの指令（rad/s）として**Gazeboへ送る。4001番の上限は1000で、x500の模型の最大の回転数（`maxRotVelocity` 1000）と合わせてある。この上限のままQAV250を飛ばすと、指令は1000rad/sまでしか出ない。3-1節の係数では、1000rad/sの推力は1つで1.71N、4つで重さとほぼ同じ（約1.0倍）になり、機体はほとんど浮かない。模型の `maxRotVelocity`（2146）、PX4の `SIM_GZ_EC_MAX`、推力の係数は、**組で合わせる値**である。
+**モーターの指令の上限**（`SIM_GZ_EC_MAX<n>`）は、見落としやすい。PX4は、モーターへの出力（0〜1）を、`SIM_GZ_EC_MIN`〜`SIM_GZ_EC_MAX` の値に直線で写し、その値を**回転の速さの指令（rad/s）として**Gazeboへ送る。4001番の上限は1000で、x500の模型の最大の回転数（`maxRotVelocity` 1000）と合わせてある。この上限のままQAV250を飛ばすと、指令は1000rad/sまでしか出ない。3-1節の係数では、1000rad/sの推力は1つで1.71N、4つで重さとほぼ同じ（約1.0倍）になり、機体はほとんど浮かない。逆に、PX4の上限を上げても、模型の `maxRotVelocity` を超える指令は、Gazeboのモーターのプラグインがその値で頭打ちにする（筆者が、模型の `maxRotVelocity` だけを1000にして起動したところ、アームして離陸を検知した〈`Takeoff detected`〉が、離陸の高さに届かなかった）。模型の `maxRotVelocity`（2146）、PX4の `SIM_GZ_EC_MAX`、推力の係数は、**組で合わせる値**である。
 
 `SIM_GZ_EC_MAX` の値の範囲は、パラメータの定義では1000までとされているが、`param set` は2146を受け付け、意図どおりに動いた（筆者が確かめた）。
 
@@ -394,8 +394,7 @@ INFO  [commander] Ready for takeoff!
 
 フェーズ1と同じように、QGCの **Takeoff** のボタンで離陸させる。決めた高さで止まった（飛行モードが Hold になった）ら、T1でモーターへの指令を見る。
 
-```bash
-# T1
+```text
 pxh> listener actuator_outputs
 
 pxh> listener hover_thrust_estimate
@@ -457,14 +456,13 @@ PX4_PARAM_IMU_DGYRO_CUTOFF=45
 
 起動したら、飛ばす前に、7-1節で変えたゲインをT1で既定に戻す。7-1節でDゲインも試した場合は、`MC_ROLLRATE_D MC_PITCHRATE_D` も同じ行に足して戻す。
 
-```bash
-# T1
+```text
 pxh> param reset MC_ROLLRATE_P MC_PITCHRATE_P
 
 pxh> param show MC_ROLLRATE_P
 ```
 
-**期待する結果**（`param show` の表示の抜粋）:
+**期待する結果**（`param reset` は何も表示しない。`param show` の表示は抜粋）:
 
 ```text
 x   MC_ROLLRATE_P [551,1004] : 0.1500
@@ -474,8 +472,7 @@ x   MC_ROLLRATE_P [551,1004] : 0.1500
 
 もう一度離陸させ、止まったところで、T1でモーターへの指令を見る。
 
-```bash
-# T1
+```text
 pxh> listener actuator_outputs
 
 pxh> listener hover_thrust_estimate
@@ -650,7 +647,7 @@ make px4_sitl gz_x500
 
 ## つまずきやすい点
 
-- **離陸の指示をしても、ほとんど浮かない**: `SIM_GZ_EC_MAX<n>` を値の一覧に入れ忘れている（問い1）。T1で `pxh> param show SIM_GZ_EC_MAX1` を打ち、2146になっているかを確かめる。
+- **離陸の指示をしても、ほとんど浮かない**: `SIM_GZ_EC_MAX<n>` を値の一覧に入れ忘れている（問い1）。T1で `pxh> param show SIM_GZ_EC_MAX1` を打ち、2146になっているかを確かめる。4節のスクリプトの値（`KV`・`VOLT`・`LOAD`）を変えて模型の `maxRotVelocity` が小さくなった場合も、指令がその値で頭打ちになり、同じ症状になる（5-2節）。
 - **離陸の直後にひっくり返る**: 模型とPX4で、ローターの位置か回る向きが合っていない。PX4の `CA_ROTOR<n>_PY` は、模型の y と符号が逆になる（5-2節）。
 - **値の一覧の値が効いていない**: その値が、パラメータの定義の既定値と同じではないかを確かめる（5-2節の最後の段落）。T1で `pxh> param set <名前> <値>` を打てば、起動の後からでも設定できる。
 - **本編の機体に、この章の値が残っている**: `PX4_PARAM_` の環境変数を、括弧の外で `export` していないかを確かめる（6-1節）。T1を閉じて開き直せば消える。
@@ -666,4 +663,5 @@ make px4_sitl gz_x500
 - 旧いQAV250の組み立てと機体の設定（4052番）: PX4 User Guide（v1.17、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)、Dronecode/PX4）の「Holybro QAV250 + Pixhawk 4 Mini Build (Discontinued)」と、PX4 v1.17.0のソース（[PX4-Autopilot](https://github.com/PX4/PX4-Autopilot)、BSD 3-Clause）の `ROMFS/px4fmu_common/init.d/airframes/4052_holybro_qav250`。値を見比べただけで、ファイルは載せていない。
 - 制御の遅れとフィルタ（7-2節）: PX4 User Guide（v1.17）の「MC Filter Tuning & Control Latency」（`docs/en/config_mc/filter_tuning.md`）の要約。オートチューン（9節）: 同じユーザーガイドの「Multicopter Auto-Tuning」（`docs/en/config/autotune_mc.md`）。
 - 起動の流れ・`PX4_PARAM_`・パラメータの既定への戻し方・モーターの指令の写し方・`param set` の動き: PX4 v1.17.0のソース（`ROMFS/px4fmu_common/init.d-posix/rcS`、`src/lib/mixer_module/mixer_module.cpp`、`src/modules/simulation/gz_bridge/`、`src/systemcmds/param/param.cpp`）。
+- 模型の `maxRotVelocity` で回転の速さの指令を頭打ちにする動き（5-2節）: Gazeboの gz-sim 8.15.0 のソース（[gz-sim](https://github.com/gazebosim/gz-sim)、Apache License 2.0）の `src/systems/multicopter_motor_model/MulticopterMotorModel.cc`（モーターの種類が `velocity` のとき、指令と `maxRotVelocity` の小さい方を使う）。抜粋は載せていない。
 - 4節のスクリプトは、この教材で一から書いたもの（Apache License 2.0）。モーターのプラグインの要素の並びと、x500から借りた値（応答の時間・反トルクの係数・空気抵抗の元の値）は、PX4の `Tools/simulation/gz/models/x500/model.sdf`（PX4-gazebo-models、Copyright (c) 2022, Rudis Laboratories、BSD 3-Clause License）による（リポジトリの `LICENSE` の3節に記載）。センサの要素は、読者のPCのx500の模型から実行のときに読み込み、この教材には載せていない。
